@@ -1,0 +1,69 @@
+.Collage{
+
+    /* define how much padding you want in between your images */
+    padding:5px;
+
+    }
+
+.Collage img{
+
+    /* ensures padding at the bottom of the image is correct */
+    /*vertical-align:center;*/
+
+    /* hide the images until the plugin has run. the plugin will reveal the images*/
+    opacity:0;
+    }
+
+#images{
+	width:1600px;
+	/*width: 1600px ;*/
+	margin-left: auto ;
+	margin-right: auto ;
+}
+
+.gridimg{
+    /*opacity:0.8;*/
+    width:175px;
+}
+.gridimg {
+        /*Xborder: 1px solid rgba(255,255,255,0);             */
+        /*-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";*/
+        
+        -webkit-transition: all 2s ease-out;
+        /*transition: all .1s ease-out;*/
+        /*-moz-transition: all .1s ease-out;*/
+        /*-o-transition: all .1s ease-out;*/
+}
+
+
+.gridimg:hover {
+    top:-50px; left:-50px;
+    width:250px}
+/*.gridimg:hover{
+    
+    width:350px;
+    z-index: 999;   
+    /*opacity: 1;
+}
+*/
+img.centered {
+    display: block;
+    margin-left: auto;
+    margin-right: auto
+  }
+
+img.transparent {
+  opacity:0.4;
+}
+
+
+
+#top {
+  position: fixed;
+  top: 0px;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  height: 100px;
+  background-color: black;
+}

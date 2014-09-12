@@ -1,0 +1,60 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}Temperature!{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  <meta charset="utf-8">
+
+  <meta name="description" content="Digital Garage event pictures">
+  <meta name="author" content="Halfdan Rump">
+
+  <!-- <link rel="stylesheet" href="css/styles.css?v=1.0"> 
+  // <script src="/static/javascript/jquery-2.1.0.min.js"></script>
+  -->
+  <script src="/static/javascript/jquery-2.1.0.min.js"></script>
+  
+  <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+
+  <script type="text/javascript" charset="utf-8">
+       
+
+    $(document).ready(function(){
+      var socket = io.connect('http://' + document.domain + ':' + location.port + '/serial');
+      console.log('asd');
+
+      socket.on('new serial data', function(msg){
+
+        console.log(msg.temperature);
+
+        if (msg.temperature[0].indexOf("ddr: 5") >= 0){
+            $('#hatake2').append('<h3>' + msg.temperature[0] + '</h3>');
+            $('#hatake1').append('<h3>' + msg.temperature[1] + '</h3>');  
+        }else{
+            $('#hatake1').append('<h3>' + msg.temperature[0] + '</h3>');
+            $('#hatake2').append('<h3>' + msg.temperature[1] + '</h3>');  
+        }
+      });
+
+      socket.emit('request serial data', function(msg){
+        console.log("Requested serial data");
+        console.log(msg);
+      });
+    });
+    
+  </script>
+{% endblock %}
+
+
+{% block content %}
+
+  <div class="container">
+    <div class="row">      
+      <div id="hatake1" class="col-md-6" style="background-color: #e5f5e0">
+            <h1>畑１の温度</h1><br/> 
+      </div>
+      <div id="hatake2" class="col-md-6" style="background-color: #a1d99b">
+            <h1>畑２の温度</h1><br/>
+      </div>
+    </div>
+  </div>
+{% endblock %}
