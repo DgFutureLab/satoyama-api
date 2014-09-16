@@ -5,7 +5,7 @@ import os
 if __name__ == "__main__":
 	
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--env', choices = ('test', 'dev', 'prod'), default = 'dev')
+	parser.add_argument('--env', choices = ('test', 'dev', 'prod'), default = 'dev', help = 'Specify environment, which determines which database to use.')
 	args = parser.parse_args()
 
 	

@@ -2,20 +2,58 @@ from datetime import datetime
 from app import rest_api, flapp
 from satoyama.models import Node, Sensor, SensorType, Reading
 
-import json
 from flask.ext import restful
 from flask import request
-from sqlalchemy.exc import IntegrityError, DataError
+from sqlalchemy.exc import DataError
+from copy import deepcopy
 
 API_UNITS = {
 	'm':'SI meters', 
 	's':'SI seconds'
 	}
 
+class ApiResponse(object):
+	
+	def __init__(self, request):
+		self.warnings = list()
+		self.errors = list()
+		self.request_data = request.form
+		self.objects = list()
 
-class UnknownUnitException(Exception):
+	def add_warning(self, warning):
+		self.warnings.append(warning)
+
+	def add_error(self, error):
+		self.errors.append(error)
+
+	def add_object(self, obj):
+		self.objects.append(obj.json_detailed())
+		
+
+	def json(self):
+		return {'warnings': self.warnings, 'errors': self.errors, 'request': self.request_data, 'data': self.objects}
+
+
+
+class ApiBaseException(Exception):
+	def __init__(self, message = None):
+		super(ApiBaseException, self).__init__(message)
+		
+		def __repr__(self):
+			return self.message
+
+		### Do some crazy logging in here
+
+
+
+class UnknownUnitException(ApiBaseException):
 	def __init__(self, supplied_unit):
 		super(UnknownUnitException, self).__init__('Bad unit specified: %s'%supplied_unit)
+
+
+class MissingNodeException(ApiBaseException):
+	def __init__(self, node_id):
+		super(MissingNodeException, self).__init__('No such node: %s'%node_id)
 
 class Unit:
 	def __init__(self, unit_string):
@@ -35,36 +73,43 @@ class Unit:
 		return str(self.unit)
 
 
-readings = dict()
-import inspect
+
 class NodeResource(restful.Resource):
-	def get(self, node_id):
+	def get(self):
 		response = ApiResponse(request)
+		node_id = get_form_data(response, 'id')
 		try:
 			node_id = int(node_id)
-			node = Node.query.filter_by(id = node_id).first()
-			response.add_object(node.id)
-		except TypeError:
+		except ValueError:
 			response.add_error('node_id must be an integer')
+		node = Node.query.filter_by(id = node_id).first()
+		if node:
+			response.add_object(node)
+		else:
+			response.add_error('no such node')
 		return response.json()
 			
 		
 
-	def post(self, uid):
-		# print dict(request.form)
-		if request.form.has_key('alias'):
-			alias = request.form['alias']
-			print type(alias)
+	def post(self):
+		response = ApiResponse(request)
+		if not node_id:
+			node = Node.create()
+			response.add_object(node)
+		else:
+			try:
+				node_id = int(node_id)
+			except ValueError:
+				response.add_error('node_id must be an integer')
+			if Node.query.filter_by(id = node_id).first():
+				response.add_error('Node already exists')
+			else:
+				node = Node.create(id = node_id)
+				response.add_object(node)
 		
-		# try:
-		node = Node.create()
-		return {'node': str(node)}
-		# return {'node': node.__repr__()}
-			# except IntegrityError:
-			# 	return {'fukka you!':'node already exists...'}
-			# except Exception, e:
-			# 	return {'exception':json.dumps(e)}
-
+		return response.json()
+		
+rest_api.add_resource(NodeResource, '/node')		
 
 class SensorResource(restful.Resource):
 	
@@ -92,26 +137,6 @@ class SensorResource(restful.Resource):
 		print readings
 		return 'OK'
 
-class ApiResponse(object):
-	
-
-	def __init__(self, request):
-		self.warnings = list()
-		self.errors = list()
-		self.request_data = request.form
-		self.objects = list()
-
-	def add_warning(self, warning):
-		self.warnings.append(warning)
-
-	def add_error(self, error):
-		self.errors.append(error)
-
-	def add_object(self, obj):
-		self.objects.append(obj)
-
-	def json(self):
-		return {'warnings': self.warnings, 'errors': self.errors, 'request': self.request_data, 'data': self.objects}
 
 
 def get_form_data(response, field = None):
@@ -192,10 +217,14 @@ class ReadingResource(restful.Resource):
 		return response.json()
 
 
-### For administration
-rest_api.add_resource(SensorResource, '/sensor/<string:sensor_type>')
 
-rest_api.add_resource(NodeResource, '/node/<string:node_id>')
+### For administration
+
+
+rest_api.add_resource(SensorResource, '/sensor/<string:sensor_type>')
+# rest_api.add_resource(SensorResource, '/sensor/<int:node_id>')
+
+
 
 ### For storing/accessing sensor readings
 rest_api.add_resource(ReadingResource, '/reading/node_<string:node_id>/<string:sensor_alias>')

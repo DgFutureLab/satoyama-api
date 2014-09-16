@@ -31,11 +31,11 @@ def format_data(sensor_data):
 	sensor_data = map(lambda d: ', '.join(['%s: %s'%(k,v) for k,v in d.items()]), sensor_data)
 	return sensor_data
 
-@flapp.route('/node/all', methods = ['GET'])
-def get_all_nodes():
-	response = ApiResponse(request)
-	nodes = Node.query.all()
-	return json.dumps(map(lambda n: n.json_detailed(), nodes))
+# @flapp.route('/node/all', methods = ['GET'])
+# def get_all_nodes():
+# 	response = ApiResponse(request)
+# 	nodes = Node.query.all()
+# 	return json.dumps(map(lambda n: n.json_detailed(), nodes))
 
 
 
