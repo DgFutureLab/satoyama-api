@@ -1,6 +1,12 @@
 from flask import Flask
+
 flapp = Flask('sensor_api')
 
+from helpers import UrlHelper
+UrlHelper(flapp)
+# def register_helper(self, func):
+# 	setattr(self, func.func_name, func)	
+# flapp.register_helper = register_helper
 
 ### Use Twitter Bootstrap
 from flask_bootstrap import Bootstrap
