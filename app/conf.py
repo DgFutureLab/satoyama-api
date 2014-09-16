@@ -12,7 +12,7 @@ shared_config = {
 	'SECRET_KEY': 'you-will-never-guess'
 }
 
-def config_production(flapp):
+def config_production(flapp, **kwargs):
 	flapp.config.update(shared_config)
 	flapp.config.update(
 			DEBUG = False,
@@ -22,8 +22,9 @@ def config_production(flapp):
 			SQLALCHEMY_DATABASE_URI = "postgresql://halfdan:halfdan@localhost/tekrice_prod",
 			LOGLEVEL = 'WARNING'
 		)
+	flapp.config.update(**kwargs)
 
-def config_development(flapp):
+def config_development(flapp, **kwargs):
 	flapp.config.update(shared_config)
 	flapp.config.update(
 			DEBUG = True,
@@ -33,8 +34,9 @@ def config_development(flapp):
 			SQLALCHEMY_DATABASE_URI = "postgresql://halfdan:halfdan@localhost/tekrice_dev",
 			LOGLEVEL = 'DEBUG'
 		)
+	flapp.config.update(**kwargs)
 
-def config_test_env(flapp):
+def config_test_env(flapp, **kwargs):
 	flapp.config.update(shared_config)
 	flapp.config.update(
 			DEBUG = False,
@@ -44,3 +46,4 @@ def config_test_env(flapp):
 			SQLALCHEMY_DATABASE_URI = "postgresql://halfdan:halfdan@localhost/tekrice_test",
 			LOGLEVEL = 'DEBUG'
 		)
+	flapp.config.update(**kwargs)
