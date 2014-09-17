@@ -38,7 +38,10 @@ class ApiResponse(object):
 		self.errors.append(error)
 
 	def add_object(self, obj):
-		self.objects.append(obj.json_detailed())
+		if hasattr(obj, 'json_detailed'):
+			self.objects.append(obj.json_detailed())
+		else:
+			self.objects.append(obj)
 		
 
 	def json(self):
@@ -165,12 +168,12 @@ class ReadingResource(restful.Resource):
 		if not sensor: 
 			response.add_error('Get reading failed: Node has no sensor with alias %s'%sensor_alias)
 		else:
-			try:
-				reading = Reading.query.filter_by(sensor = sensor).all()[-1]
-				print reading.json_detailed()
-				response.add_object({'value': reading.value})
-			except Exception, e:
-				response.add_error(e.message)
+			# try:
+			reading = Reading.query.filter_by(sensor = sensor).all()[-1]
+			# print reading.json_detailed()
+			response.add_object({'value': reading.value})
+			# except Exception, e:
+			# 	response.add_error(e.message)
 		return response.json()
 
 		
