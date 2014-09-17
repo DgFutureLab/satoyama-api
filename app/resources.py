@@ -1,16 +1,27 @@
-from datetime import datetime
 from app import rest_api, flapp
-from satoyama.models import Node, Sensor, SensorType, Reading
+from satoyama.models import Node, Sensor, Reading
 
 from flask.ext import restful
 from flask import request
 from sqlalchemy.exc import DataError
-from copy import deepcopy
+import zlib
+import sys
+import json
 
 API_UNITS = {
 	'm':'SI meters', 
 	's':'SI seconds'
 	}
+
+def get_form_data(response, field = None):
+	assert isinstance(response, ApiResponse), 'response must an instance of type ApiResponse'
+	try:
+		field = request.form[field]
+	except KeyError:
+		response.add_warning('Missing field: %s'%field)
+		field = None
+	finally:
+		return field
 
 class ApiResponse(object):
 	
@@ -45,7 +56,6 @@ class ApiBaseException(Exception):
 		### Do some crazy logging in here
 
 
-
 class UnknownUnitException(ApiBaseException):
 	def __init__(self, supplied_unit):
 		super(UnknownUnitException, self).__init__('Bad unit specified: %s'%supplied_unit)
@@ -54,6 +64,7 @@ class UnknownUnitException(ApiBaseException):
 class MissingNodeException(ApiBaseException):
 	def __init__(self, node_id):
 		super(MissingNodeException, self).__init__('No such node: %s'%node_id)
+
 
 class Unit:
 	def __init__(self, unit_string):
@@ -93,20 +104,11 @@ class NodeResource(restful.Resource):
 
 	def post(self):
 		response = ApiResponse(request)
-		if not node_id:
+		try:
 			node = Node.create()
 			response.add_object(node)
-		else:
-			try:
-				node_id = int(node_id)
-			except ValueError:
-				response.add_error('node_id must be an integer')
-			if Node.query.filter_by(id = node_id).first():
-				response.add_error('Node already exists')
-			else:
-				node = Node.create(id = node_id)
-				response.add_object(node)
-		
+		except Exception, e:
+			response.add_error(e)
 		return response.json()
 		
 rest_api.add_resource(NodeResource, '/node')		
@@ -139,15 +141,6 @@ class SensorResource(restful.Resource):
 
 
 
-def get_form_data(response, field = None):
-	assert isinstance(response, ApiResponse), 'response must an instance of type ApiResponse'
-	try:
-		field = request.form[field]
-	except KeyError:
-		response.add_warning('Missing field: %s'%field)
-		field = None
-	finally:
-		return field
 
 
 class ReadingResource(restful.Resource):
@@ -191,32 +184,76 @@ class ReadingResource(restful.Resource):
 
 		timestamp = get_form_data(response, 'timestamp')
 		value = get_form_data(response, 'value')
-		node, sensor = None, None
 
-		try:
-			node = Node.query.filter_by(id = node_id).first()
-		except DataError:
-			response.add_error('node_id must be an integer')
-		if not node: response.add_error('Insert reading failed: No node with id %s'%node_id)
-
-		try:
-			sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
-		except DataError:
-			response.add_error('sensor_id must an integer')
-
-		 
-		if not sensor: 
-			response.add_error('Insert reading failed: Node has no sensor with alias %s'%sensor_alias)
-		else:
-			try:
-				Reading.create(sensor = sensor, value = value, timestamp = timestamp)
-			except Exception, e:
-				response.add_error(e.message)
-
+		put_reading_in_database(node_id, sensor_alias, value, timestamp, response)
 
 		return response.json()
 
+class SensorData(object):
+	"""
+	This is a convenience class for structuring data sent from the aggregator nodes. 
+	It contains methods which act as a bridge between the API and the database.
+	"""
+	def __init__(self, alias = None, value = None, timestamp = None, node_id = None, **kwargs):
+		self.alias = alias
+		self.value = value
+		self.timestamp = timestamp
+		self.node_id = node_id
+		if kwargs:
+			flapp.logger.warning('Got unknown sensor: %s'%kwargs)
 
+	def as_dict(self):
+		return {'node_id' : self.node_id, 'sensor_alias': self.alias, 'value': self.value, 'timestamp': self.timestamp}
+
+	def __repr__(self):
+		return str(self.__dict__)
+
+
+def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_response):
+	### Would be cool to make this an instance method in SensorData
+	node, sensor = None, None
+
+	try:
+		node = Node.query.filter_by(id = node_id).first()
+	except DataError:
+		api_response.add_error('node_id must be an integer')
+	if not node: 
+		api_response.add_error('Insert reading failed: No node with id %s'%node_id)
+
+	try:
+		sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
+	except DataError:
+		api_response.add_error('sensor_id must an integer')
+
+	 
+	if not sensor: 
+		api_response.add_error('Insert reading failed: Node has no sensor with alias %s'%sensor_alias)
+	else:
+		try:
+			Reading.create(sensor = sensor, value = value, timestamp = timestamp)
+		except Exception, e:
+			api_response.add_error(e.message)
+
+
+@flapp.route('/reading/batch', methods = ['POST'])
+def process_multiple_readings():
+	flapp.logger.info('Received %s bytes of compressed data'%sys.getsizeof(request.data))
+	decompressed = zlib.decompress(request.data)
+	response = ApiResponse(request)
+	try:
+		request_json = json.loads(decompressed)
+	except Exception, e:
+		print e
+
+	# if isinstance(request_json, list):
+	for reading in request_json:
+		sensor_reading = SensorData(**reading)
+		put_reading_in_database(api_response = response, **sensor_reading.as_dict())
+	print len(Reading.query.all())
+	# else: 
+	# 	pass
+	print response.json()
+	return json.dumps(response.json())
 
 ### For administration
 

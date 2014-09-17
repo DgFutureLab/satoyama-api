@@ -40,6 +40,8 @@ class NodeResourceTests(unittest.TestCase):
 		self.assertResponse(r)
 		self.assertTrue(get_response_errors(r))
 		
+
+
 		# self.assertNoApiErrors(r)
 
 
