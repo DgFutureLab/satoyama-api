@@ -58,12 +58,13 @@ class UrlHelper(ApiHelper):
 		
 
 class RequestHelper(ApiHelper):
-	def check_query_parameters(model, response):
+	def check_query_parameters(self, model, response):
 		query_params = {}
 		settables = model.settables()
 		for par, val in request.form.items():
 			if par in settables:
 				query_params.update({par : val})
 			else:
-				response.add_warning(exc.InvalidAttributeException(par))
+				response.add_warning(exc.InvalidAttributeException(par, model))
 		return query_params
+

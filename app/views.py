@@ -35,7 +35,7 @@ def format_data(sensor_data):
 # def get_all_nodes():
 # 	response = ApiResponse(request)
 # 	nodes = Node.query.all()
-# 	return json.dumps(map(lambda n: n.json_detailed(), nodes))
+# 	return json.dumps(map(lambda n: n.json(), nodes))
 
 
 
