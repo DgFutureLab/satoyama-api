@@ -1,28 +1,10 @@
 import urllib
-import urlparse
-from flask import Flask
 from inspect import getmembers, isfunction, ismethod
+import exc
+from flask import request
 
-
-### *** IS THIS USED??
-flapp = Flask(__name__)
-def register_helper(self, func):
-	setattr(self, func.func_name, func)	
-flapp.register_helper = register_helper
-
-
-
-
-
-class BaseHelper(object):
-	pass
-
-class UrlHelper(BaseHelper):
-	
-	DEFAULT_HOST = 'localhost'
-	DEFAULT_PORT = '8080'
-
-	def __init__(self, flapp = None):
+class ApiHelper(object):
+	def __init__(self, flapp):
 		self.flapp = flapp
 		helpers = [member for member, typ in getmembers(self) if isfunction(typ) or (ismethod(typ) and member != '__init__')]
 		for helper in helpers:
@@ -31,6 +13,11 @@ class UrlHelper(BaseHelper):
 			else:
 				setattr(self.flapp, helper, getattr(self, helper))
 
+
+class UrlHelper(ApiHelper):
+	
+	DEFAULT_HOST = 'localhost'
+	DEFAULT_PORT = '8080'
 
 	@staticmethod
 	def example_static_method():
@@ -48,12 +35,12 @@ class UrlHelper(BaseHelper):
 			host = self.flapp.config['HOST']
 		except KeyError:
 			host = self.DEFAULT_HOST
-			flapp.logger.warning('HOST not set for flask app. Using %s instead.'%self.DEFAULT_HOST)
+			self.flapp.logger.warning('HOST not set for flask app. Using %s instead.'%self.DEFAULT_HOST)
 		try:
 			port = self.flapp.config['PORT']
 		except KeyError:
 			port = self.DEFAULT_PORT
-			flapp.logger.warning('PORT not set for flask app. Using %s instead.'%self.DEFAULT_PORT)
+			self.flapp.logger.warning('PORT not set for flask app. Using %s instead.'%self.DEFAULT_PORT)
 
 		return 'http://%s:%s/'%(host, port)
 
@@ -66,46 +53,17 @@ class UrlHelper(BaseHelper):
 		try:
 			path = map(str, path)
 			return self.get_root_url() + '/'.join(path) + '?' + urllib.urlencode(query_params)
-		except ValueError, e:
+		except ValueError:
 			raise ValueError('All path arguments must be convertible to strings')
 		
 
-		
-
-
-
-# # @flapp.add_helper
-# # def get_url():
-# # 	print 'jim'
-
-# # flapp.get_url = get_url
-
-# def route(self, rule, **options):
-#         """A decorator that is used to register a view function for a
-#         given URL rule.  This does the same thing as :meth:`add_url_rule`
-#         but is intended for decorator usage::
-
-#             @app.route('/')
-#             def index():
-#                 return 'Hello World'
-
-#         For more information refer to :ref:`url-route-registrations`.
-
-#         :param rule: the URL rule as string
-#         :param endpoint: the endpoint for the registered URL rule.  Flask
-#                          itself assumes the name of the view function as
-#                          endpoint
-#         :param options: the options to be forwarded to the underlying
-#                         :class:`~werkzeug.routing.Rule` object.  A change
-#                         to Werkzeug is handling of method options.  methods
-#                         is a list of methods this rule should be limited
-#                         to (`GET`, `POST` etc.).  By default a rule
-#                         just listens for `GET` (and implicitly `HEAD`).
-#                         Starting with Flask 0.6, `OPTIONS` is implicitly
-#                         added and handled by the standard request handling.
-#         """
-#         def decorator(f):
-#             endpoint = options.pop('endpoint', None)
-#             self.add_url_rule(rule, endpoint, f, **options)
-#             return f
-#         return decorator
+class RequestHelpers(ApiHelper):
+	def check_query_parameters(model, response):
+		query_params = {}
+		settables = model.settables()
+		for par, val in request.form.items():
+			if par in settables:
+				query_params.update({par : val})
+			else:
+				response.add_warning(exc.InvalidAttributeException(par))
+		return query_params
