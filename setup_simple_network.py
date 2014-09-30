@@ -2,11 +2,12 @@ import satoyama
 from satoyama.models import Node, Sensor, SensorType, Reading
 
 if __name__ == "__main__":
+	
 	satoyama.database.recreate()
 	
-	collector1 = Node.create(alias = "chibi_temp_dist")
-	collector2 = Node.create(alias = 'chibi_temp')
-	collector3 = Node.create(alias = 'saboten_hector_desk')
+	collector1 = Node.create(alias = "chibi_temp_dist", latitude = 35.143951, longitude = 139.988560)
+	collector2 = Node.create(alias = 'chibi_temp', latitude = 35.143945, longitude = 139.988236)
+	collector3 = Node.create(alias = 'saboten_hector_desk', latitude = 35.144150, longitude = 139.988486)
 
 	st_temp = SensorType('temperature', 'C')
 	st_dist = SensorType('distance', 'cm')
