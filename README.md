@@ -20,9 +20,9 @@ Which features do we want to copy?
 
 Which new features do we want?
 - Better geo support - use reverse geocoding to get an address instead of just  longitude and latitude
-
-         * This would enable quires such as “show me temperature measurements in Tokyo 23 wards and show heat map”
-         * This could tricky for a system that should be globally useable, but it’s doable for Japan or other countries supported by gmaps
-
+  - This would enable quires such as “show me temperature measurements in Tokyo 23 wards and show heat map”
+  - This could tricky for a system that should be globally useable, but it’s doable for Japan or other countries supported by gmaps
+- Two types of node groupings
+  - asd
 
 
