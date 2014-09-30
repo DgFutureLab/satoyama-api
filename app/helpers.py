@@ -57,7 +57,7 @@ class UrlHelper(ApiHelper):
 			raise ValueError('All path arguments must be convertible to strings')
 		
 
-class RequestHelpers(ApiHelper):
+class RequestHelper(ApiHelper):
 	def check_query_parameters(model, response):
 		query_params = {}
 		settables = model.settables()
