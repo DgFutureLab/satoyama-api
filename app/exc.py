@@ -19,8 +19,11 @@ class UnknownUnitException(ApiBaseException):
 		super(UnknownUnitException, self).__init__('Bad unit specified: %s'%supplied_unit)
 
 class InvalidAttributeException(ApiBaseException):
-	def __init__(self, attribute):
-		super(InvalidAttributeException, self).__init__('"%s" has no meaning or is not allowed the context of the current request.'%attribute)
+	def __init__(self, attribute, model = None):
+		message = '"%s" has no meaning or is not allowed the context of the current request.'%attribute
+		if model: 
+			message += ' Valid parameters for model %s are: %s'%(model.__name__, model.settables())
+		super(InvalidAttributeException, self).__init__(message)
 
 class MissingNodeException(ApiBaseException):
 	def __init__(self, node_id):
