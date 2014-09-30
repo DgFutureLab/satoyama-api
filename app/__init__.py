@@ -2,8 +2,9 @@ from flask import Flask
 
 flapp = Flask('sensor_api')
 
-from helpers import UrlHelper
-UrlHelper(flapp)
+from helpers import UrlHelper, RequestHelper
+ApiHelper(flapp)
+RequestHelper(flapp)
 # def register_helper(self, func):
 # 	setattr(self, func.func_name, func)	
 # flapp.register_helper = register_helper
