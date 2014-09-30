@@ -8,15 +8,16 @@ RESTful (more or less) API for working with sensor networks based on Satoyama (h
 Let’s “draw inspiration” from things speak. What are the main features?
 
 
-   * Real-time data
-   * Data processing converting raw sensor data into meaningful status updates (you left your light on)
-   * Data visualization - graphs and stuff. No biggie.
-   * Geotagging - but it seems to be manual
-   * Channels - A channel can track up to eight sensor values
+ * Real-time data
+ * Data processing converting raw sensor data into meaningful status updates (you left your light on)
+ * Data visualization - graphs and stuff. No biggie.
+ * Geotagging - but it seems to be manual
+ * Channels - A channel can track up to eight sensor values
 
 Which features do we want to copy?
 
    * Real-time data (don’t know how they do it, but I suggest web sockets)
+   * Chan
 
 Which new features do we want?
 - Better geo support - use reverse geocoding to get an address instead of just  longitude and latitude
