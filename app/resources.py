@@ -33,6 +33,7 @@ class ApiResponse(object):
 		self.warnings = list()
 		self.errors = list()
 		self.objects = list()
+		self.ok = True
 		if request:
 			self.query = request.form
 		else:
@@ -68,6 +69,7 @@ class ApiResponse(object):
 			except Exception:
 				item = exc.InternalErrorException().json()
 		getattr(self, listname).append(item)
+		self.__validate__()
 
 
 	def add_warning(self, warning_message):
@@ -79,23 +81,11 @@ class ApiResponse(object):
 	def add_object(self, obj):
 		self.__append__('objects', obj)
 		
-	def has_warnings(self):
-		if self.warnings:
-			return True
+	def __validate__(self):
+		if self.errors or self.warnings:
+			self.ok = False
 		else:
-			return False
-
-	def has_errors(self):
-		if self.errors:
-			return True
-		else:
-			return False
-
-	def ok(self):
-		if self.has_errors() or self.has_warnings():
-			return False
-		else:
-			return True
+			self.ok = True
 
 	def json(self):
 		return dict(zip(ApiResponse.__fields__, map(lambda x: getattr(self, x), ApiResponse.__fields__)))
