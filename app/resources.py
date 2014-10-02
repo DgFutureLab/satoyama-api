@@ -198,7 +198,7 @@ class SensorResource(restful.Resource):
 
 
 
-class ReadingResource(restful.Resource, Filterer):
+class ReadingResource(restful.Resource):
 
 	def get(self, node_id, sensor_alias):
 		node, sensor = None, None
