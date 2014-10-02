@@ -14,11 +14,11 @@ def get_response_warnings(response):
 	return response['warnings']
 
 def get_response_data(response):
-	print response
-	# response = json.loads(response.text)
-	# print 
-	# return response['data']
+	response = json.loads(response.text)
+	return response['data']
 
+def get_api_response(response):
+	return json.loads(response.text)
 
 
 class NodeResourceTests(unittest.TestCase):
@@ -37,13 +37,15 @@ class NodeResourceTests(unittest.TestCase):
 		url = flapp.get_url('node')
 		r = requests.get(url, data = {'node_id' : 1})
 		self.assertResponse(r)
-		self.assertTrue(not get_response_errors(r))
+		api_response = get_api_response(r)
+		self.assertTrue(api_response.ok())
 
 	def test_GET_nonexisting_node_by_id(self):
 		url = flapp.get_url('node')
 		r = requests.get(url, data = {'node_id' : 100000000})
 		self.assertResponse(r)
-		self.assertTrue(get_response_errors(r))
+		api_response = get_api_response(r)
+		self.assertTrue(api_response.ok())
 		
 
 
@@ -53,9 +55,9 @@ class NodeResourceTests(unittest.TestCase):
 	def test_POST_node(self):
 		url = flapp.get_url('node')
 		r = requests.post(url, data = {'node_alias' : 'mynode'})
-		print r.text
 		self.assertTrue(r.ok)
-		print get_response_data(r)
+		print r.text
+		# print get_response_data(r)
 		# self.assertTrue(get_response_data(r)[0].id == 1)
 		
 	# 	self.assertTrue(r.ok) ### Simply assert that the server doesn't comlain about anything

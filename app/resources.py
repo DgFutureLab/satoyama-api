@@ -7,6 +7,7 @@ from sqlalchemy.exc import DataError
 import zlib
 import sys
 import json
+from datetime import datetime, timedelta
 
 API_UNITS = {
 	'm':'SI meters', 
@@ -167,7 +168,6 @@ class NodeResource(restful.Resource):
 		response.add_object(node)
 		return response.json()
 		
-rest_api.add_resource(NodeResource, '/node')		
 
 class SensorResource(restful.Resource):
 	
@@ -198,12 +198,13 @@ class SensorResource(restful.Resource):
 
 
 
-class ReadingResource(restful.Resource):
+class ReadingResource(restful.Resource, Filterer):
 
 	def get(self, node_id, sensor_alias):
-		response = ApiResponse(request)
-
 		node, sensor = None, None
+		response = ApiResponse(request)
+		date_range = request.args.get('date_range')
+
 
 		try:
 			node = Node.query.filter_by(id = node_id).first()
@@ -216,18 +217,18 @@ class ReadingResource(restful.Resource):
 		except DataError:
 			response.add_error('sensor_id must an integer')
 
-		 
 		if not sensor: 
 			response.add_error('Get reading failed: Node has no sensor with alias %s'%sensor_alias)
 		else:
-			# try:
-			reading = Reading.query.filter_by(sensor = sensor).all()[-1]
-			response.add_object({'value': reading.value})
-			# except Exception, e:
-			# 	response.add_error(e.message)
+			if date_range == '1week':
+				from_date = datetime.now() - timedelta(weeks = 1)
+				readings = Reading.query.filter_by(sensor = sensor).filter(Reading.timestamp > from_date).all()				
+				for reading in readings: 
+					response.add_object({'value': reading.value})
+			else:
+				reading = Reading.query.filter_by(sensor = sensor).all()[-1]
+				response.add_object({'value': reading.value})
 		return response.json()
-
-		
 	
 	def put(self, node_id, sensor_alias):
 		""" 
@@ -262,6 +263,15 @@ class SensorData(object):
 	def __repr__(self):
 		return str(self.__dict__)
 
+#class Filterer(object):
+#	def add_condition(condition):
+#		self.conditions.append(condition)
+#
+#	def run_query(model)
+		# for q in self.conditions:
+		# 	r = model.filter(q)
+		# pass
+
 
 def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_response):
 	### Would be cool to make this an instance method in SensorData
@@ -289,37 +299,14 @@ def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_respons
 			api_response.add_error(e.message)
 
 
-@flapp.route('/reading/batch', methods = ['POST'])
-def process_multiple_readings():
-	flapp.logger.info('Received %s bytes of compressed data'%sys.getsizeof(request.data))
-	decompressed = zlib.decompress(request.data)
-	response = ApiResponse(request)
-	try:
-		request_json = json.loads(decompressed)
-	except Exception, e:
-		print e
-
-	# if isinstance(request_json, list):
-	for reading in request_json:
-		sensor_reading = SensorData(**reading)
-		put_reading_in_database(api_response = response, **sensor_reading.as_dict())
-	print len(Reading.query.all())
-	# else: 
-	# 	pass
-	print response.json()
-	return json.dumps(response.json())
 
 ### For administration
 
-
+rest_api.add_resource(NodeResource, '/node')	
 rest_api.add_resource(SensorResource, '/sensor/<string:sensor_type>')
-# rest_api.add_resource(SensorResource, '/sensor/<int:node_id>')
 
-
-
-### For storing/accessing sensor readings
 rest_api.add_resource(ReadingResource, '/reading/node_<string:node_id>/<string:sensor_alias>')
 
-# rest_api.add_resource(ReadingResource, '/reading/sensor/<string:sensor_id>')
-
+#rest_api.add_resource(ReadingResource, '/reading?node_id=1&sensor_alias=distance')
+#rest_api.add_resource(ReadingResource, '/node/<string:node_id>/sensor/distance/reading/1week')
 

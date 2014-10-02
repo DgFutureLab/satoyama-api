@@ -1,8 +1,7 @@
 import satoyama
 from satoyama.models import Node, Sensor, SensorType, Reading
 
-if __name__ == "__main__":
-	
+def seed_simple_network():
 	satoyama.database.recreate()
 	
 	collector1 = Node.create(alias = "chibi_temp_dist", latitude = 35.143951, longitude = 139.988560)
@@ -25,3 +24,8 @@ if __name__ == "__main__":
 
 	print '****** Nodes: ', Node.query.all()
 	print '****** Sensors: ', Sensor.query.all()
+
+	return collector1, collector2, collector3
+
+if __name__ == "__main__":
+	seed_simple_network()

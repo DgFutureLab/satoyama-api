@@ -31,11 +31,35 @@ def format_data(sensor_data):
 	sensor_data = map(lambda d: ', '.join(['%s: %s'%(k,v) for k,v in d.items()]), sensor_data)
 	return sensor_data
 
-# @flapp.route('/node/all', methods = ['GET'])
-# def get_all_nodes():
-# 	response = ApiResponse(request)
-# 	nodes = Node.query.all()
-# 	return json.dumps(map(lambda n: n.json(), nodes))
+@flapp.route('/node/all', methods = ['GET'])
+def get_all_nodes():
+	# response = ApiResponse(request)
+	nodes = Node.query.all()
+	# print json.dumps(map(lambda n: n.json(), nodes))
+	return json.dumps(str(map(lambda n: n.json(), nodes)))
+	#return str(nodes)
+	# json.dumps(map(lambda n: n.json(), nodes))
+
+
+@flapp.route('/reading/batch', methods = ['POST'])
+def process_multiple_readings():
+	flapp.logger.info('Received %s bytes of compressed data'%sys.getsizeof(request.data))
+	decompressed = zlib.decompress(request.data)
+	response = ApiResponse(request)
+	try:
+		request_json = json.loads(decompressed)
+	except Exception, e:
+		print e
+
+	# if isinstance(request_json, list):
+	for reading in request_json:
+		sensor_reading = SensorData(**reading)
+		put_reading_in_database(api_response = response, **sensor_reading.as_dict())
+	print len(Reading.query.all())
+	# else: 
+	# 	pass
+	print response.json()
+	return json.dumps(response.json())
 
 
 

@@ -3,18 +3,25 @@ from inspect import getmembers, isfunction, ismethod
 import exc
 from flask import request
 
-class ApiHelper(object):
-	def __init__(self, flapp):
-		self.flapp = flapp
+class HelperBase(object):
+	"""
+	Subclass this class to make a helper
+	"""
+	def __init__(self, obj):
+		"""
+		:param obj: An object of any type. When the helper is instantiated, it adds all methods in the helper to
+		the namespace of the object.
+		"""
+		self.obj = obj
 		helpers = [member for member, typ in getmembers(self) if isfunction(typ) or (ismethod(typ) and member != '__init__')]
 		for helper in helpers:
-			if hasattr(self.flapp, helper):
+			if hasattr(self.obj, helper):
 				raise Exception('Cannot add helper "%s": The provided app already has a method with the same name'%helper)
 			else:
-				setattr(self.flapp, helper, getattr(self, helper))
+				setattr(self.obj, helper, getattr(self, helper))
 
 
-class UrlHelper(ApiHelper):
+class UrlHelper(HelperBase):
 	
 	DEFAULT_HOST = 'localhost'
 	DEFAULT_PORT = '8080'
@@ -57,7 +64,7 @@ class UrlHelper(ApiHelper):
 			raise ValueError('All path arguments must be convertible to strings')
 		
 
-class RequestHelper(ApiHelper):
+class RequestHelper(HelperBase):
 	def check_query_parameters(self, model, response):
 		query_params = {}
 		settables = model.settables()
