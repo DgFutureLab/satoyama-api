@@ -5,20 +5,10 @@ from satoyama.models import Node, Sensor, SensorType, Reading
 from app import flapp
 import json
 
-def get_response_errors(response):
-	response = json.loads(response.text)
-	return response['errors']
-
-def get_response_warnings(response):
-	response = json.loads(response.text)
-	return response['warnings']
-
-def get_response_data(response):
-	response = json.loads(response.text)
-	return response['data']
 
 def get_api_response(response):
-	return json.loads(response.text)
+	return app.resources.ApiResponse(response.text)
+	# return json.loads(response.text)
 
 
 class NodeResourceTests(unittest.TestCase):
@@ -26,38 +16,29 @@ class NodeResourceTests(unittest.TestCase):
 	def setUp(self):
 		app.database.recreate()
 
-	def assertResponse(self, response):
-		self.assertTrue(response.ok, response.text)
-
-		
-
+	def assert_all_ok(self, response):
+		self.assertTrue(response.ok)
+		api_response = get_api_response(response)
+		self.assertTrue(api_response.ok)
+		return api_response
 
 	def test_GET_existing_node_by_id(self):
 		Node.create() # create the node that we want to get
 		url = flapp.get_url('node')
 		r = requests.get(url, data = {'node_id' : 1})
-		self.assertResponse(r)
-		api_response = get_api_response(r)
-		self.assertTrue(api_response.ok())
+		self.assert_all_ok(r)
 
 	def test_GET_nonexisting_node_by_id(self):
 		url = flapp.get_url('node')
 		r = requests.get(url, data = {'node_id' : 100000000})
-		self.assertResponse(r)
-		api_response = get_api_response(r)
-		self.assertTrue(api_response.ok())
-		
-
-
-		# self.assertNoApiErrors(r)
-
+		self.assert_all_ok(r)		
 
 	def test_POST_node(self):
 		url = flapp.get_url('node')
 		r = requests.post(url, data = {'node_alias' : 'mynode'})
-		self.assertTrue(r.ok)
-		print r.text
-		# print get_response_data(r)
+		self.assert_all_ok(r)
+		
+		# self.assertTrue(api_response.ok)
 		# self.assertTrue(get_response_data(r)[0].id == 1)
 		
 	# 	self.assertTrue(r.ok) ### Simply assert that the server doesn't comlain about anything
