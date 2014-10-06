@@ -1,24 +1,27 @@
 import urllib
 from inspect import getmembers, isfunction, ismethod
 import exc
-from flask import request
+from flask import request, Flask
 
 class HelperBase(object):
 	"""
 	Subclass this class to make a helper
 	"""
-	def __init__(self, obj):
+	def __init__(self, obj = None):
 		"""
-		:param obj: An object of any type. When the helper is instantiated, it adds all methods in the helper to
-		the namespace of the object.
+		:param obj (optional): An object of any type. When the helper is instantiated, it adds all methods in the helper to
+		the namespace of the object. If not specified, the helper methods are available by accessing the helper class instance directly.
 		"""
-		self.obj = obj
-		helpers = [member for member, typ in getmembers(self) if isfunction(typ) or (ismethod(typ) and member != '__init__')]
-		for helper in helpers:
-			if hasattr(self.obj, helper):
-				raise Exception('Cannot add helper "%s": The provided app already has a method with the same name'%helper)
-			else:
-				setattr(self.obj, helper, getattr(self, helper))
+		if obj:
+			self.obj = obj
+			if isinstance(obj, Flask):
+				self.flapp = obj
+			helpers = [member for member, typ in getmembers(self) if isfunction(typ) or (ismethod(typ) and member != '__init__')]
+			for helper in helpers:
+				if hasattr(self.obj, helper):
+					raise Exception('Cannot add helper "%s": The provided app already has a method with the same name'%helper)
+				else:
+					setattr(self.obj, helper, getattr(self, helper))
 
 
 class UrlHelper(HelperBase):
@@ -52,8 +55,13 @@ class UrlHelper(HelperBase):
 		return 'http://%s:%s/'%(host, port)
 
 
+
+	
 	def get_url(self, *path, **query_params):
 		"""
+		### *** UNNECCESARRY! REPLACE WITH werkzeug.urls.Href
+		******************************************************
+
 		Constructs a url from path elements and named query parameters.
 		Example: >>> flapp.get_url('readings', node_id = 2, sensor_alias = 'indoor_temperature', when = 'latest')
 		"""
@@ -62,10 +70,14 @@ class UrlHelper(HelperBase):
 			return self.get_root_url() + '/'.join(path) + '?' + urllib.urlencode(query_params)
 		except ValueError:
 			raise ValueError('All path arguments must be convertible to strings')
-		
+
+# class GeoHelper()		
 
 class RequestHelper(HelperBase):
 	def check_query_parameters(self, model, response):
+		"""
+		Helper method for checking if a passed query parameter is allowed for a particular model.
+		"""
 		query_params = {}
 		settables = model.settables()
 		for par, val in request.form.items():

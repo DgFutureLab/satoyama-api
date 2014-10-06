@@ -22,5 +22,3 @@
 # modules = filter(lambda x: re.match('.*\.py$', x), files) 
 # print modules
 # print map(lambda x: __import__(os.path.join(root, x)), modules)
-
-import seeds

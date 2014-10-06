@@ -36,19 +36,17 @@ class ApiResponse(object):
 		self.objects = list()
 		self.ok = True
 		if request:
-			self.query = request.form
+			if hasattr(request, 'form'):
+				self.query = request.form
 		else:
 			self.query = {}	
 		
 
 		for list_name in ApiResponse.__list_fields__:
-			print list_name
 			if kwargs.has_key(list_name):
 				list_items = kwargs[list_name]
-				print list_items
 				if not hasattr(list_items, '__iter__'): 
 					list_items = [list_items]
-					print list_items
 				for list_item in list_items: 
 					self.__append__(list_name, list_item)
 		
@@ -88,11 +86,11 @@ class ApiResponse(object):
 		else:
 			self.ok = True
 
+	def __repr__(self):
+		return json.dumps(self.json())
+
 	def json(self):
 		return dict(zip(ApiResponse.__fields__, map(lambda x: getattr(self, x), ApiResponse.__fields__)))
-
-		# {'warnings': self.warnings, 'errors': self.errors, 'request': self.request_data, 'data': self.objects}
-
 
 
 def get_form_data(response, field_name, field_type):
@@ -108,9 +106,8 @@ def get_form_data(response, field_name, field_type):
 	try:
 		field = request.form[field_name]
 	except KeyError:
-		response.add_error('Missing field: %s'%field_name)
+		response.add_error('Could not fulfill request. Missing field: %s. All query data must be placed in the request body.'%field_name)
 		field = None
-	
 	try: 
 		field = field_type(field)
 	except ValueError, e:
@@ -152,7 +149,6 @@ class NodeResource(restful.Resource):
 		response = ApiResponse(request)
 
 		node_id = get_form_data(response, 'node_id', int)
-		print 
 		node = Node.query.filter_by(id = node_id).first()
 		if node:
 			response.add_object(node)
@@ -178,9 +174,6 @@ class SensorResource(restful.Resource):
 		:param sensor_type: 
 		"""
 
-		#OPTIONAL SENSOR UUID
-
-		print alias, sensor_type
 		node = Node.query.filter_by(alias = alias).first()
 		sensors = Sensor.query.filter_by(node_id = node.id, type = sensor_type).all()
 		
@@ -196,15 +189,47 @@ class SensorResource(restful.Resource):
 
 
 
+#
+# Actions: get all, get datetime range , get a geolocated range
+#
+
+class DatetimeResource():
+	def get(self, object_type, start_date, end_date):
+		pass
 
 
+'/time/reading/star/end'
+'/geo/'
+
+meter = 10**(-5)/1.113
+
+class GeoResource(restful.Resource):
+	def get(self, object_type, longitude, latitude, radius):
+		response = ApiResponse()
+		model = eval(object_type.capitalize())
+
+		vupper_right_latitude = latitude - radius
+
+		print longitude - radius, longitude + radius
+
+		longitude_cond = (model.longitude > longitude - radius) & (model.longitude < longitude + radius)
+		latitude_cond = (model.latitude > latitude - radius) & (model.latitude < latitude + radius)
+
+		results = model.query.filter(longitude_cond & latitude_cond).all()
+		for result in results:
+			response.add_object(result)
+		# print response.json()
+		return response.json()
+
+rest_api.add_resource(GeoResource, '/geo/<string:object_type>/<float:longitude>/<float:latitude>/<float:radius>')
+
+ 
 class ReadingResource(restful.Resource):
 
 	def get(self, node_id, sensor_alias):
 		node, sensor = None, None
 		response = ApiResponse(request)
-		date_range = request.args.get('date_range')
-
+		date_range = request.args.get('date_range', None)
 
 		try:
 			node = Node.query.filter_by(id = node_id).first()
@@ -302,7 +327,9 @@ def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_respons
 
 ### For administration
 
-rest_api.add_resource(NodeResource, '/node')	
+rest_api.add_resource(NodeResource, '/node', '/sensornodes/')
+
+
 rest_api.add_resource(SensorResource, '/sensor/<string:sensor_type>')
 
 rest_api.add_resource(ReadingResource, '/reading/node_<string:node_id>/<string:sensor_alias>')

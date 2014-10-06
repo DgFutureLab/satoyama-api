@@ -36,7 +36,7 @@ def get_all_nodes():
 	# response = ApiResponse(request)
 	nodes = Node.query.all()
 	# print json.dumps(map(lambda n: n.json(), nodes))
-	return json.dumps(str(map(lambda n: n.json(), nodes)))
+	return json.dumps(map(lambda n: n.json(), nodes))
 	#return str(nodes)
 	# json.dumps(map(lambda n: n.json(), nodes))
 
@@ -62,10 +62,6 @@ def process_multiple_readings():
 	return json.dumps(response.json())
 
 
-
-'''
-	Admin tool
-'''
 
 @flapp.route('/admin', methods =['GET'])
 def admin_top():

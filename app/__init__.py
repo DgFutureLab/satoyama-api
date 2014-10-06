@@ -17,8 +17,6 @@ Bootstrap(flapp)
 from flask.ext import restful
 rest_api = restful.Api(flapp)
 
-
-
 ### Adds websocket to app
 from flask.ext.socketio import SocketIO
 socketio = SocketIO(flapp)
@@ -26,9 +24,6 @@ socketio = SocketIO(flapp)
 ### Before importing other modules, import and setup run configuration
 from app import conf
 flapp.config.update(conf.module_config)
-
-
-
 
 from satoyama import database, models
 
@@ -38,3 +33,9 @@ import resources, views
 @flapp.teardown_appcontext
 def shutdown_session(exception=None):
     database.db_session.remove()
+
+# from resources import ApiResponse
+# @flapp.after_request
+# def create_response():
+# 	response = ApiResponse()
+# 	return response

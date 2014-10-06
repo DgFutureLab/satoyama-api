@@ -44,5 +44,5 @@ def read_sensors():
 
 
 if __name__ == "__main__":
-	#create_nodes()
+	create_nodes()
 	read_sensors()
