@@ -7,7 +7,7 @@ from time import sleep
 n_nodes = 100
 n_sensortypes = 20
 n_sensors_per_node = 10
-reading_refresh_rate = 3600
+reading_refresh_rate = 60*60
 
 
 def get_random_coordinates():
@@ -35,13 +35,14 @@ def create_nodes():
 
 def read_sensors():
 	nodes = Node.query.all()
-	for node in nodes:
-		for sensor in node.sensors:
-			r = Reading.create(value = uniform(30, 100), sensor = sensor, timestamp = datetime.utcnow())
-			print datetime.utcnow(), r
-	sleep(reading_refresh_rate)
+	while True:
+		for node in nodes:
+			for sensor in node.sensors:
+				r = Reading.create(value = uniform(30, 100), sensor = sensor, timestamp = datetime.utcnow())
+				print datetime.utcnow(), r
+		sleep(reading_refresh_rate)
 
 
 if __name__ == "__main__":
-	# create_nodes()
+	#create_nodes()
 	read_sensors()
