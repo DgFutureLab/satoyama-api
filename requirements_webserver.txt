@@ -13,3 +13,4 @@ flask-wtf
 sqlalchemy
 psycopg2
 satoyama
+pytest
