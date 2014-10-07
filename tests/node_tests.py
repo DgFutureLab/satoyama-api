@@ -7,15 +7,17 @@ import json
 
 
 
-
-
-
-
-
-class NodeResourceTests(unittest.TestCase):
-
-	def setUp(self):
-		app.database.recreate()
+class ApiTester(object):
+	def assert_response_format(self, response):
+		"""
+		:param response: An instance of requests.Response
+		Checks if an ApiResponse can be created
+		from the text attribute of the response
+		"""
+		json_dict = json.loads(response.text)
+		self.assertTrue(json_dict.has_key('warnings'))
+		self.assertTrue(json_dict.has_key('errors'))
+		self.assertTrue(json_dict.has_key('objects'))
 
 	def assert_all_ok(self, response):
 		"""
@@ -28,22 +30,16 @@ class NodeResourceTests(unittest.TestCase):
 		self.assertTrue(api_response.ok)
 		return api_response
 
-	def assert_response_format(self, response):
-		"""
-		:param response: An instance of requests.Response
-		Checks if an ApiResponse can be created
-		from the text attribute of the response
-		"""
-		json_dict = json.loads(response.text)
-		print json_dict
-		self.assertTrue(json_dict.has_key('warnings'))
-		self.assertTrue(json_dict.has_key('errors'))
-		self.assertTrue(json_dict.has_key('objects'))
-
 	def get_api_response(self, response):
 		json_dict = json.loads(response.text)
 		api_response = app.resources.ApiResponse(**json_dict)
 		return api_response
+
+
+class NodeResourceTests(unittest.TestCase, ApiTester):
+
+	def setUp(self):
+		app.database.recreate()
 
 
 	def test_GET_existing_node_by_id(self):
