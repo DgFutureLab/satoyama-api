@@ -3,6 +3,14 @@ satoyama-api
 
 RESTful (more or less) API for working with sensor networks based on Satoyama (https://github.com/DgFutureLab/satoyama, https://pypi.python.org/pypi/satoyama)
 
+# TESTS
+Still only a few tests have been implemented BUT FEEL FREE TO WRITE MORE.
+## Running tests
+Go to satoyama-api root folder and simply run py.test -v -s
+
+## Writing tests
+As this project uses py.test, writing tests is easy. Place your test in a file prefixed 'test_' in the tests package. The actual tests are methods (class or not) beginning with 'test_'.
+
 
 # DEV NOTES
 - All calls to the API returns a serialized instance of ApiResponse. The role of ApiResponse is to provide the client with information about problems with the request, such as wrongly named query parameters etc.
