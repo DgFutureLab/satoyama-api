@@ -1,14 +1,7 @@
 import unittest
-# from tests.db import *
-# from tests.node_tests import NodeResourceTests
 from app import conf, flapp
 import urllib
 import argparse
-
-from tests.node_tests import *
-# from tests.reading_tests import *
-# from tests.sensor_tests import *
-
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
@@ -21,3 +14,4 @@ if __name__ == "__main__":
 
 	conf.config_test_env(flapp, HOST = args.host, PORT = args.port)
 	unittest.main()
+#

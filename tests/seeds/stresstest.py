@@ -10,9 +10,27 @@ n_sensors_per_node = 10
 reading_refresh_rate = 60*60
 
 
+class RandomNetwork(object):
+	def __init__(self, n_nodes, avr_sensors_per_node, avr_readings_per_sensor):
+		self.nodes = list()
+		self.sensortypes = list()
+		self.sensors = list()
+		for i in n_sensortypes:
+			st = SensorType.create()
+		# self.readings = list()
+
+	def get_random_coordinates(self):
+		return {'longitude' : uniform(139.988, 139.989), 'latitude': uniform(35.143, 35.144)}
+
+
+	def add_nodes(n_nodes):
+		for n in range(n_nodes):
+			pass
+
+
+
 def get_random_coordinates():
 	return {'longitude' : uniform(139.988, 139.989), 'latitude': uniform(35.143, 35.144)}
-
 
 
 def create_nodes():

@@ -17,23 +17,20 @@ class NodeResourceTests(unittest.TestCase, ApiTester):
 	def test_GET_existing_node_by_id(self):
 		Node.create() # create the node that we want to get
 		url = flapp.get_url('node', node_id = 1)
-		# r = requests.get(url)
 		r = requests.get(url, data = {'node_id' : 1})
-		self.assert_all_ok(r)
-		print 'ASDLIAJSDLAKJSDOLAKSJDLAKSJDASJD'
+		api_response = self.assert_all_ok(r)
 
-	# def test_GET_nonexisting_node_by_id(self):
-	# 	url = flapp.get_url('node')
-	# 	r = requests.get(url, data = {'node_id' : 100000000})
-	# 	print r.text
-	# 	# self.assert_all_ok(r)		
-
-	# def test_POST_node(self):
-	# 	url = flapp.get_url('node')
-	# 	r = requests.post(url, data = {'node_alias' : 'mynode'})
-	# 	api_response = self.assert_all_ok(r)
-	# 	# print r.text
-	# 	print api_response
+	def test_GET_nonexisting_node_by_id(self):
+		url = flapp.get_url('node')
+		r = requests.get(url, data = {'node_id' : 100000000})
+		self.assert_all_ok(r, expect_success = False)	
+ 
+	def test_POST_node(self):
+		url = flapp.get_url('node')
+		r = requests.post(url, data = {'alias' : 'mynode'})
+		# print r.text
+		api_response = self.assert_all_ok(r)
+		
 		
 		# self.assertTrue(api_response.ok)
 		# self.assertTrue(get_response_data(r)[0].id == 1)
