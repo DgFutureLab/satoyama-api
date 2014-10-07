@@ -208,17 +208,12 @@ class GeoResource(restful.Resource):
 		response = ApiResponse()
 		model = eval(object_type.capitalize())
 
-		vupper_right_latitude = latitude - radius
-
-		print longitude - radius, longitude + radius
-
 		longitude_cond = (model.longitude > longitude - radius) & (model.longitude < longitude + radius)
 		latitude_cond = (model.latitude > latitude - radius) & (model.latitude < latitude + radius)
 
 		results = model.query.filter(longitude_cond & latitude_cond).all()
 		for result in results:
 			response.add_object(result)
-		# print response.json()
 		return response.json()
 
 rest_api.add_resource(GeoResource, '/geo/<string:object_type>/<float:longitude>/<float:latitude>/<float:radius>')

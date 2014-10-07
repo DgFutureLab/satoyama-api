@@ -31,14 +31,17 @@ def format_data(sensor_data):
 	sensor_data = map(lambda d: ', '.join(['%s: %s'%(k,v) for k,v in d.items()]), sensor_data)
 	return sensor_data
 
+
+
+
+
 @flapp.route('/node/all', methods = ['GET'])
 def get_all_nodes():
-	# response = ApiResponse(request)
+	response = ApiResponse(request)
 	nodes = Node.query.all()
-	# print json.dumps(map(lambda n: n.json(), nodes))
-	return json.dumps(map(lambda n: n.json(), nodes))
-	#return str(nodes)
-	# json.dumps(map(lambda n: n.json(), nodes))
+	for node in nodes:
+		response.add_object(node)
+	return repr(response)
 
 
 @flapp.route('/reading/batch', methods = ['POST'])
@@ -58,26 +61,5 @@ def process_multiple_readings():
 	print len(Reading.query.all())
 	# else: 
 	# 	pass
-	print response.json()
-	return json.dumps(response.json())
-
-
-
-@flapp.route('/admin', methods =['GET'])
-def admin_top():
-	return render_template('admin/index.html')
-
-@flapp.route('/admin/addnode', methods =['GET'])
-def add_node():
-	form = NodeForm(request.form)
-	return render_template('admin/add_node.html', form=form)
-
-@flapp.route('/admin/addnode/submit', methods=('GET', 'POST'))
-def submit():
-    form = NodeForm(request.form)
-
-    if request.method == 'POST':
-    	node = Node.create(uuid = request.form['uuid'], alias = request.form['alias'])
-    	return 'A new Node has been added to the network'
-    	redirect('/admin')
-	return render_template('admin/add_node.html', form=form)
+	# print response.json()
+	return repr(response)
