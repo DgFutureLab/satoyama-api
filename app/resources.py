@@ -20,74 +20,70 @@ class ApiResponse(object):
 	Designed so that client_side_response = ApiResponse(**server_side_response.json())
 	where server_side_response is itself an ApiResponse instance
 	"""
-	__fields__ = ['warnings', 'errors', 'objects', 'query']
-	__list_fields__ = ['warnings', 'errors', 'objects']
+	__fields__ = ['errors', 'objects', 'query']
 
-	
-
-	def __init__(self, request = None, **kwargs):
+	def __init__(self, request = None, query = {}, objects = [], errors = []):
 		"""
 		kwargs is a dict which can contains the keys 'warnings', 'errors' and 'objects', each of which maps to an item which 
 		can be a iterable of serializable objects, or just a single object. This is intended to make writing tests easier, as
 		the json() serialization of an ApiResponse instance will always be contained in the HTTP response from the API.
 		"""
-		self.warnings = list()
 		self.errors = list()
 		self.objects = list()
 		self.ok = True
+		
 		if request:
 			if hasattr(request, 'form'):
 				self.query = request.form
 		else:
 			self.query = {}	
-		
 
-		for list_name in ApiResponse.__list_fields__:
-			if kwargs.has_key(list_name):
-				list_items = kwargs[list_name]
-				if not hasattr(list_items, '__iter__'): 
-					list_items = [list_items]
-				for list_item in list_items: 
-					self.__append__(list_name, list_item)
-		
+		if self.is_json(objects):
+			self.objects = objects[:]
 
+		if self.is_json(errors):
+			self.errors = errors[:]
 		
-
-	def __append__(self, listname, item_to_append):
-		"""
-		Method used to append messages to the appropriate member in the response.
-		item_to_append must have either a 'json' method, a 'message' attribute, or be convertable to str, or the method will throw an expection
-		"""
-		if hasattr(item_to_append, 'json'):
-			item = item_to_append.json()
-		elif hasattr(item_to_append, 'message'):
-			item = item_to_append.message
-		else:
-			try:
-				item = str(item_to_append)
-			except Exception:
-				item = exc.InternalErrorException().json()
-		getattr(self, listname).append(item)
 		self.__validate__()
 
-
-	def add_warning(self, warning_message):
-		self.__append__('warnings', warning_message)
-
-	def add_error(self, exception):
-		self.__append__('errors', exception)
-
-	def add_object(self, obj):
-		self.__append__('objects', obj)
 		
+	def is_json(self, obj):
+		try:
+			json.dumps(obj)
+			return True
+		except TypeError:
+			return False
+
+		
+	def __iadd__(self, obj):
+		if hasattr(obj, '__class__'):
+			if issubclass(obj.__class__, Exception):
+				self.errors.append(getattr(obj, 'message'))
+			elif self.is_json(obj):
+				self.objects.append(obj)
+			elif hasattr(obj, 'json'):
+				obj_as_json = obj.json()
+				if self.is_json(obj_as_json):
+					self.objects.append(obj_as_json)
+				else:
+					self.errors.append(exc.ApiException('object had json method, but json method did not produce json-serializable output.').__str__())
+			else:
+				self.errors.append(exc.ApiException('object added to response could not be json serialized').__str__())
+		else:
+			self.errors.append(exc.ApiException('obj has no __class__ attribute'))
+		self.__validate__()
+		return self
+
+
+
 	def __validate__(self):
-		if self.errors or self.warnings:
+		if self.errors:
 			self.ok = False
 		else:
 			self.ok = True
 
 	def __repr__(self):
-		return json.dumps(self.json())
+		return 'ApiResponse() instance'
 
 	def json(self):
 		return dict(zip(ApiResponse.__fields__, map(lambda x: getattr(self, x), ApiResponse.__fields__)))
@@ -106,7 +102,7 @@ def get_form_data(response, field_name, field_type):
 	try:
 		field = request.form[field_name]
 	except KeyError:
-		response.add_error('Could not fulfill request. Missing field: %s. All query data must be placed in the request body.'%field_name)
+		response += exc.MissingFieldException('Could not fulfill request. Missing field: %s. All query data must be placed in the request body.'%field_name)
 		field = None
 	try: 
 		field = field_type(field)
@@ -140,7 +136,26 @@ def get_form_data(response, field_name, field_type):
 # 	def __repr__(self):
 # 		return str(self.unit)
 
-	
+
+class ResponseDecorator(object):
+
+	def __init__(self, handler):
+		self.handler = handler
+
+
+	def __call(self):
+		api_response = ApiResponse()
+		response = self.handler()
+		return json.dumps(response.json())
+
+def view_decorator(view_func):
+	def wrapper(*args, **kwwargs):
+		api_response = ApiResponse()
+		view_func(*args, **kwargs)
+
+
+
+
 
 
 
@@ -151,9 +166,9 @@ class NodeResource(restful.Resource):
 		node_id = get_form_data(response, 'node_id', int)
 		node = Node.query.filter_by(id = node_id).first()
 		if node:
-			response.add_object(node)
+			response += node
 		else:
-			response.add_error(exc.MissingNodeException(node_id))
+			response += exc.MissingNodeException(node_id)
 		return response.json()
 			
 		
@@ -161,7 +176,7 @@ class NodeResource(restful.Resource):
 		response = ApiResponse(request)
 		params = flapp.check_query_parameters(Node, response)
 		node = Node.create(**params)
-		response.add_object(node)
+		response += node
 		return response.json()
 		
 
@@ -213,7 +228,7 @@ class GeoResource(restful.Resource):
 
 		results = model.query.filter(longitude_cond & latitude_cond).all()
 		for result in results:
-			response.add_object(result)
+			response += result
 		return response.json()
 
 rest_api.add_resource(GeoResource, '/geo/<string:object_type>/<float:longitude>/<float:latitude>/<float:radius>')
@@ -229,25 +244,27 @@ class ReadingResource(restful.Resource):
 		try:
 			node = Node.query.filter_by(id = node_id).first()
 		except DataError:
-			response.add_error('node_id must be an integer')
-		if not node: response.add_error('Insert reading failed: No node with id %s'%node_id)
+			response += exc.ApiException('node_id must be an integer')
+		if not node: 
+			response += exc.ApiException('Insert reading failed: No node with id %s'%node_id)
 
 		try:
 			sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
 		except DataError:
-			response.add_error('sensor_id must an integer')
+			response += exc.ApiException('sensor_id must an integer')
 
 		if not sensor: 
-			response.add_error('Get reading failed: Node has no sensor with alias %s'%sensor_alias)
+			response += exc.ApiException('Get reading failed: Node has no sensor with alias %s'%sensor_alias)
 		else:
 			if date_range == '1week':
 				from_date = datetime.now() - timedelta(weeks = 1)
 				readings = Reading.query.filter_by(sensor = sensor).filter(Reading.timestamp > from_date).all()				
 				for reading in readings: 
-					response.add_object({'value': reading.value})
+					response += exc.ApiException({'value': reading.value})
 			else:
-				reading = Reading.query.filter_by(sensor = sensor).all()[-1]
-				response.add_object({'value': reading.value})
+				readings = Reading.query.filter(Reading.sensor == sensor).all()
+				for reading in readings:
+					response += exc.ApiException(reading)
 		return response.json()
 	
 	def put(self, node_id, sensor_alias):
@@ -300,23 +317,23 @@ def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_respons
 	try:
 		node = Node.query.filter_by(id = node_id).first()
 	except DataError:
-		api_response.add_error('node_id must be an integer')
+		api_response += exc.ApiException('node_id must be an integer')
 	if not node: 
-		api_response.add_error('Insert reading failed: No node with id %s'%node_id)
+		api_response += exc.ApiException('Insert reading failed: No node with id %s'%node_id)
 
 	try:
 		sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
 	except DataError:
-		api_response.add_error('sensor_id must an integer')
+		api_response += exc.ApiException('sensor_id must an integer')
 
 	 
 	if not sensor: 
-		api_response.add_error('Insert reading failed: Node has no sensor with alias %s'%sensor_alias)
+		api_response += exc.ApiException('Insert reading failed: Node has no sensor with alias %s'%sensor_alias)
 	else:
 		try:
 			Reading.create(sensor = sensor, value = value, timestamp = timestamp)
 		except Exception, e:
-			api_response.add_error(e.message)
+			api_response += e
 
 
 

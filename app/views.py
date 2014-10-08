@@ -3,12 +3,9 @@ from app import flapp, socketio
 from flask import render_template, request
 import datetime
 import json
-from flask_wtf import Form
-from wtforms import StringField
-from wtforms.validators import DataRequired
-from forms import NodeForm
 from resources import ApiResponse
 from satoyama.models import Node
+import zlib 
 
 @flapp.route('/', methods = ['GET'])
 def index():
@@ -39,9 +36,10 @@ def format_data(sensor_data):
 def get_all_nodes():
 	response = ApiResponse(request)
 	nodes = Node.query.all()
-	for node in nodes:
-		response.add_object(node)
-	return repr(response)
+	for node in nodes: response += node
+	return json.dumps(response.json())
+	# return 'OK'
+	# return repr(response)
 
 
 @flapp.route('/reading/batch', methods = ['POST'])

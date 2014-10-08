@@ -8,6 +8,10 @@ class ApiException(Exception):
 		return self.message
 		### Do some crazy logging in here, based on the exception class?
 
+	def __repr__(self):
+		return '%s : %s'%(self.__class__, self.message)
+
+
 
 class UnknownUnitException(ApiException):
 	def __init__(self, supplied_unit = None):
@@ -20,6 +24,10 @@ class InvalidAttributeException(ApiException):
 		if model: 
 			message += ' Valid parameters for model %s are: %s'%(model.__name__, model.settables())
 		super(InvalidAttributeException, self).__init__(message)
+
+class MissingFieldException(ApiException):
+	def __init__(self, message = None):
+		super(MissingFieldException, self).__init__(message)
 
 
 class MissingNodeException(ApiException):

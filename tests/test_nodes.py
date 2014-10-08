@@ -28,7 +28,6 @@ class NodeResourceTests(unittest.TestCase, ApiTester):
 	def test_POST_node(self):
 		url = flapp.get_url('node')
 		r = requests.post(url, data = {'alias' : 'mynode'})
-		# print r.text
 		api_response = self.assert_all_ok(r)
 		
 		

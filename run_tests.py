@@ -14,4 +14,3 @@ if __name__ == "__main__":
 
 	conf.config_test_env(flapp, HOST = args.host, PORT = args.port)
 	unittest.main()
-#
