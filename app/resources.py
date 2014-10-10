@@ -39,6 +39,7 @@ class ApiResponse(object):
 			self.query = {}	
 
 		if self.is_json(objects):
+			# for obj in objects: self += obj
 			self.objects = objects[:]
 
 		if self.is_json(errors):
@@ -73,7 +74,6 @@ class ApiResponse(object):
 			self.errors.append(exc.ApiException('obj has no __class__ attribute'))
 		self.__validate__()
 		return self
-
 
 
 	def __validate__(self):
