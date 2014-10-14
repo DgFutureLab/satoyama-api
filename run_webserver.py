@@ -2,22 +2,15 @@ import argparse
 from app import flapp, conf, socketio
 import os
 
-if __name__ == "__main__":
-	
-	parser = argparse.ArgumentParser()
-	parser.add_argument('--env', choices = ('test', 'dev', 'prod'), default = 'dev', help = 'Specify environment, which determines which database to use.')
-	args = parser.parse_args()
-
-	
-
-
-	if args.env == 'test':
-		print 'TEST ENVIRONMENT NOT IMPLEMENTED YET. QUITTING!'
-		os._exit(1)
-	elif args.env == 'dev':
-		conf.config_development(flapp)
-	elif args.env == 'production':
-		conf.config_production(flapp)
-		
+def run_webserver(env):
+	conf.configure_flapp(flapp, env)
 	flapp.logger.debug('Running webserver with config: %s'%flapp.config)
-	socketio.run(flapp, port = 8080)
+	socketio.run(flapp, port = flapp.config['PORT'])
+
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--env', choices = ('test', 'dev', 'prod'), required = True, help = 'Specify environment, which determines which database to use.')
+	args = parser.parse_args()
+	environment = args.env
+	run_webserver(environment)
+	

@@ -24,9 +24,7 @@ class ApiResponse(object):
 
 	def __init__(self, request = None, query = {}, objects = [], errors = []):
 		"""
-		kwargs is a dict which can contains the keys 'warnings', 'errors' and 'objects', each of which maps to an item which 
-		can be a iterable of serializable objects, or just a single object. This is intended to make writing tests easier, as
-		the json() serialization of an ApiResponse instance will always be contained in the HTTP response from the API.
+		
 		"""
 		self.errors = list()
 		self.objects = list()
@@ -39,8 +37,8 @@ class ApiResponse(object):
 			self.query = {}	
 
 		if self.is_json(objects):
-			# for obj in objects: self += obj
-			self.objects = objects[:]
+			for obj in objects: self += obj
+			# self.objects = objects[:]
 
 		if self.is_json(errors):
 			self.errors = errors[:]

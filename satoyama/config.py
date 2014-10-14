@@ -1,0 +1,1 @@
+SENSORTYPES = {'temperature': 'C'}

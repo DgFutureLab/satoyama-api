@@ -52,7 +52,7 @@ class UrlHelper(HelperBase):
 			port = self.DEFAULT_PORT
 			self.flapp.logger.warning('PORT not set for flask app. Using %s instead.'%self.DEFAULT_PORT)
 
-		return 'http://%s:%s/'%(host, port)
+		return '%s:%s/'%(host, port)
 
 
 

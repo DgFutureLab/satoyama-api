@@ -2,6 +2,7 @@ from app.resources import ApiResponse
 from satoyama.models import *
 import unittest
 from datetime import datetime
+import json
 
 class Badboy(object):
 
@@ -51,3 +52,49 @@ class TestApiResponse(unittest.TestCase):
 		self.r += d
 		assert len(self.r.errors) == 1
 		assert len(self.r.objects) == 0
+
+	def test_ApiResponse_ok_attribute(self):
+		assert self.r.ok
+		self.r += 2
+		assert self.r.ok
+		self.r += Exception()
+		assert not self.r.ok
+
+	def test_ApiResponse_json_method(self):
+		try:
+			### Empty ApiResponse
+			json.dumps(self.r.json())
+		except Exception:
+			assert False
+
+		try:
+			### ApiResponse with object
+			self.r += Node.create()
+			json.dumps(self.r.json())
+		except Exception:
+			assert False
+
+		try:
+			### ApiResponse with error
+			self.r += Exception('I will destroy you')
+			json.dumps(self.r.json())
+		except Exception:
+			assert False
+
+	# def test_ApiResponse_get_nodes_method():
+	# 	nodes = [Node.create(alias = 'node_%s'%i) for i in range(10)]
+	# 	sensors = [Sensor.create(node = nodes[i], alias = 'sensor_%s'%i) for i in range(10)]
+	# 	for node in nodes: self.r += node
+		
+	# 	assert len(self.r.get_nodes()) == 10
+	# 	for node_dict in self.r.get_nodes():
+	# 		assert Node.deep_validate_pars()
+
+
+
+
+	# 	for sensor in sensors: self.r += sensors
+	# 	assert len(self.r.get_nodes()) == 10  ### Test that sensors are not retrieved by get_nodes
+
+
+

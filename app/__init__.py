@@ -22,17 +22,19 @@ from flask.ext.socketio import SocketIO
 socketio = SocketIO(flapp)
 
 ### Before importing other modules, import and setup run configuration
-from app import conf
+import conf
 flapp.config.update(conf.module_config)
-
+conf.configure_flapp(flapp, 'dev')
 from satoyama import database, models
 
 ### Import modules containing statements that must be executed when the webapp is started (such as adding routes for the REST api)
 import resources, views
 
+
+
 @flapp.teardown_appcontext
 def shutdown_session(exception=None):
-    database.db_session.remove()
+    flapp.db_session.remove()
 
 # from resources import ApiResponse
 # @flapp.after_request

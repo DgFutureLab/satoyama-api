@@ -20,13 +20,9 @@ class ApiTester(object):
 		self.assertTrue(response.ok)
 		self.assert_response_format(response)
 		api_response = self.get_api_response(response)
-		print api_response.errors
-		print api_response.ok
 		if expect_success:
-			print 'ASdasd'
 			self.assertTrue(api_response.ok)
 		else:
-			print 'adasd'
 			self.assertTrue(not api_response.ok)
 		return api_response
 
