@@ -5,6 +5,7 @@ from app import flapp
 
 
 
+
 def seed_simple_network(recreate = False, env = 'dev'):
 	if recreate:
 
