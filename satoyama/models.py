@@ -23,7 +23,8 @@ def create(model):						### 'create' is the name of the decorator
 				flapp.db_session.add(instance)			### ..added to the session
 				flapp.db_session.commit()					### ..inserted to the database
 				if isinstance(instance, Reading):   ### If the new object is a Reading, add it as the lastest reading of the sensor
-					instance.sensor.latest_reading = json.dumps(instance.json('sensor', 'sensor_id'))				
+					pass
+					# instance.sensor.latest_reading = json.dumps(instance.json('sensor', 'sensor_id'))				
 				return instance 					### ..and returned to the caller
 			except Exception, e:
 				flapp.db_session.rollback()
@@ -45,14 +46,23 @@ class SatoyamaBase(object):
 		pass		
 
 	def json(self, *exclude_fields):
-		print 'IN PARENT', exclude_fields
+		"""
+		Dumps to json any type of objects inheriting from SatoyamaBase
+		:param *exclude_fields: fields that are not needed to be converted to json
+		"""
+		def addattr(attr):
+			# If the attribute is an instance of a class which inherets from SatoyamaBase, call this json method, else return the 
+			# JSON serialized string
+			return attr.json() if isinstance(attr, SatoyamaBase) else json.dumps(attr)
+
 		jsondict = {}
 		for prop in object_mapper(self).iterate_properties: 
 			if not prop.key in exclude_fields:
-				attr = getattr(self, prop.key)	
-				if hasattr(attr, '__iter__'):
-					# If the attribute is iterable (such as Node.sensors), each item in the iterable must be converted to a string.
-					attr = map(lambda x: json.loads(repr(x)) if isinstance(self, SatoyamaBase) else x, attr)
+				attr = getattr(self, prop.key)
+				if hasattr(attr, '__iter__'):		
+					attr = map(addattr, attr)
+				else:
+					attr = addattr(attr)
 				jsondict.update({prop.key: attr})
 		jsondict.update({'type': str(type(self))})
 		return jsondict
@@ -198,10 +208,12 @@ class Reading(SatoyamaBase, Base):
 				raise e
 
 		self.timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp)
-	
+
+	def json(self):
+		return {'little': 'dict'}
+
 	def json(self, *exclude_fields):
-		print exclude_fields
-		json_dict = super(Reading, self).json('timestamp', *exclude_fields)
+		json_dict = super(Reading, self).json('timestamp', 'sensor', *exclude_fields)
 		json_dict.update({'timestamp': DatetimeHelper.convert_datetime_to_timestamp(self.timestamp)})
 		return json_dict
 
@@ -212,4 +224,3 @@ class Reading(SatoyamaBase, Base):
 		else: 
 			json_dict.update({'id' : self.id})
 		return json.dumps(json_dict)
-

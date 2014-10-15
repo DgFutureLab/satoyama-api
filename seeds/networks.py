@@ -5,6 +5,8 @@ from app import flapp
 
 
 
+#def seed_network(number_nodes = 0, sensors = ('temperature'), readings = False):
+
 
 def seed_simple_network(recreate = False, env = 'dev'):
 	if recreate:

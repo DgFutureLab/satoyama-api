@@ -8,6 +8,7 @@ import zlib
 import sys
 import json
 from datetime import datetime, timedelta
+import inspect
 
 API_UNITS = {
 	'm':'SI meters', 
@@ -65,7 +66,8 @@ class ApiResponse(object):
 				if self.is_json(obj_as_json):
 					self.objects.append(obj_as_json)
 				else:
-					self.errors.append(exc.ApiException('object had json method, but json method did not produce json-serializable output.').__str__())
+					self.errors.append(exc.ApiException('object had json method, but json method did not produce json-serializable output.: %s'%obj).__str__())
+					# print map(lambda x: {'file': x[1], 'line': x[2]}, inspect.stack())
 			else:
 				self.errors.append(exc.ApiException('object added to response could not be json serialized').__str__())
 		else:
@@ -86,6 +88,10 @@ class ApiResponse(object):
 	def json(self):
 		return dict(zip(ApiResponse.__fields__, map(lambda x: getattr(self, x), ApiResponse.__fields__)))
 
+	# @classmethod
+	# def from_json(cls, json_dict):
+	# 	instance = cls(**json_dict)
+	# 	return instance
 
 def get_form_data(response, field_name, field_type):
 	"""
@@ -231,7 +237,7 @@ class GeoResource(restful.Resource):
 
 rest_api.add_resource(GeoResource, '/geo/<string:object_type>/<float:longitude>/<float:latitude>/<float:radius>')
 
- 
+
 class ReadingResource(restful.Resource):
 
 	def get(self, node_id, sensor_alias):
@@ -257,12 +263,10 @@ class ReadingResource(restful.Resource):
 			if date_range == '1week':
 				from_date = datetime.now() - timedelta(weeks = 1)
 				readings = Reading.query.filter_by(sensor = sensor).filter(Reading.timestamp > from_date).all()				
-				for reading in readings: 
-					response += exc.ApiException({'value': reading.value})
 			else:
 				readings = Reading.query.filter(Reading.sensor == sensor).all()
-				for reading in readings:
-					response += exc.ApiException(reading)
+			for reading in readings:
+				response += reading
 		return response.json()
 	
 	def put(self, node_id, sensor_alias):

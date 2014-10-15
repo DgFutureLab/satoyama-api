@@ -6,7 +6,8 @@ from app import flapp
 import json
 import os
 from test_helpers import ApiTester
-from random import random
+from random import random, randint
+import re
 
 class ReadingResourceTests(unittest.TestCase, ApiTester):
 
@@ -14,32 +15,32 @@ class ReadingResourceTests(unittest.TestCase, ApiTester):
 		app.conf.config_test_env(flapp)
 		app.database.recreate()
 
-	
-	def seed_network_with_readings(self):		
-
-
-		nodes = [Node.create(alias = i) for i in range(2)]
-		sensortype = SensorType.create(name = 'Robot sonar', unit = 'm')
-		for node in nodes:
-			node.sensors = [Sensor.create(node = node, sensortype = sensortype) for i in range(2)]
-			for sensor in node.sensors:
-				for r in range(0, randint(0, 10)):
-					Reading.create(sensor = sensor, value = random())
+	def seed_network_with_one_node_one_sensor_one_reading(self):		
+		node = Node.create()
+		sensortype = SensorType(name = 'Sonar', unit = 'm')
+		sensor = Sensor.create(node = node, sensortype = sensortype, alias="distance")
+		reading = Reading.create(sensor = sensor, value = 2)
 
 	#	###############################################################################
 	#	### Tests for reading GET /reading/node_:id/distance
-	#   ### TODO: http://127.0.0.1/reading?node_id=1&sensor_
+	#			  http://127.0.0.1/node/:node_id/sensor/:sensor_id?from_date=&to_date=
+			      # http://127.0.0.1/node/:node_id 
+
+	#   ### TODO: http://127.0.0.1/reading?node_id=1&sensor_id
 	#	###############################################################################
 
-	# def test_GET_reading_by_nodeid_and_sensorid(self):
-	# 	readings = Reading.query.all()
-	# 	for reading in readings:
-	# 		sensor = Sensor.query.filter_by(id = reading.sensor_id)
-	# 		url = flapp.get_url('reading', 'node_%s'%sensor.node_id, 'sensor_%s'%sensor.id)
-	# 		print url
+	def test_GET_reading_by_nodeid_and_sensorid(self):
+		self.seed_network_with_one_node_one_sensor_one_reading()
+		url = flapp.get_url('reading', 'node_1', 'distance')
+		r = requests.get(url)
+		assert r.ok
+		api_response = self.get_api_response(r)
+		assert api_response.ok
 
 
-
-
-
-	
+	def test_that_when_the_user_does_a_get_request_to_a_reading_it_will_get_a_reading(self):
+		self.seed_network_with_one_node_one_sensor_one_reading()
+		url = flapp.get_url('reading', 'node_1', 'distance')
+		r = requests.get(url)
+		api_response = self.get_api_response(r)
+		assert api_response.objects[0].has_key('value')
