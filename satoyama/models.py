@@ -23,8 +23,7 @@ def create(model):						### 'create' is the name of the decorator
 				flapp.db_session.add(instance)			### ..added to the session
 				flapp.db_session.commit()					### ..inserted to the database
 				if isinstance(instance, Reading):   ### If the new object is a Reading, add it as the lastest reading of the sensor
-					pass
-					# instance.sensor.latest_reading = json.dumps(instance.json('sensor', 'sensor_id'))				
+					instance.sensor.latest_reading = json.dumps(instance.json('sensor', 'sensor_id'))				
 				return instance 					### ..and returned to the caller
 			except Exception, e:
 				flapp.db_session.rollback()

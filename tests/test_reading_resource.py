@@ -15,6 +15,9 @@ class ReadingResourceTests(unittest.TestCase, ApiTester):
 		app.conf.config_test_env(flapp)
 		app.database.recreate()
 
+	def tearDown(self):
+		app.flapp.db_session.remove()
+
 	def seed_network_with_one_node_one_sensor_one_reading(self):		
 		node = Node.create()
 		sensortype = SensorType(name = 'Sonar', unit = 'm')
@@ -36,7 +39,6 @@ class ReadingResourceTests(unittest.TestCase, ApiTester):
 		assert r.ok
 		api_response = self.get_api_response(r)
 		assert api_response.ok
-
 
 	def test_that_when_the_user_does_a_get_request_to_a_reading_it_will_get_a_reading(self):
 		self.seed_network_with_one_node_one_sensor_one_reading()

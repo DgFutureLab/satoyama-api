@@ -14,6 +14,10 @@ class NodeResourceTests(unittest.TestCase, ApiTester):
 		app.conf.config_test_env(flapp)
 		app.database.recreate()
 
+	def tearDown(self):
+		app.flapp.db_session.remove()
+    
+
 	#	###############################################################################
 	#	### Tests for node REST URLs [GET, POST] /node
 	#	###############################################################################
@@ -49,7 +53,7 @@ class NodeResourceTests(unittest.TestCase, ApiTester):
 		self.seed_for_node_all()
 		url = flapp.get_url('node', 'all')
 		r = requests.get(url)
-		api_response = r.ok
+		assert r.ok
 
 	def test_GET_all_nodes_ApiResponse_status(self):
 		"""
@@ -59,6 +63,7 @@ class NodeResourceTests(unittest.TestCase, ApiTester):
 		url = flapp.get_url('node', 'all')
 		r = requests.get(url)
 		api_response = self.assert_all_ok(r)
+		# assert api_response.ok
 
 	def test_GET_all_nodes_response_content_matches_spec(self):
 		"""

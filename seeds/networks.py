@@ -11,7 +11,7 @@ from app import flapp
 def seed_simple_network(recreate = False, env = 'dev'):
 	if recreate:
 
-		satoyama.database.recreate(session = flapp.db_session, engine = flapp.engine)
+		satoyama.database.recreate()
 	
 	node1 = Node.create(alias = "chibi_temp_dist", latitude = 35.143951, longitude = 139.988560)
 	node2 = Node.create(alias = 'chibi_temp', latitude = 35.143945, longitude = 139.988236)

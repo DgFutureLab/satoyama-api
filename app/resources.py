@@ -311,7 +311,6 @@ class SensorData(object):
 		# 	r = model.filter(q)
 		# pass
 
-
 def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_response):
 	### Would be cool to make this an instance method in SensorData
 	node, sensor = None, None
