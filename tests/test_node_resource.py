@@ -6,6 +6,7 @@ from app import flapp
 import json
 import os
 from test_helpers import ApiTester
+from seeds.networks import seed_simple_network
 
 class NodeResourceTests(unittest.TestCase, ApiTester):
 
@@ -38,7 +39,8 @@ class NodeResourceTests(unittest.TestCase, ApiTester):
 	#	################################################################################
 
 	def seed_for_node_all(self):		
-		nodes = [Node.create(alias = i) for i in range(10)]
+		seed_simple_network()
+		#nodes = [Node.create(alias = i) for i in range(10)]
 
 	def test_GET_all_nodes_HTTP_response_status(self):
 		"""
@@ -68,8 +70,10 @@ class NodeResourceTests(unittest.TestCase, ApiTester):
 		url = flapp.get_url('node', 'all')
 		r = requests.get(url)
 		api_response = self.assert_all_ok(r)
-		assert len(api_response.objects) == 10
+		assert len(api_response.objects) == 3
 		assert len(api_response.errors) == 0
+
+		print r.text
 
 		for obj in api_response.objects:
 			assert obj.has_key('id')

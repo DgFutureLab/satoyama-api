@@ -53,7 +53,8 @@ class SatoyamaBase(object):
 		def addattr(attr):
 			# If the attribute is an instance of a class which inherets from SatoyamaBase, call this json method, else return the 
 			# JSON serialized string
-			return attr.json() if isinstance(attr, SatoyamaBase) else json.dumps(attr)
+			# return attr.json() if isinstance(attr, SatoyamaBase) else json.dumps(attr)
+			return json.loads(repr(attr)) if isinstance(attr, SatoyamaBase) else json.dumps(attr)
 
 		jsondict = {}
 		for prop in object_mapper(self).iterate_properties: 
