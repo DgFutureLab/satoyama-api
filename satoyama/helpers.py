@@ -15,7 +15,6 @@ class DatetimeHelper(HelperBase):
 		converted = False
 		if not isinstance(timestamp, datetime):
 			for format in DATETIME_FORMATS:
-				print format
 				try:
 					timestamp = datetime.strptime(timestamp, format)
 					converted = True
@@ -35,5 +34,6 @@ class DatetimeHelper(HelperBase):
 	def convert_datetime_to_timestamp(datetime_instance):
 		"""
 		Converts a datetime instance into a timestamp string with the highest precision format
+		:param datetime_instance: instance of datetime.datetime
 		"""
 		return datetime_instance.strftime(DATETIME_FORMATS[0])

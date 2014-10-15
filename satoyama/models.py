@@ -45,6 +45,7 @@ class SatoyamaBase(object):
 		pass		
 
 	def json(self, *exclude_fields):
+		print 'IN PARENT', exclude_fields
 		jsondict = {}
 		for prop in object_mapper(self).iterate_properties: 
 			if not prop.key in exclude_fields:
@@ -177,7 +178,7 @@ class Sensor(SatoyamaBase, Base):
 		return json.dumps(json_dict)
 
 @create
-class Reading(SatoyamaBase, DatetimeHelper, Base):
+class Reading(SatoyamaBase, Base):
 	__tablename__ = 'readings'
 
 	id = Column( Integer, primary_key = True )
@@ -196,12 +197,13 @@ class Reading(SatoyamaBase, DatetimeHelper, Base):
 				value = None
 				raise e
 
-		self.timestamp = self.convert_timestamp(timestamp)
-		print self.__repr__()
+		self.timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp)
 	
-	# def json(self):
-	# 	json_dict = super(Reading, self).json(self)
-	# 	print json_dict
+	def json(self, *exclude_fields):
+		print exclude_fields
+		json_dict = super(Reading, self).json('timestamp', *exclude_fields)
+		json_dict.update({'timestamp': DatetimeHelper.convert_datetime_to_timestamp(self.timestamp)})
+		return json_dict
 
 	def __repr__(self):
 		json_dict = {'type' : str(self.__class__)}
