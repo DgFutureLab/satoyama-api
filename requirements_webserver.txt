@@ -16,3 +16,4 @@ satoyama
 pytest
 Flask-Script
 alembic
+requests
