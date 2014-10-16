@@ -64,11 +64,11 @@ Response:
 }
 ```
 
-Get a data readings from sensors
+Get  data readings from sensors
 ----
 This is what you will use for storing and accessing readings from sensors.
 
-## Get the most recent reading from a sensor
+#### Get the most recent reading from a sensor
 
 In order to address a sensor a node_id and the sensor within that node must be provided.
 
@@ -95,7 +95,7 @@ Response:
 ```
 
 
-TESTS
+Tests
 ===================
 
 Still only a few tests have been implemented BUT FEEL FREE TO WRITE MORE.
@@ -105,8 +105,9 @@ Go to satoyama-api root folder and simply run py.test -v -s
 ## Writing tests
 As this project uses py.test, writing tests is easy. Place your test in a file prefixed 'test_' in the tests package. The actual tests are methods (class or not) beginning with 'test_'.
 
+Development notes
+===================
 
-# DEV NOTES
 - All calls to the API returns a serialized instance of ApiResponse. The role of ApiResponse is to provide the client with information about problems with the request, such as wrongly named query parameters etc.
 -- ApiResponse.errors do not contain any information about internal server errors, but rather information about what the API couldn't perform given the request.
 - All query parameters are type-validated instantly upon receival, and sane error messages are added to the ApiResponse instance
@@ -122,21 +123,10 @@ As this project uses py.test, writing tests is easy. Place your test in a file p
 -- Fetch all objects requested by the query and add them to the ApiResponse.
 Type validate 
 
-
-# API base URLs
-## Used by admin tools:
-- /node
-- /sensor
-- /
-
-##
-- /batch/readings
-- /area?sensortype=
-
-#Long term API development
+Long term API development
+===================
 
 Let’s “draw inspiration” from things speak. What are the main features?
-
 
  - Real-time data
  - Data processing converting raw sensor data into meaningful status updates (you left your light on)
@@ -159,4 +149,3 @@ Which new features do we want?
     - Instead I think it's better to just allow a Place to be defined as an arbitrary closed path drawn on a map, a post-code, city name or whatever. 
     - Hence a node can easily belong to several places at once. 
   - Networks (need to come up with a better name), that is nodes grouped not by physical location, but by organization, like the Rice Association of Japan, or something like that. 
-
