@@ -1,9 +1,103 @@
 satoyama-api
 ============
 
-RESTful (more or less) API for working with sensor networks based on Satoyama (https://github.com/DgFutureLab/satoyama, https://pypi.python.org/pypi/satoyama)
+RESTful (more or less) API for working with sensor networks based on Freaklabs open hardware
 
-# TESTS
+
+API Usage
+============
+
+The API is hosted on Digital Ocean and the current entry point IP address is http://128.199.191.249/
+
+Resource Types
+===================
+
+Site
+----
+Not yet implemented
+
+Node
+----
+Nodes are computing elements gathering data from the environment. Each node can have 0 or more sensors attached to it.
+
+Sensor
+-----
+Each sensor belongs to one node. Sensors gather information in "readings"
+
+
+Reading
+----
+Each reading belongs to a sensor.
+
+API Calls
+===================
+
+Get all current nodes in the network /node/all
+----
+
+## Get all the nodes in the network
+
+Get the node_ids that belong to the current network
+
+`GET /node/all`
+
+#### Example
+
+Request:
+`GET /node/all`
+
+Response:
+```
+{
+    "data": [
+        {
+            "nodes" : [{"node_id" : 1,
+                        "node_alias": "Chris Hatake North side",
+                        "sensors" : [{"sensor_alias" : "temperature",
+                        "latest_reading" : {"value" : 26.0, "time"}},
+                        {"sensor_alias" : "distance"}]}]
+        }
+    ],
+    "errors": [],
+    "request": {},
+    "warnings": []
+}
+```
+
+Get a data readings from sensors
+----
+This is what you will use for storing and accessing readings from sensors.
+
+## Get the most recent reading from a sensor
+
+In order to address a sensor a node_id and the sensor within that node must be provided.
+
+`GET /reading/node_:node_id/:sensor_alias`
+
+#### Example
+
+Request:
+`GET /reading/node_1/inside_temperature`
+
+Response:
+```
+{
+    "data": [
+        {
+            "timestamp" : 2014-09-10-11:29:41:468362,
+            "value": 29.0
+        }
+    ],
+    "errors": [],
+    "request": {},
+    "warnings": []
+}
+```
+
+
+TESTS
+===================
+
 Still only a few tests have been implemented BUT FEEL FREE TO WRITE MORE.
 ## Running tests
 Go to satoyama-api root folder and simply run py.test -v -s
