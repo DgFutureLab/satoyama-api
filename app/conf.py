@@ -1,7 +1,7 @@
 from satoyama.database import Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-
+from app import limiter
 ### Settings necessary to use the app in the console
 ### Note that enrivonment settings override module settings.
 module_config = {
@@ -49,7 +49,7 @@ def config_development(flapp, **kwargs):
 			PORT = 8080,
 			SQLALCHEMY_DATABASE_URI = "postgresql://halfdan:halfdan@localhost/tekrice_dev",
 			LOGLEVEL = 'DEBUG',
-			ENVIRONMENT = 'DEVELOPMENT'
+			ENVIRONMENT = 'DEVELOPMENT',
 		)
 	flapp.config.update(**kwargs)
 	setattr(flapp, 'engine', create_engine(flapp.config['SQLALCHEMY_DATABASE_URI'], convert_unicode = True))
@@ -64,8 +64,9 @@ def config_test_env(flapp, **kwargs):
 			PORT = 8081,
 			SQLALCHEMY_DATABASE_URI = "postgresql://halfdan:halfdan@localhost/tekrice_test",
 			LOGLEVEL = 'DEBUG',
-			ENVIRONMENT = 'TEST'
+			ENVIRONMENT = 'TEST',
 		)
 	flapp.config.update(**kwargs)
+	limiter.enabled = False
 	setattr(flapp, 'engine', create_engine(flapp.config['SQLALCHEMY_DATABASE_URI'], convert_unicode = True))
 	setattr(flapp, 'db_session', scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=getattr(flapp, 'engine'))))

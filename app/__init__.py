@@ -21,14 +21,21 @@ rest_api = restful.Api(flapp)
 from flask.ext.socketio import SocketIO
 socketio = SocketIO(flapp)
 
+from flask_limiter import Limiter
+limiter = Limiter(flapp, global_limits=["1 per second"])
+
 ### Before importing other modules, import and setup run configuration
 import conf
 flapp.config.update(conf.module_config)
 conf.configure_flapp(flapp, 'dev')
 from satoyama import database, models
 
+
+
 ### Import modules containing statements that must be executed when the webapp is started (such as adding routes for the REST api)
-import resources, views
+import resources, views, conf
+
+
 
 
 

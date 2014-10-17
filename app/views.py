@@ -1,5 +1,5 @@
 # coding: utf-8
-from app import flapp, socketio
+from app import flapp, socketio, limiter
 from flask import render_template, request
 import datetime
 import json
@@ -23,6 +23,17 @@ def respond_to_data_request():
 	flapp.logger.debug('Got request for data')
 
 
+
+@flapp.route("/slow")
+@limiter.limit("1 per day")
+def slow():
+    return "24"
+
+@flapp.route("/fast")
+def fast():
+    return "42"
+
+
 def format_data(sensor_data):
 	sensor_data = map(lambda s: dict(zip(['time', 'addr', u'reading(°C)'], s.split(','))), sensor_data)
 	for reading in sensor_data: reading.update({'time': datetime.datetime.fromtimestamp(float(reading['time'])).strftime('%Y-%m-%d %H:%M:%S')})
@@ -30,7 +41,7 @@ def format_data(sensor_data):
 	return sensor_data
 
 
-
+# @limiter.limit("1 per minute")
 @flapp.route('/node/all', methods = ['GET'])
 def get_all_nodes():
 	response = ApiResponse(request)
