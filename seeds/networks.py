@@ -2,10 +2,21 @@ import satoyama
 from satoyama.models import Node, Sensor, SensorType, Reading
 from random import randint, random
 from app import flapp
-
+import uuid
 
 
 #def seed_network(number_nodes = 0, sensors = ('temperature'), readings = False):
+
+# class NetworkManager(object):
+
+def seed_singlenode_network(n_readings = 10):
+	node = Node.create(alias = uuid.uuid4().hex)
+	st = SensorType('Sonar', 'cm')
+	sensor = Sensor.create(node = node, sensortype = st, alias = 'distance')
+	for i in range(n_readings):
+		Reading.create(sensor = sensor, value = random())
+
+	return node
 
 
 def seed_simple_network(recreate = False, env = 'dev'):
