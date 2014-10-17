@@ -2,6 +2,8 @@ import json
 from app.resources import ApiResponse
 
 class ApiTester(object):
+
+
 	def assert_response_format(self, response):
 		"""
 		:param response: An instance of requests.Response

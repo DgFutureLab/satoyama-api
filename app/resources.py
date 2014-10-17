@@ -118,46 +118,25 @@ def get_form_data(response, field_name, field_type):
 
 
 
+# class ResponseDecorator(object):
+
+# 	def __init__(self, handler):
+# 		self.handler = handler
 
 
+# 	def __call__(self, *args, **kwargs):
+# 		self.response = ApiResponse()
+# 		self.handler()
+# 		return response.json()
+
+# # def view_decorator(view_func):
+# # 	def wrapper(*args, **kwwargs):
+# # 		self.response = ApiResponse()
+# # 		view_func(*args, **kwargs)
 
 
-
-# class Unit:
-# 	def __init__(self, unit_string):
-# 		self.unit = unit_string
-
-# 	def verify_unit(self):
-# 		if not self.unit in API_UNITS.keys() or self.unit not in API_UNITS.values():
-# 			raise UnknownUnitException(self.unit)
-	
-# 	def get_unit_name(self):
-# 		return API_UNITS[self.unit]
-
-# 	def get_unit_description(self):
-# 		pass
-
-# 	def __repr__(self):
-# 		return str(self.unit)
-
-
-class ResponseDecorator(object):
-
-	def __init__(self, handler):
-		self.handler = handler
-
-
-	def __call(self):
-		api_response = ApiResponse()
-		response = self.handler()
-		return json.dumps(response.json())
-
-def view_decorator(view_func):
-	def wrapper(*args, **kwwargs):
-		api_response = ApiResponse()
-		view_func(*args, **kwargs)
-
-
+# class TestResource(restful.Resource):
+# 	def get(self):
 
 
 
@@ -183,32 +162,6 @@ class NodeResource(restful.Resource):
 		response += node
 		return response.json()
 		
-
-class SensorResource(restful.Resource):
-	
-	def get(self, alias, sensor_type):
-		""" 
-		REST GET handler. Query database and return json dump of retrieved object(s)
-		:param alias: node UUID or alias
-		:param sensor_type: 
-		"""
-
-		node = Node.query.filter_by(alias = alias).first()
-		sensors = Sensor.query.filter_by(node_id = node.id, type = sensor_type).all()
-		
-		if readings.has_key(key):
-			return {'value':readings[(alias, sensor_type)]}
-		else:
-			return {'value': 'EMPTY'}
-
-	def put(self, node, sensor_type):
-		readings[(node, sensor_type)] = request.data
-		print readings
-		return 'OK'
-
-
-
-
 
 class ReadingResource(restful.Resource):
 
@@ -236,7 +189,7 @@ class ReadingResource(restful.Resource):
 				from_date = datetime.now() - timedelta(weeks = 1)
 				readings = Reading.query.filter_by(sensor = sensor).filter(Reading.timestamp > from_date).all()				
 			else:
-				readings = Reading.query.filter(Reading.sensor == sensor).all()
+				readings = [Reading.query.filter(Reading.sensor == sensor).order_by(Reading.timestamp.desc()).first()]
 			for reading in readings:
 				response += reading
 		return response.json()
@@ -255,33 +208,7 @@ class ReadingResource(restful.Resource):
 
 		return response.json()
 
-class SensorData(object):
-	"""
-	This is a convenience class for structuring data sent from the aggregator nodes. 
-	It contains methods which act as a bridge between the API and the database.
-	"""
-	def __init__(self, alias = None, value = None, timestamp = None, node_id = None, **kwargs):
-		self.alias = alias
-		self.value = value
-		self.timestamp = timestamp
-		self.node_id = node_id
-		if kwargs:
-			flapp.logger.warning('Got unknown sensor: %s'%kwargs)
 
-	def as_dict(self):
-		return {'node_id' : self.node_id, 'sensor_alias': self.alias, 'value': self.value, 'timestamp': self.timestamp}
-
-	def __repr__(self):
-		return str(self.__dict__)
-
-#class Filterer(object):
-#	def add_condition(condition):
-#		self.conditions.append(condition)
-#
-#	def run_query(model)
-		# for q in self.conditions:
-		# 	r = model.filter(q)
-		# pass
 
 def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_response):
 	### Would be cool to make this an instance method in SensorData
@@ -313,9 +240,6 @@ def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_respons
 ### For administration
 
 rest_api.add_resource(NodeResource, '/node', '/sensornodes/')
-
-
-rest_api.add_resource(SensorResource, '/sensor/<string:sensor_type>')
 
 rest_api.add_resource(ReadingResource, '/reading/node_<string:node_id>/<string:sensor_alias>')
 

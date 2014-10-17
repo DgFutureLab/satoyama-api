@@ -22,13 +22,12 @@ def emit_temperature():
 def respond_to_data_request():
 	flapp.logger.debug('Got request for data')
 
+
 def format_data(sensor_data):
 	sensor_data = map(lambda s: dict(zip(['time', 'addr', u'reading(°C)'], s.split(','))), sensor_data)
 	for reading in sensor_data: reading.update({'time': datetime.datetime.fromtimestamp(float(reading['time'])).strftime('%Y-%m-%d %H:%M:%S')})
 	sensor_data = map(lambda d: ', '.join(['%s: %s'%(k,v) for k,v in d.items()]), sensor_data)
 	return sensor_data
-
-
 
 
 

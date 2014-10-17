@@ -209,9 +209,6 @@ class Reading(SatoyamaBase, Base):
 
 		self.timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp)
 
-	def json(self):
-		return {'little': 'dict'}
-
 	def json(self, *exclude_fields):
 		json_dict = super(Reading, self).json('timestamp', 'sensor', *exclude_fields)
 		json_dict.update({'timestamp': DatetimeHelper.convert_datetime_to_timestamp(self.timestamp)})
