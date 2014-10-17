@@ -180,7 +180,7 @@ class Sensor(SatoyamaBase, Base):
 			self.readings.append(reading)
 
 	def __repr__(self):
-		json_dict = {'type' : str(self.__class__), 'latest_reading' : self.latest_reading}
+		json_dict = {'type' : str(self.__class__), 'latest_reading' : json.loads(self.latest_reading)}
 		if self.alias: 
 			json_dict.update({'alias' : self.alias})
 		else: 
