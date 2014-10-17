@@ -1,0 +1,3 @@
+box: wercker/python
+services: 
+	- wercker/postgresql

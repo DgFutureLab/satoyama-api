@@ -208,34 +208,6 @@ class SensorResource(restful.Resource):
 
 
 
-#
-# Actions: get all, get datetime range , get a geolocated range
-#
-
-class DatetimeResource():
-	def get(self, object_type, start_date, end_date):
-		pass
-
-
-'/time/reading/star/end'
-'/geo/'
-
-meter = 10**(-5)/1.113
-
-class GeoResource(restful.Resource):
-	def get(self, object_type, longitude, latitude, radius):
-		response = ApiResponse()
-		model = eval(object_type.capitalize())
-
-		longitude_cond = (model.longitude > longitude - radius) & (model.longitude < longitude + radius)
-		latitude_cond = (model.latitude > latitude - radius) & (model.latitude < latitude + radius)
-
-		results = model.query.filter(longitude_cond & latitude_cond).all()
-		for result in results:
-			response += result
-		return response.json()
-
-rest_api.add_resource(GeoResource, '/geo/<string:object_type>/<float:longitude>/<float:latitude>/<float:radius>')
 
 
 class ReadingResource(restful.Resource):
