@@ -5,18 +5,10 @@ from satoyama.models import Node, Sensor, SensorType, Reading
 from app import flapp
 import json
 import os
-from test_helpers import ApiTester
+from apitestbase import ApiTestBase
 from seeds.networks import seed_simple_network
 
-class NodeResourceTests(unittest.TestCase, ApiTester):
-
-	def setUp(self):
-		app.conf.config_test_env(flapp)
-		app.database.recreate()
-
-	def tearDown(self):
-		app.flapp.db_session.remove()
-    
+class NodeResourceTests(ApiTestBase):
 
 	#	###############################################################################
 	#	### Tests for node REST URLs [GET, POST] /node
@@ -77,8 +69,6 @@ class NodeResourceTests(unittest.TestCase, ApiTester):
 		api_response = self.assert_all_ok(r)
 		assert len(api_response.objects) == 3
 		assert len(api_response.errors) == 0
-
-		print r.text
 
 		for obj in api_response.objects:
 			assert obj.has_key('id')

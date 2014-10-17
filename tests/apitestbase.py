@@ -1,7 +1,16 @@
 import json
 from app.resources import ApiResponse
+import unittest
+import app
 
-class ApiTester(object):
+class ApiTestBase(unittest.TestCase):
+
+	def setUp(self):
+		app.conf.config_test_env(app.flapp)
+		app.database.recreate()
+
+	def tearDown(self):
+		app.flapp.db_session.remove()
 
 
 	def assert_response_format(self, response):

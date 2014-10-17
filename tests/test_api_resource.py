@@ -15,6 +15,7 @@ class Badboy(object):
 		"""
 		return datetime.now()
 
+
 class TestApiResponse(unittest.TestCase):
 
 	def setUp(self):

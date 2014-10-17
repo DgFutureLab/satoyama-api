@@ -5,12 +5,12 @@ from satoyama.models import Node, Sensor, SensorType, Reading
 from app import flapp
 import json
 import os
-from test_helpers import ApiTester
+from apitestbase import ApiTestBase
 from random import random, randint
 import re
 import seeds
 
-class ReadingResourceTests(unittest.TestCase, ApiTester):
+class ReadingResourceTests(ApiTestBase):
 
 	def setUp(self):
 		app.conf.config_test_env(flapp)
