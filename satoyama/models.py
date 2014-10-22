@@ -3,11 +3,9 @@ from database import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.exc import DataError
 from sqlalchemy.orm import object_mapper, class_mapper, relationship
-import sqlalchemy
 from collections import Iterable
 from helpers import DatetimeHelper
 import json
-
 
 
 def create(model):						### 'create' is the name of the decorator
@@ -44,29 +42,6 @@ class SatoyamaBase(object):
 		# if not inspect.stack()[4][3] == 'autocommit' or not for_testing:
 		# 	raise Exception('Please use the "create" method to create instances that are meant to be commited to the database, or set the for_testing argument to True')
 		pass		
-
-	# def json(self, *exclude_fields):
-	# 	"""
-	# 	Dumps to json any type of objects inheriting from SatoyamaBase
-	# 	:param *exclude_fields: fields that are not needed to be converted to json
-	# 	"""
-	# 	def addattr(attr):
-	# 		# If the attribute is an instance of a class which inherets from SatoyamaBase, call this json method, else return the 
-	# 		# JSON serialized string
-	# 		# return attr.json() if isinstance(attr, SatoyamaBase) else json.dumps(attr)
-	# 		return json.loads(repr(attr)) if isinstance(attr, SatoyamaBase) else json.dumps(attr)
-
-	# 	jsondict = {}
-	# 	for prop in object_mapper(self).iterate_properties: 
-	# 		if not prop.key in exclude_fields:
-	# 			attr = getattr(self, prop.key)
-	# 			if hasattr(attr, '__iter__'):		
-	# 				attr = map(addattr, attr)
-	# 			else:
-	# 				attr = addattr(attr)
-	# 			jsondict.update({prop.key: attr})
-	# 	jsondict.update({'type': str(type(self))})
-	# 	return jsondict
 
 
 	def json(self, column_transformations, relationship_representation):
@@ -216,8 +191,6 @@ class Sensor(SatoyamaBase, Base):
 					}
 		return json.dumps(json_dict)
 
-# class SatoyamaFormatter(object):
-
 
 @create
 class Reading(SatoyamaBase, Base):
@@ -231,7 +204,6 @@ class Reading(SatoyamaBase, Base):
 	def __init__(self, sensor, value = None, timestamp = None, **kwargs):
 		super(Reading, self).__init__(**kwargs)
 		self.sensor = sensor
-		# sensor.latest_reading = self	
 		if value:
 			try:
 				self.value = float(value)
@@ -253,28 +225,7 @@ class Reading(SatoyamaBase, Base):
 			}
 		return super(Reading, self).json(column_transformations, relationship_representation)
 
-	# def json(self, *exclude_fields):
-	# 	json_dict = super(Reading, self).json('timestamp', 'sensor', *exclude_fields)
-	# 	json_dict.update({'timestamp': DatetimeHelper.convert_datetime_to_timestamp(self.timestamp)})
-	# 	return json_dict
 
-
-	# def json(self):
-	# 	json_dict = self.json_columns()		
-	# 	rf = {
-	# 		'sensor': {
-	# 			'columns' : ['id', 'alias'], 
-	# 			'transformations' : {'id' : str}
-	# 			}
-	# 		}
-
-	# 	# for relation, entry in rf.items():
-	# 	# 	print entry
-	# 	# 	json_dict.update({relation : map(lambda column: dict(zip(entry['columns'], map(lambda a: entry['transformations'].get(a, lambda x: x)(getattr(column, a)), entry['columns']))), getattr(self, relation) if isinstance(getattr(self, relation), Iterable) else [getattr(self, relation)])})
-		
-
-	# 	json_dict.update(dict(zip(rf.keys(), map(lambda (relation, entry): map(lambda column: dict(zip(entry['columns'], map(lambda a: entry['transformations'].get(a, lambda x: x)(getattr(column, a)), entry['columns']))), getattr(self, relation) if isinstance(getattr(self, relation), Iterable) else [getattr(self, relation)]), rf.items()))))
-	# 	return json_dict
 
 	def __repr__(self):
 		json_dict = {
