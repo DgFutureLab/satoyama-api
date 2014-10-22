@@ -3,6 +3,7 @@ from database import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.exc import DataError
 from sqlalchemy.orm import object_mapper, class_mapper, relationship
+import sqlalchemy
 from collections import Iterable
 from helpers import DatetimeHelper
 import json
@@ -23,7 +24,7 @@ def create(model):						### 'create' is the name of the decorator
 				flapp.db_session.add(instance)			### ..added to the session
 				flapp.db_session.commit()					### ..inserted to the database
 				if isinstance(instance, Reading):   ### If the new object is a Reading, add it as the lastest reading of the sensor
-					instance.sensor.latest_reading = json.dumps(instance.json('sensor', 'sensor_id'))				
+					instance.sensor.latest_reading = json.dumps(instance.json())				
 				return instance 					### ..and returned to the caller
 			except Exception, e:
 				flapp.db_session.rollback()
@@ -44,28 +45,35 @@ class SatoyamaBase(object):
 		# 	raise Exception('Please use the "create" method to create instances that are meant to be commited to the database, or set the for_testing argument to True')
 		pass		
 
-	def json(self, *exclude_fields):
-		"""
-		Dumps to json any type of objects inheriting from SatoyamaBase
-		:param *exclude_fields: fields that are not needed to be converted to json
-		"""
-		def addattr(attr):
-			# If the attribute is an instance of a class which inherets from SatoyamaBase, call this json method, else return the 
-			# JSON serialized string
-			# return attr.json() if isinstance(attr, SatoyamaBase) else json.dumps(attr)
-			return json.loads(repr(attr)) if isinstance(attr, SatoyamaBase) else json.dumps(attr)
+	# def json(self, *exclude_fields):
+	# 	"""
+	# 	Dumps to json any type of objects inheriting from SatoyamaBase
+	# 	:param *exclude_fields: fields that are not needed to be converted to json
+	# 	"""
+	# 	def addattr(attr):
+	# 		# If the attribute is an instance of a class which inherets from SatoyamaBase, call this json method, else return the 
+	# 		# JSON serialized string
+	# 		# return attr.json() if isinstance(attr, SatoyamaBase) else json.dumps(attr)
+	# 		return json.loads(repr(attr)) if isinstance(attr, SatoyamaBase) else json.dumps(attr)
 
-		jsondict = {}
-		for prop in object_mapper(self).iterate_properties: 
-			if not prop.key in exclude_fields:
-				attr = getattr(self, prop.key)
-				if hasattr(attr, '__iter__'):		
-					attr = map(addattr, attr)
-				else:
-					attr = addattr(attr)
-				jsondict.update({prop.key: attr})
-		jsondict.update({'type': str(type(self))})
-		return jsondict
+	# 	jsondict = {}
+	# 	for prop in object_mapper(self).iterate_properties: 
+	# 		if not prop.key in exclude_fields:
+	# 			attr = getattr(self, prop.key)
+	# 			if hasattr(attr, '__iter__'):		
+	# 				attr = map(addattr, attr)
+	# 			else:
+	# 				attr = addattr(attr)
+	# 			jsondict.update({prop.key: attr})
+	# 	jsondict.update({'type': str(type(self))})
+	# 	return jsondict
+
+
+	def json(self, t, rf):
+		json_dict = {}
+		json_dict.update(dict(zip(object_mapper(self).columns.keys(), map(lambda column_name: t.get(column_name, lambda x: x)(getattr(self, column_name)), object_mapper(self).columns.keys()))))
+		json_dict.update(dict(zip(rf.keys(), map(lambda (relation, entry): map(lambda column: dict(zip(entry['columns'], map(lambda a: entry['transformations'].get(a, lambda x: x)(getattr(column, a)), entry['columns']))), getattr(self, relation) if isinstance(getattr(self, relation), Iterable) else [getattr(self, relation)]), rf.items()))))
+		return json_dict
 
 	@classmethod
 	def settables(cls):
@@ -123,6 +131,38 @@ class Node(SatoyamaBase, Base):
 		self.latitude = latitude
 		self.alias = alias
 
+	# def json(self):
+	# 	json_dict = self.json_columns()		
+	# 	rf = {'sensors': ['id', 'alias']}
+	# 	for relation, columns in rf.items():
+	# 		json_dict.update({relation : map(lambda sensor: dict(zip(columns, map(lambda a: getattr(sensor, a), columns))), getattr(self, relation))})
+	# 	# json_dict.update({'sensors' : map(lambda sensor: dict(zip(sf, map(lambda a: getattr(sensor, a), sf))), self.sensors)})
+
+	# 	# for sensor in n.sensors: 
+
+	# 	# 	dict(zip(sf, map(lambda a: getattr(sensor, a), sf)))
+
+	# 	# rf = {'sensors': ['id', 'alias']}
+	# 	# def get_relational_fields():
+			
+	# 	# 	for relation, columns in rf.items():
+	# 	# 		'sensor'
+	# 	# 		dict(zip(columns, map(lambda column: , columns)))
+
+	# 	# json_dict = self.json_columns()
+	# 	# json_dict.update({'sensors': map(lambda s: {'id': s.id, }, self.sensors)})
+	# 	return json_dict
+
+	def json(self):
+		column_transformations = {}
+		relationship_representation = {
+			'sensors': {
+				'columns' : ['id', 'alias'], 
+				'transformations' : {}
+				}
+			}
+		return super(Node, self).json(column_transformations, relationship_representation)
+
 	def __repr__(self):
 		json_dict = {
 					'type' : str(self.__class__),
@@ -178,6 +218,16 @@ class Sensor(SatoyamaBase, Base):
 			assert isinstance(reading, Reading), 'Each item in readings must be an instance of type Reading'
 			self.readings.append(reading)
 
+	def json(self):
+		column_transformations = {}
+		relationship_representation = {
+			'readings': {
+				'columns' : ['id', 'value', 'timestamp'], 
+				'transformations' : {'timestamp': DatetimeHelper.convert_datetime_to_timestamp}
+				}
+			}
+		return super(Sensor, self).json(column_transformations, relationship_representation)
+
 	def __repr__(self):
 		json_dict = {	
 					'type' : str(self.__class__), 
@@ -186,6 +236,9 @@ class Sensor(SatoyamaBase, Base):
 					'id' : self.id
 					}
 		return json.dumps(json_dict)
+
+# class SatoyamaFormatter(object):
+
 
 @create
 class Reading(SatoyamaBase, Base):
@@ -209,10 +262,40 @@ class Reading(SatoyamaBase, Base):
 
 		self.timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp)
 
-	def json(self, *exclude_fields):
-		json_dict = super(Reading, self).json('timestamp', 'sensor', *exclude_fields)
-		json_dict.update({'timestamp': DatetimeHelper.convert_datetime_to_timestamp(self.timestamp)})
-		return json_dict
+	def json(self):
+		column_transformations = {
+			'timestamp' : DatetimeHelper.convert_datetime_to_timestamp
+			}
+		relationship_representation = {
+			'sensor': {
+				'columns' : ['id', 'alias'], 
+				'transformations' : {'id' : str}
+				}
+			}
+		return super(Reading, self).json(column_transformations, relationship_representation)
+
+	# def json(self, *exclude_fields):
+	# 	json_dict = super(Reading, self).json('timestamp', 'sensor', *exclude_fields)
+	# 	json_dict.update({'timestamp': DatetimeHelper.convert_datetime_to_timestamp(self.timestamp)})
+	# 	return json_dict
+
+
+	# def json(self):
+	# 	json_dict = self.json_columns()		
+	# 	rf = {
+	# 		'sensor': {
+	# 			'columns' : ['id', 'alias'], 
+	# 			'transformations' : {'id' : str}
+	# 			}
+	# 		}
+
+	# 	# for relation, entry in rf.items():
+	# 	# 	print entry
+	# 	# 	json_dict.update({relation : map(lambda column: dict(zip(entry['columns'], map(lambda a: entry['transformations'].get(a, lambda x: x)(getattr(column, a)), entry['columns']))), getattr(self, relation) if isinstance(getattr(self, relation), Iterable) else [getattr(self, relation)])})
+		
+
+	# 	json_dict.update(dict(zip(rf.keys(), map(lambda (relation, entry): map(lambda column: dict(zip(entry['columns'], map(lambda a: entry['transformations'].get(a, lambda x: x)(getattr(column, a)), entry['columns']))), getattr(self, relation) if isinstance(getattr(self, relation), Iterable) else [getattr(self, relation)]), rf.items()))))
+	# 	return json_dict
 
 	def __repr__(self):
 		json_dict = {
