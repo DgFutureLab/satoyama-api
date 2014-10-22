@@ -69,10 +69,10 @@ class SatoyamaBase(object):
 	# 	return jsondict
 
 
-	def json(self, t, rf):
+	def json(self, column_transformations, relationship_representation):
 		json_dict = {}
-		json_dict.update(dict(zip(object_mapper(self).columns.keys(), map(lambda column_name: t.get(column_name, lambda x: x)(getattr(self, column_name)), object_mapper(self).columns.keys()))))
-		json_dict.update(dict(zip(rf.keys(), map(lambda (relation, entry): map(lambda column: dict(zip(entry['columns'], map(lambda a: entry['transformations'].get(a, lambda x: x)(getattr(column, a)), entry['columns']))), getattr(self, relation) if isinstance(getattr(self, relation), Iterable) else [getattr(self, relation)]), rf.items()))))
+		json_dict.update(dict(zip(object_mapper(self).columns.keys(), map(lambda column_name: column_transformations.get(column_name, lambda x: x)(getattr(self, column_name)), object_mapper(self).columns.keys()))))
+		json_dict.update(dict(zip(relationship_representation.keys(), map(lambda (relation, entry): map(lambda column: dict(zip(entry['columns'], map(lambda a: entry['transformations'].get(a, lambda x: x)(getattr(column, a)), entry['columns']))), getattr(self, relation) if isinstance(getattr(self, relation), Iterable) else [getattr(self, relation)]), relationship_representation.items()))))
 		return json_dict
 
 	@classmethod
@@ -131,34 +131,13 @@ class Node(SatoyamaBase, Base):
 		self.latitude = latitude
 		self.alias = alias
 
-	# def json(self):
-	# 	json_dict = self.json_columns()		
-	# 	rf = {'sensors': ['id', 'alias']}
-	# 	for relation, columns in rf.items():
-	# 		json_dict.update({relation : map(lambda sensor: dict(zip(columns, map(lambda a: getattr(sensor, a), columns))), getattr(self, relation))})
-	# 	# json_dict.update({'sensors' : map(lambda sensor: dict(zip(sf, map(lambda a: getattr(sensor, a), sf))), self.sensors)})
-
-	# 	# for sensor in n.sensors: 
-
-	# 	# 	dict(zip(sf, map(lambda a: getattr(sensor, a), sf)))
-
-	# 	# rf = {'sensors': ['id', 'alias']}
-	# 	# def get_relational_fields():
-			
-	# 	# 	for relation, columns in rf.items():
-	# 	# 		'sensor'
-	# 	# 		dict(zip(columns, map(lambda column: , columns)))
-
-	# 	# json_dict = self.json_columns()
-	# 	# json_dict.update({'sensors': map(lambda s: {'id': s.id, }, self.sensors)})
-	# 	return json_dict
 
 	def json(self):
 		column_transformations = {}
 		relationship_representation = {
 			'sensors': {
-				'columns' : ['id', 'alias'], 
-				'transformations' : {}
+				'columns' : ['id', 'alias', 'latest_reading'], 
+				'transformations' : {'latest_reading' : json.loads}
 				}
 			}
 		return super(Node, self).json(column_transformations, relationship_representation)

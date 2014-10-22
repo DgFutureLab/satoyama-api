@@ -67,7 +67,6 @@ class ApiResponse(object):
 					self.objects.append(obj_as_json)
 				else:
 					self.errors.append(exc.ApiException('object had json method, but json method did not produce json-serializable output.: %s'%obj).__str__())
-					# print map(lambda x: {'file': x[1], 'line': x[2]}, inspect.stack())
 			else:
 				self.errors.append(exc.ApiException('object added to response could not be json serialized').__str__())
 		else:
@@ -88,10 +87,6 @@ class ApiResponse(object):
 	def json(self):
 		return dict(zip(ApiResponse.__fields__, map(lambda x: getattr(self, x), ApiResponse.__fields__)))
 
-	# @classmethod
-	# def from_json(cls, json_dict):
-	# 	instance = cls(**json_dict)
-	# 	return instance
 
 def get_form_data(response, field_name, field_type):
 	"""
