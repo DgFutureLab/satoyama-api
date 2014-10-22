@@ -124,11 +124,10 @@ class Node(SatoyamaBase, Base):
 		self.alias = alias
 
 	def __repr__(self):
-		json_dict = {'type' : str(self.__class__)}
-		if self.alias: 
-			json_dict.update({'alias' : self.alias})
-		else: 
-			json_dict.update({'id' : self.id})
+		json_dict = {
+					'type' : str(self.__class__),
+					'id' : self.id
+					}
 		return json.dumps(json_dict)
 
 @create
@@ -146,11 +145,11 @@ class SensorType(SatoyamaBase, Base):
 		self.unit = unit
 
 	def __repr__(self):
-		json_dict = {'type' : str(self.__class__)}
-		if self.name: 
-			json_dict.update({'name' : self.name})
-		else: 
-			json_dict.update({'id' : self.id})
+		json_dict = {
+					'type' : str(self.__class__),
+					'name' : self.name,
+					'id' : self.id
+					}	
 		return json.dumps(json_dict)
 
 @create
@@ -180,11 +179,12 @@ class Sensor(SatoyamaBase, Base):
 			self.readings.append(reading)
 
 	def __repr__(self):
-		json_dict = {'type' : str(self.__class__), 'latest_reading' : json.loads(self.latest_reading)}
-		if self.alias: 
-			json_dict.update({'alias' : self.alias})
-		else: 
-			json_dict.update({'id' : self.id})
+		json_dict = {	
+					'type' : str(self.__class__), 
+					'sensortype' : self.sensortype.name,
+					'latest_reading' : json.loads(self.latest_reading),
+					'id' : self.id
+					}
 		return json.dumps(json_dict)
 
 @create
@@ -215,9 +215,9 @@ class Reading(SatoyamaBase, Base):
 		return json_dict
 
 	def __repr__(self):
-		json_dict = {'type' : str(self.__class__)}
-		if self.value: 
-			json_dict.update({'value' : self.value})
-		else: 
-			json_dict.update({'id' : self.id})
+		json_dict = {
+					'type' : str(self.__class__),
+					'value' : self.value,
+					'id' : self.id
+					}
 		return json.dumps(json_dict)
