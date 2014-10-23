@@ -15,7 +15,7 @@ build:
   # The steps that will be executed on build
   steps:
     - add-to-known_hosts:
-        hostname: $DIGITALOCEAN_TEKRICE_URL
+        hostname: 128.199.191.249
     # A step that sets up the python virtual environment
     - virtualenv:
         name: setup virtual environment
@@ -40,12 +40,12 @@ build:
         code: |
           echo "python version $(python --version) running"
           echo "pip version $(pip --version) running"
-    - script:
-        name: start test webserver
-        code: python run_webserver.py --env test
-    - script:
-        name: API tests
-        code: py.test -v
+    # - script:
+    #     name: start test webserver
+    #     code: python run_webserver.py --env test
+    # - script:
+    #     name: API tests
+    #     code: py.test -v
     - script:
         name: transfer application
         code: |
