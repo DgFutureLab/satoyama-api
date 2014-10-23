@@ -14,6 +14,8 @@ services:
 build:
   # The steps that will be executed on build
   steps:
+    - add-to-known_hosts:
+        hostname: $DIGITALOCEAN_TEKRICE_URL
     # A step that sets up the python virtual environment
     - virtualenv:
         name: setup virtual environment
@@ -49,4 +51,4 @@ build:
         code: |
           pwd
           ls -la
-          scp -i $PRIVATEKEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=no foo-test root@128.199.191.249:/home/halfdan/satoyama-api
+          scp -i $PRIVATEKEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=no foo-test $DIGITALOCEAN_TEKRICE_USER@$DIGITALOCEAN_TEKRICE_URL:/home/halfdan/satoyama-api
