@@ -47,9 +47,10 @@ build:
     #     name: API tests
     #     code: py.test -v
     - script:
+        name: echo env vars
         code: |
             export
-    - mktemp:
+    - mktemp:	
         envvar: PRIVATEKEY_PATH
     - create-file:
         name: write key
@@ -65,4 +66,4 @@ build:
         code: |
           pwd
           ls -la
-          scp -i $PRIVATEKEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=no foo-test $DIGITALOCEAN_TEKRICE_USER@$DIGITALOCEAN_TEKRICE_URL:/home/halfdan/satoyama-api
+          scp -i $PRIVATEKEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=no foo-test root@$128.199.191.249:/home/halfdan/satoyama-api
