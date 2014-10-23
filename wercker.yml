@@ -46,7 +46,9 @@ build:
     # - script:
     #     name: API tests
     #     code: py.test -v
-
+    - script:
+        code: |
+            export
     - mktemp:
         envvar: PRIVATEKEY_PATH
     - create-file:
@@ -54,9 +56,10 @@ build:
         filename: $PRIVATEKEY_PATH
         content: $foo_PRIVATE
         overwrite: true
-    - script: 
-        name: env debug
-        code: env
+    # - script: 
+    #     name: env debug
+    #     code: |
+    #         env
     - script:
         name: transfer application
         code: |
