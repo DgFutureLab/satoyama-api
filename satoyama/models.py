@@ -8,6 +8,7 @@ from helpers import DatetimeHelper
 import json
 
 
+
 def create(model):						### 'create' is the name of the decorator
 	@staticmethod
 	def autocommit(*args, **kwargs): 		### Gets arguments for the object to create
@@ -117,12 +118,12 @@ class Node(SatoyamaBase, Base):
 			}
 		return super(Node, self).json(column_transformations, relationship_representation)
 
-	def __repr__(self):
-		json_dict = {
-					'type' : str(self.__class__),
-					'id' : self.id
-					}
-		return json.dumps(json_dict)
+	# def __repr__(self):
+	# 	json_dict = {
+	# 				'type' : str(self.__class__),
+	# 				'id' : self.id
+	# 				}
+	# 	return json.dumps(json_dict)
 
 @create
 class SensorType(SatoyamaBase, Base):
@@ -138,13 +139,13 @@ class SensorType(SatoyamaBase, Base):
 		self.name = name
 		self.unit = unit
 
-	def __repr__(self):
-		json_dict = {
-					'type' : str(self.__class__),
-					'name' : self.name,
-					'id' : self.id
-					}	
-		return json.dumps(json_dict)
+	# def __repr__(self):
+	# 	json_dict = {
+	# 				'type' : str(self.__class__),
+	# 				'name' : self.name,
+	# 				'id' : self.id
+	# 				}	
+	# 	return json.dumps(json_dict)
 
 @create
 class Sensor(SatoyamaBase, Base):
@@ -182,14 +183,16 @@ class Sensor(SatoyamaBase, Base):
 			}
 		return super(Sensor, self).json(column_transformations, relationship_representation)
 
-	def __repr__(self):
-		json_dict = {	
-					'type' : str(self.__class__), 
-					'sensortype' : self.sensortype.name,
-					'latest_reading' : json.loads(self.latest_reading),
-					'id' : self.id
-					}
-		return json.dumps(json_dict)
+	# def __repr__(self):
+	# 	json_dict = {	
+	# 				'type' : str(self.__class__), 
+	# 				'sensortype' : self.sensortype.name,
+	# 				'latest_reading' : json.loads(self.latest_reading),
+	# 				'id' : self.id
+	# 				}
+	# 	return json.dumps(json_dict)
+
+# class SatoyamaFormatter(object):
 
 
 @create
@@ -204,6 +207,7 @@ class Reading(SatoyamaBase, Base):
 	def __init__(self, sensor, value = None, timestamp = None, **kwargs):
 		super(Reading, self).__init__(**kwargs)
 		self.sensor = sensor
+		# sensor.latest_reading = self	
 		if value:
 			try:
 				self.value = float(value)
@@ -227,10 +231,10 @@ class Reading(SatoyamaBase, Base):
 
 
 
-	def __repr__(self):
-		json_dict = {
-					'type' : str(self.__class__),
-					'value' : self.value,
-					'id' : self.id
-					}
-		return json.dumps(json_dict)
+	# def __repr__(self):
+	# 	json_dict = {
+	# 				'type' : str(self.__class__),
+	# 				'value' : self.value,
+	# 				'id' : self.id
+	# 				}
+	# 	return json.dumps(json_dict)
