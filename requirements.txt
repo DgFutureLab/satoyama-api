@@ -18,3 +18,4 @@ Flask-Script
 alembic
 requests
 sphinx
+flask-limiter
