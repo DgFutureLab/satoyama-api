@@ -9,6 +9,8 @@
 # 			code: py.test -v
 box: wercker/python
 # Build definition
+services:
+  - wercker/postgresql
 build:
   # The steps that will be executed on build
   steps:
