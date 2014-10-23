@@ -66,4 +66,4 @@ build:
         code: |
           pwd
           ls -la
-          scp -i $PRIVATEKEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=no foo-test root@$128.199.191.249:/home/halfdan/satoyama-api
+          scp -i $PRIVATEKEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=no foo-test root@128.199.191.249:/home/halfdan/satoyama-api
