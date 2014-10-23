@@ -1,3 +1,9 @@
 box: wercker/python
 services: 
 	- wercker/postgresql
+build:
+	steps:
+		- pip-install
+		- script:
+			name: webapp tests
+			code: py.test -v
