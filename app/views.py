@@ -50,6 +50,11 @@ def get_all_nodes():
 	return json.dumps(response.json())
 	# return repr(response)
 
+@flapp.route('/wada', methods = ['GET'])
+def get_all_nodes():
+	return 'Hello Wada!'
+	# return repr(response)
+
 
 @flapp.route('/reading/batch', methods = ['POST'])
 def process_multiple_readings():
