@@ -68,4 +68,4 @@ deploy:
         code: |
           pwd
           ls -la
-          scp -i $PRIVATEKEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=no -r $WERCKER_SOURCE_DIR root@128.199.191.249:/home/halfdan/satoyama-api
+          scp -i $PRIVATEKEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=no -r $WERCKER_SOURCE_DIR $DIGITALOCEAN_TEKRICE_USER@$DIGITALOCEAN_TEKRICE_URL:$DIGITALOCEAN_TEKRICE_API_PATH
