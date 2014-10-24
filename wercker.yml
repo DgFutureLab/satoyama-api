@@ -46,6 +46,7 @@ build:
     # - script:
     #     name: API tests
     #     code: py.test -v
+deploy:    
     - script:
         name: echo env vars
         code: |
