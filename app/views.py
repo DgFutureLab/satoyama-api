@@ -51,7 +51,7 @@ def get_all_nodes():
 	# return repr(response)
 
 @flapp.route('/wada', methods = ['GET'])
-def get_all_nodes():
+def say_wada():
 	return 'Hello Wada!'
 	# return repr(response)
 
