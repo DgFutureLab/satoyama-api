@@ -3,6 +3,8 @@ from app import conf, flapp
 import urllib
 import argparse
 
+from threading import Thread
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--env', choices = ('test', 'dev', 'prod'), default = 'dev', help = 'Specify environment, which determines which database to use.', type = str)

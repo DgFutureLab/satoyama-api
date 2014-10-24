@@ -47,8 +47,8 @@ def get_all_nodes():
 	response = ApiResponse(request)
 	nodes = Node.query.all()
 	for node in nodes: response += node
-	return json.dumps(response.json())
-	# return 'OK'
+	# return json.dumps(response.json())
+	return 'OK'
 	# return repr(response)
 
 
