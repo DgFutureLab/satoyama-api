@@ -1,11 +1,13 @@
 # coding: utf-8
-from app import flapp, socketio, limiter
+from app import flapp, socketio
 from flask import render_template, request
 import datetime
 import json
 from resources import ApiResponse
-from satoyama.models import Node
+from app.models import Node, Reading
 import zlib 
+import sys
+from resources import put_reading_in_database, SensorData
 
 @flapp.route('/', methods = ['GET'])
 def index():
@@ -23,17 +25,6 @@ def respond_to_data_request():
 	flapp.logger.debug('Got request for data')
 
 
-
-@flapp.route("/slow")
-@limiter.limit("1 per day")
-def slow():
-    return "24"
-
-@flapp.route("/fast")
-def fast():
-    return "42"
-
-
 def format_data(sensor_data):
 	sensor_data = map(lambda s: dict(zip(['time', 'addr', u'reading(°C)'], s.split(','))), sensor_data)
 	for reading in sensor_data: reading.update({'time': datetime.datetime.fromtimestamp(float(reading['time'])).strftime('%Y-%m-%d %H:%M:%S')})
@@ -41,19 +32,21 @@ def format_data(sensor_data):
 	return sensor_data
 
 
-# @limiter.limit("1 per minute")
+###################################################################
+### BELOW ARE API ROUTES
+###################################################################
+
+
+
 @flapp.route('/node/all', methods = ['GET'])
 def get_all_nodes():
+	"""	This return info about all nodes. """
 	response = ApiResponse(request)
 	nodes = Node.query.all()
 	for node in nodes: response += node
 	return json.dumps(response.json())
 	# return repr(response)
 
-@flapp.route('/wada', methods = ['GET'])
-def say_wada():
-	return 'Hello Wada!'
-	# return repr(response)
 
 
 @flapp.route('/reading/batch', methods = ['POST'])
@@ -74,4 +67,4 @@ def process_multiple_readings():
 	# else: 
 	# 	pass
 	# print response.json()
-	return repr(response)
+	return json.dumps(response.json())

@@ -232,6 +232,26 @@ def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_respons
 
 
 
+class SensorData(object):
+	"""
+	This is a convenience class for structuring data sent from the aggregator nodes. 
+	It contains methods which act as a bridge between the API and the database.
+	"""
+	def __init__(self, alias = None, value = None, timestamp = None, node_id = None, **kwargs):
+		self.alias = alias
+		self.value = value
+		self.timestamp = timestamp
+		self.node_id = node_id
+		if kwargs:
+			flapp.logger.warning('Got unknown sensor: %s'%kwargs)
+
+	def as_dict(self):
+		return {'node_id' : self.node_id, 'sensor_alias': self.alias, 'value': self.value, 'timestamp': self.timestamp}
+
+	def __repr__(self):
+		return str(self.__dict__)
+
+
 ### For administration
 
 rest_api.add_resource(NodeResource, '/node', '/sensornodes/')
