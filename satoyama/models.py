@@ -1,12 +1,10 @@
-from app import flapp
-from database import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.exc import DataError
 from sqlalchemy.orm import object_mapper, class_mapper, relationship
 from collections import Iterable
 from helpers import DatetimeHelper
 import json
-
+from database import Base, manager
 
 
 def create(model):						### 'create' is the name of the decorator
@@ -15,22 +13,21 @@ def create(model):						### 'create' is the name of the decorator
 		try:
 			instance = model(*args, **kwargs) 	### Instance is created		
 		except Exception, e:
-			flapp.db_session.rollback()
+			manager.session.rollback()
 			raise e
-
 		if instance:
 			try:
-				flapp.db_session.add(instance)			### ..added to the session
-				flapp.db_session.commit()					### ..inserted to the database
+				manager.session.add(instance)			### ..added to the session
+				manager.session.commit()					### ..inserted to the database
 				if isinstance(instance, Reading):   ### If the new object is a Reading, add it as the lastest reading of the sensor
 					instance.sensor.latest_reading = json.dumps(instance.json())				
 				return instance 					### ..and returned to the caller
 			except Exception, e:
-				flapp.db_session.rollback()
-				print 'ARGAJS', e
-
+				manager.session.rollback()
+				print e
 	model.create = autocommit 			###	The model class (e.g. Node, Sensor, etc, is given a create method which calls the inner function) 		
-	return model						### The decorated model class is returned and replaces the origin model class
+	return model 						### The decorated model class is returned and replaces the origin model class
+
 
 class SatoyamaBase(object):
 
@@ -42,8 +39,10 @@ class SatoyamaBase(object):
 		# self.messages = list()
 		# if not inspect.stack()[4][3] == 'autocommit' or not for_testing:
 		# 	raise Exception('Please use the "create" method to create instances that are meant to be commited to the database, or set the for_testing argument to True')
-		pass		
+		pass
 
+	def insert(self):
+		pass
 
 	def json(self, column_transformations, relationship_representation):
 		json_dict = {}
@@ -84,19 +83,52 @@ class SatoyamaBase(object):
 		except Exception, e:
 			return False
 
+# @create
+# class Network(SatoyamaBase, Base):
+
+# 	__tablename__ = 'networks'
+# 	json_column_transformations = {}
+# 	json_relationship_representation = {
+# 		'nodes': {
+# 			'columns' : ['id', 'alias'], 
+# 			'transformations' : {}
+# 			}
+# 		}
+
+# 	def __init__(self, alias, nodes):
+# 		self.alias = alias
+# 		self.nodes = nodes
+# 		if not isinstance(Iterable, nodes): nodes = [nodes]
+# 		for node in nodes:
+# 			assert isinstance(node, Node), 'Each item in nodes must be an instance of type Node'
+# 			self.nodes.append(node)
+
+# 	id = Column( Integer, primary_key = True)
+# 	alias = Column( String(100) )
+# 	nodes = relationship('Node', backref = True)
+
 
 @create
 class Node(SatoyamaBase, Base):
 	
 	__tablename__ = 'nodes'
+
+	json_column_transformations = {}
+	json_relationship_representation = {
+		'sensors': {
+			'columns' : ['id', 'alias', 'latest_reading'], 
+			'transformations' : {'latest_reading' : json.loads}
+			}
+		}
 	
 	id = Column( Integer, primary_key = True )
 	alias = Column( String(100) )
 	sensors = relationship('Sensor', backref = 'node')
 	longitude = Column( Float()) 
 	latitude = Column( Float())
+	# network_id = Column( Integer, ForeignKey('networks.id') )
 
-	def __init__(self, alias = None, sensors = [], longitude = None, latitude = None, **kwargs):
+	def __init__(self, network = None, alias = None, sensors = [], longitude = None, latitude = None, **kwargs):
 		super(Node, self).__init__(**kwargs)
 		assert isinstance(sensors, Iterable), 'sensors must be iterable'
 		for sensor in sensors:
@@ -106,17 +138,12 @@ class Node(SatoyamaBase, Base):
 		self.longitude = longitude
 		self.latitude = latitude
 		self.alias = alias
+		# if network: assert isinstance(network, Network)
+		# self.network = network
 
 
 	def json(self):
-		column_transformations = {}
-		relationship_representation = {
-			'sensors': {
-				'columns' : ['id', 'alias', 'latest_reading'], 
-				'transformations' : {'latest_reading' : json.loads}
-				}
-			}
-		return super(Node, self).json(column_transformations, relationship_representation)
+		return super(Node, self).json(Node.json_column_transformations, Node.json_relationship_representation)
 
 	# def __repr__(self):
 	# 	json_dict = {
@@ -173,6 +200,9 @@ class Sensor(SatoyamaBase, Base):
 			assert isinstance(reading, Reading), 'Each item in readings must be an instance of type Reading'
 			self.readings.append(reading)
 
+	# def create(self):
+	# 	### Run super create and then add latest reading things
+
 	def json(self):
 		column_transformations = {}
 		relationship_representation = {
@@ -204,6 +234,17 @@ class Reading(SatoyamaBase, Base):
 	value = Column( Float() )
 	sensor_id = Column( Integer, ForeignKey('sensors.id') )
 
+	json_column_transformations = {
+			'timestamp' : DatetimeHelper.convert_datetime_to_timestamp
+			}
+	
+	json_relationship_representation = {
+		'sensor': {
+			'columns' : ['id', 'alias'], 
+			'transformations' : {'id' : str}
+			}
+		}
+
 	def __init__(self, sensor, value = None, timestamp = None, **kwargs):
 		super(Reading, self).__init__(**kwargs)
 		self.sensor = sensor
@@ -218,16 +259,7 @@ class Reading(SatoyamaBase, Base):
 		self.timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp)
 
 	def json(self):
-		column_transformations = {
-			'timestamp' : DatetimeHelper.convert_datetime_to_timestamp
-			}
-		relationship_representation = {
-			'sensor': {
-				'columns' : ['id', 'alias'], 
-				'transformations' : {'id' : str}
-				}
-			}
-		return super(Reading, self).json(column_transformations, relationship_representation)
+		return super(Reading, self).json(Reading.json_column_transformations, Reading.json_relationship_representation)
 
 
 

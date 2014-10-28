@@ -12,12 +12,6 @@ import seeds
 
 class ReadingResourceTests(ApiTestBase):
 
-	def setUp(self):
-		app.conf.config_test_env(flapp)
-		app.database.recreate()
-
-	def tearDown(self):
-		app.flapp.db_session.remove()
 
 	def seed_network_with_one_node_one_sensor_one_reading(self):		
 		node = Node.create()

@@ -4,7 +4,7 @@ from flask import render_template, request
 import datetime
 import json
 from resources import ApiResponse
-from app.models import Node, Reading
+from satoyama.models import Node, Reading
 import zlib 
 import sys
 from resources import put_reading_in_database, SensorData

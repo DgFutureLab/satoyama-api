@@ -1,9 +1,8 @@
 import satoyama
-from satoyama.models import Node, Sensor, SensorType, Reading
+# from satoyama.models import Node, Sensor, SensorType, Reading
 from random import randint, random
-from app import flapp
 import uuid
-
+from satoyama.models import *
 
 #def seed_network(number_nodes = 0, sensors = ('temperature'), readings = False):
 
@@ -21,7 +20,6 @@ def seed_singlenode_network(n_readings = 10):
 
 def seed_simple_network(recreate = False, env = 'dev'):
 	if recreate:
-
 		satoyama.database.recreate()
 	
 	node1 = Node.create(alias = "chibi_temp_dist", latitude = 35.143951, longitude = 139.988560)

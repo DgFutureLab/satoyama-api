@@ -2,12 +2,14 @@ import json
 from app.resources import ApiResponse
 import unittest
 import app
+import satoyama
+
 
 class ApiTestBase(unittest.TestCase):
 
 	def setUp(self):
-		app.conf.config_test_env(app.flapp)
-		app.database.recreate()
+		app.conf.configure_flapp('test')
+		satoyama.database.manager.recreate()
 
 	def tearDown(self):
 		app.flapp.db_session.remove()
