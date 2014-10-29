@@ -1,7 +1,7 @@
 satoyama-api
 ============
 
-RESTful (more or less) API for working with sensor networks based on Freaklabs open hardware
+RESTful (more or less) API for working with sensor networks based on Freaklabs open hardware. Test
 
 
 API Usage
