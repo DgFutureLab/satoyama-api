@@ -4,7 +4,7 @@ import os
 from threading import Thread
 
 def run_webserver(name, env):
-	conf.configure_flapp(flapp, env)
+	conf.configure_flapp(env)
 	flapp.logger.debug('Running webserver with config: %s'%flapp.config)
 	socketio.run(flapp, port = flapp.config['PORT'])
 

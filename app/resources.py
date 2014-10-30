@@ -1,5 +1,5 @@
 from app import rest_api, flapp
-# from app.satoyama.models import Node, Sensor, Reading
+from satoyama.models import Node, Sensor, Reading
 import exc
 from flask.ext import restful
 from flask import request
@@ -33,7 +33,7 @@ class ApiResponse(object):
 		
 		if request:
 			if hasattr(request, 'form'):
-				self.query = request.form
+				self.query = dict(request.form.items())
 		else:
 			self.query = {}	
 
@@ -86,6 +86,8 @@ class ApiResponse(object):
 
 	def json(self):
 		return dict(zip(ApiResponse.__fields__, map(lambda x: getattr(self, x), ApiResponse.__fields__)))
+		# return 'OK'
+		# return dict(zip(ApiResponse.__fields__, map(lambda x: getattr(self, x), ApiResponse.__fields__)))
 
 
 def get_form_data(response, field_name, field_type):

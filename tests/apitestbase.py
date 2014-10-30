@@ -22,15 +22,16 @@ class ApiTestBase(unittest.TestCase):
 		from the text attribute of the response
 		"""
 		json_dict = json.loads(response.text)
-		self.assertTrue(json_dict.has_key('errors'))
-		self.assertTrue(json_dict.has_key('objects'))
+		assert json_dict.has_key('errors')
+		assert json_dict.has_key('objects')
+		
 
 	def assert_all_ok(self, response, expect_success = True):
 		"""
 		Takes a requests.Response instance and checks if the status code is OK. ALSO checks if an ApiResponse can be created
 		from the text attribute of the response, and if so, whether or not the ApiResponse status is OK. 
 		"""
-		self.assertTrue(response.ok)
+		assert response.ok
 		self.assert_response_format(response)
 		api_response = self.get_api_response(response)
 		if expect_success:
