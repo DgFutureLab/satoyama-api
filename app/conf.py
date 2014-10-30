@@ -1,6 +1,6 @@
 from satoyama.database import manager
 
-from app import flapp
+from app import flapp, limiter
 ### Settings necessary to use the app in the console
 ### Note that enrivonment settings override module settings.
 module_config = {
@@ -47,6 +47,8 @@ def configure_flapp(env):
 
 	if env == 'test':
 		flapp.config.update(APP_TEST_SETTINGS)
+		limiter.enabled = False
+
 	elif env == 'dev':
 		flapp.config.update(APP_DEV_SETTINGS)
 	elif env == 'production':
