@@ -5,7 +5,7 @@ from collections import Iterable
 from helpers import DatetimeHelper
 import json
 from database import Base, manager
-
+from datetime import datetime
 
 def create(model):						### 'create' is the name of the decorator
 	@staticmethod
@@ -108,6 +108,8 @@ class SatoyamaBase(object):
 # 	nodes = relationship('Node', backref = True)
 
 
+
+
 @create
 class Node(SatoyamaBase, Base):
 	
@@ -144,13 +146,6 @@ class Node(SatoyamaBase, Base):
 
 	def json(self):
 		return super(Node, self).json(Node.json_column_transformations, Node.json_relationship_representation)
-
-	# def __repr__(self):
-	# 	json_dict = {
-	# 				'type' : str(self.__class__),
-	# 				'id' : self.id
-	# 				}
-	# 	return json.dumps(json_dict)
 
 @create
 class SensorType(SatoyamaBase, Base):
@@ -255,8 +250,10 @@ class Reading(SatoyamaBase, Base):
 			except DataError, e:
 				value = None
 				raise e
-
-		self.timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp)
+		if isinstance(timestamp, datetime):
+			self.timestamp = timestamp
+		else:
+			self.timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp)
 
 	def json(self):
 		return super(Reading, self).json(Reading.json_column_transformations, Reading.json_relationship_representation)
