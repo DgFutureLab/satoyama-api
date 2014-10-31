@@ -44,6 +44,5 @@ class ReadingResourceTests(ApiTestBase):
 		r = requests.get(url)
 		
 		api_response = self.get_api_response(r)
-		print api_response.objects
 		assert len(api_response.objects) == 1 ### This call should only return a single reading
 		assert api_response.objects[0].has_key('value')
