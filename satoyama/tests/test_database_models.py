@@ -1,13 +1,13 @@
 from satoyama.models import *
 from seeds import networks
-from apitestbase import ApiTestBase
+from dbtestbase import DBTestBase
 from uuid import uuid4
 from satoyama.helpers import DatetimeHelper
 from datetime import datetime
 from random import random
 # class ModelTester(ApiTestBase):
 
-class TestSensorTypeModel(ApiTestBase):
+class TestSensorTypeModel(DBTestBase):
 
 	def test_sensortype_insert(self):
 		name = uuid4().hex
@@ -18,7 +18,7 @@ class TestSensorTypeModel(ApiTestBase):
 		assert sensortype_retrieved.unit == unit
 
 
-class TestNodeModel(ApiTestBase):
+class TestNodeModel(DBTestBase):
 
 	def test_node_insert(self):
 		node_alias = uuid4().hex
@@ -46,7 +46,7 @@ class TestNodeModel(ApiTestBase):
 			assert False
 
 
-class TestSensorModel(ApiTestBase):
+class TestSensorModel(DBTestBase):
 
 	def test_sensor_insert(self):
 		alias = uuid4().hex

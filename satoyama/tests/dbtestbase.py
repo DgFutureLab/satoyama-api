@@ -1,11 +1,10 @@
 import json
-from app.resources import ApiResponse
 import unittest
 import app
 import satoyama
 
 
-class ApiTestBase(unittest.TestCase):
+class DBTestBase(unittest.TestCase):
 
 	def setUp(self):
 		app.conf.configure_flapp('test')

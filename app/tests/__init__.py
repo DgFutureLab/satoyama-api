@@ -1,0 +1,1 @@
+from satoyama.tests.dbtestbase import DBTestBase
