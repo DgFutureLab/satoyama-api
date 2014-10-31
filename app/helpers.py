@@ -2,32 +2,17 @@ import urllib
 from inspect import getmembers, isfunction, ismethod
 import exc
 from flask import request, Flask
-
-class HelperBase(object):
-	"""
-	Subclass this class to make a helper
-	"""
-	def __init__(self, obj = None):
-		"""
-		:param obj (optional): An object of any type. When the helper is instantiated, it adds all methods in the helper to
-		the namespace of the object. If not specified, the helper methods are available by accessing the helper class instance directly.
-		"""
-		if obj:
-			self.obj = obj
-			if isinstance(obj, Flask):
-				self.flapp = obj
-			helpers = [member for member, typ in getmembers(self) if isfunction(typ) or (ismethod(typ) and member != '__init__')]
-			for helper in helpers:
-				if hasattr(self.obj, helper):
-					raise Exception('Cannot add helper "%s": The provided app already has a method with the same name'%helper)
-				else:
-					setattr(self.obj, helper, getattr(self, helper))
+from satoyama.helpers import HelperBase
 
 
 class UrlHelper(HelperBase):
 	
 	DEFAULT_HOST = 'localhost'
 	DEFAULT_PORT = '8080'
+
+	def __init__(self, flapp):
+		super(UrlHelper, self).__init__(flapp)
+		self.flapp = self.obj
 
 	@staticmethod
 	def example_static_method():
@@ -53,8 +38,6 @@ class UrlHelper(HelperBase):
 			self.flapp.logger.warning('PORT not set for flask app. Using %s instead.'%self.DEFAULT_PORT)
 
 		return '%s:%s/'%(host, port)
-
-
 
 	
 	def get_url(self, *path, **query_params):

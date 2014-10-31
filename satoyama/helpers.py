@@ -1,7 +1,29 @@
-from core import HelperBase
 from datetime import datetime 
 
 from definitions import DATETIME_FORMATS
+
+from inspect import getmembers, isfunction, ismethod
+from flask import Flask
+
+class HelperBase(object):
+	"""
+	Subclass this class to make a helper
+	"""
+	def __init__(self, obj = None):
+		"""
+		:param obj (optional): An object of any type. When the helper is instantiated, it adds all methods in the helper to
+		the namespace of the object. If not specified, the helper methods are available by accessing the helper class instance directly.
+		"""
+
+		if obj:
+			self.obj = obj
+			helpers = [member for member, typ in getmembers(self) if isfunction(typ) or (ismethod(typ) and member != '__init__')]
+			for helper in helpers:
+				if hasattr(self.obj, helper):
+					raise Exception('Cannot add helper "%s": The provided app already has a method with the same name'%helper)
+				else:
+					setattr(self.obj, helper, getattr(self, helper))
+
 
 class DatetimeHelper(HelperBase):
 
@@ -36,4 +58,5 @@ class DatetimeHelper(HelperBase):
 		Converts a datetime instance into a timestamp string with the highest precision format
 		:param datetime_instance: instance of datetime.datetime
 		"""
-		return datetime_instance.strftime(DATETIME_FORMATS[0])
+		timestamp_str = datetime_instance.strftime(DATETIME_FORMATS[0])
+		return timestamp_str
