@@ -16,6 +16,7 @@ satoyama
 pytest
 Flask-Script
 alembic
+flask_migrate
 requests
 sphinx
 flask-limiter
