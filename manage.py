@@ -1,26 +1,25 @@
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
-import os
-
+import argparse
+from satoyama.database import manager as db_manager
 from app import flapp
-import app
-# flapp.config.from_object(os.environ['APP_SETTINGS'])
-app.conf.config_development(flapp)
 
 from satoyama.models import *
 from satoyama.database import Base
 
-# models = satoyama.database.get_defined_models()
-
-# for model in models:
-# 	migrate = Migrate(flapp, model)
-# 	manager = Manager(flapp)
 
 migrate = Migrate(flapp, Base)
-manager = Manager(flapp)
+migration_manager = Manager(flapp)
 
-manager.add_command('db', MigrateCommand)
+migration_manager.add_command('db', MigrateCommand)
 
 
 if __name__ == '__main__':
-    manager.run()
+	# parser = argparse.ArgumentParser()
+	# parser.add_argument('--env', choices = ('test', 'dev', 'prod'), required = True, help = 'Specify environment, which determines which database to use.')
+	# args = parser.parse_args()
+	# environment = args.env
+	# db_manager.set_environment(environment)
+	
+
+	migration_manager.run()

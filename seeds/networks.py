@@ -18,9 +18,16 @@ def seed_singlenode_network(n_readings = 10):
 	return node
 
 
+def seed_singlenode_site(n_readings = 5):
+	node = seed_singlenode_network(n_readings)
+	site = Site.create(alias = uuid.uuid4().hex, nodes = [node])
+	return site
+
+
+
 def seed_simple_network(recreate = False, env = 'dev'):
 	if recreate:
-		satoyama.database.recreate()
+		satoyama.database.manager.recreate()
 	
 	node1 = Node.create(alias = "chibi_temp_dist", latitude = 35.143951, longitude = 139.988560)
 	node2 = Node.create(alias = 'chibi_temp', latitude = 35.143945, longitude = 139.988236)

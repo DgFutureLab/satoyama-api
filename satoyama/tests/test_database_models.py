@@ -7,6 +7,19 @@ from datetime import datetime
 from random import random
 # class ModelTester(ApiTestBase):
 
+class JSONTester(object):
+
+	@staticmethod
+	def test_model_json_method(cls, json_response):
+		for relation, defining_dict in cls.json_relationship_representation.items():
+			assert json_response.has_key(relation)  ### Check that the json response contains the a key for each of the relations defined in the model (e.g. 'nodes' for an instance of Site)
+			
+			for model_instance in json_response[relation]:
+				for column in defining_dict['columns']:
+					assert model_instance.has_key(column)
+
+
+
 class TestSensorTypeModel(DBTestBase):
 
 	def test_sensortype_insert(self):
@@ -16,6 +29,19 @@ class TestSensorTypeModel(DBTestBase):
 		sensortype_retrieved = SensorType.query.first()
 		assert sensortype_retrieved.name == name
 		assert sensortype_retrieved.unit == unit
+
+
+class TestSiteModel(DBTestBase):
+	def test_site_insert(self):
+		site_alias = 'silly site'
+		site_inserted = Site.create(alias = site_alias)
+		site_retrieved = Site.query.first()
+		assert site_inserted.alias == site_retrieved.alias
+
+	def test_site_json_method(self):
+		site = networks.seed_singlenode_site()
+		site_json = site.json()
+		JSONTester.test_model_json_method(Site, site_json)
 
 
 class TestNodeModel(DBTestBase):
@@ -34,16 +60,10 @@ class TestNodeModel(DBTestBase):
 		node_retrieved = Node.query.first()
 		assert node_inserted.sensors == node_retrieved.sensors
 
-	def test_node_JSON_method(self):
-		"""
-		Tests that a node with a sensor with some readings is JSON serializable.
-		"""
-
+	def test_node_json_method(self):
 		node = networks.seed_singlenode_network(n_readings = 3)
-		try:
-			json.dumps(node.json())
-		except TypeError:
-			assert False
+		node_json = node.json()
+		JSONTester.test_model_json_method(Node, node_json)
 
 
 class TestSensorModel(DBTestBase):
@@ -59,10 +79,8 @@ class TestSensorModel(DBTestBase):
 
 	def test_sensor_json_method(self):
 		sensor = networks.seed_singlenode_network(n_readings = 3).sensors[0]
-		try:
-			json.dumps(sensor.json())
-		except TypeError:
-			assert False
+		sensor_json = sensor.json()
+		JSONTester.test_model_json_method(Sensor, sensor_json)
 
 	def test_sensor_latest_reading(self):
 		"""

@@ -13,6 +13,7 @@ if __name__ == "__main__":
 	parser.add_argument('--env', choices = ('test', 'dev', 'prod'), required = True, help = 'Specify environment, which determines which database to use.')
 	args = parser.parse_args()
 	environment = args.env
+
 	run_webserver('webserver', environment)
 	# t = Thread(target = run_webserver, args = ('webserver', environment))
 	# print 'created thread'

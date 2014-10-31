@@ -83,29 +83,32 @@ class SatoyamaBase(object):
 		except Exception, e:
 			return False
 
-# @create
-# class Network(SatoyamaBase, Base):
+@create
+class Site(SatoyamaBase, Base):
 
-# 	__tablename__ = 'networks'
-# 	json_column_transformations = {}
-# 	json_relationship_representation = {
-# 		'nodes': {
-# 			'columns' : ['id', 'alias'], 
-# 			'transformations' : {}
-# 			}
-# 		}
+	__tablename__ = 'sites'
+	json_column_transformations = {}
+	
+	json_relationship_representation = {
+		'nodes': {
+			'columns' : ['id', 'alias', 'sensors'], 
+			'transformations' : {'id' : str}
+			}
+		}
 
-# 	def __init__(self, alias, nodes):
-# 		self.alias = alias
-# 		self.nodes = nodes
-# 		if not isinstance(Iterable, nodes): nodes = [nodes]
-# 		for node in nodes:
-# 			assert isinstance(node, Node), 'Each item in nodes must be an instance of type Node'
-# 			self.nodes.append(node)
+	def __init__(self, alias, nodes = []):
+		self.alias = alias
+		assert isinstance(nodes, Iterable), 'nodes must be iterable'
+		for node in nodes:
+			assert isinstance(node, Node), 'Each item in nodes must be an instance of type Node'
+			self.nodes.append(node)
 
-# 	id = Column( Integer, primary_key = True)
-# 	alias = Column( String(100) )
-# 	nodes = relationship('Node', backref = True)
+	id = Column( Integer, primary_key = True)
+	alias = Column( String(100) )
+	nodes = relationship('Node', backref = 'site')
+
+	def json(self):
+		return super(Site, self).json(Site.json_column_transformations, Site.json_relationship_representation)
 
 
 
@@ -128,9 +131,9 @@ class Node(SatoyamaBase, Base):
 	sensors = relationship('Sensor', backref = 'node')
 	longitude = Column( Float()) 
 	latitude = Column( Float())
-	# network_id = Column( Integer, ForeignKey('networks.id') )
+	site_id = Column( Integer, ForeignKey('sites.id') )
 
-	def __init__(self, network = None, alias = None, sensors = [], longitude = None, latitude = None, **kwargs):
+	def __init__(self, site = None, alias = None, sensors = [], longitude = None, latitude = None, **kwargs):
 		super(Node, self).__init__(**kwargs)
 		assert isinstance(sensors, Iterable), 'sensors must be iterable'
 		for sensor in sensors:
@@ -140,8 +143,9 @@ class Node(SatoyamaBase, Base):
 		self.longitude = longitude
 		self.latitude = latitude
 		self.alias = alias
-		# if network: assert isinstance(network, Network)
-		# self.network = network
+		if site: 
+			assert isinstance(site, Site), 'site must be an instance of %s'%type(Site)
+			self.site = site
 
 
 	def json(self):
@@ -173,6 +177,14 @@ class SensorType(SatoyamaBase, Base):
 class Sensor(SatoyamaBase, Base):
 	__tablename__ = 'sensors'
 	
+	json_column_transformations = {}
+	json_relationship_representation = {
+		'readings': {
+			'columns' : ['id', 'value', 'timestamp'], 
+			'transformations' : {'timestamp': DatetimeHelper.convert_datetime_to_timestamp}
+			}
+		}
+
 	id = Column( Integer, primary_key = True )
 	alias = Column( String() )
 	readings = relationship('Reading', backref = 'sensor')
@@ -199,14 +211,7 @@ class Sensor(SatoyamaBase, Base):
 	# 	### Run super create and then add latest reading things
 
 	def json(self):
-		column_transformations = {}
-		relationship_representation = {
-			'readings': {
-				'columns' : ['id', 'value', 'timestamp'], 
-				'transformations' : {'timestamp': DatetimeHelper.convert_datetime_to_timestamp}
-				}
-			}
-		return super(Sensor, self).json(column_transformations, relationship_representation)
+		return super(Sensor, self).json(Sensor.json_column_transformations, Sensor.json_relationship_representation)
 
 	# def __repr__(self):
 	# 	json_dict = {	
