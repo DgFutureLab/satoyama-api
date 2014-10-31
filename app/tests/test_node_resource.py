@@ -6,7 +6,7 @@ from app import flapp
 import json
 import os
 from apitestbase import ApiTestBase
-from seeds.networks import seed_simple_network
+from seeds.nodes import seed_tekrice_node
 
 class NodeResourceTests(ApiTestBase):
 
@@ -34,9 +34,6 @@ class NodeResourceTests(ApiTestBase):
 	# 	### Tests for /node/all
 	#	################################################################################
 
-	def seed_for_node_all(self):		
-		seed_simple_network()
-		#nodes = [Node.create(alias = i) for i in range(10)]
 
 	def test_GET_all_nodes_HTTP_response_status(self):
 		"""
