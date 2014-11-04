@@ -2,6 +2,7 @@ import satoyama
 from satoyama.models import *
 from uuid import uuid4
 from random import random, randint
+from numpy.random import uniform
 
 class NodeSeeder():
 
@@ -16,8 +17,19 @@ class NodeSeeder():
 			site = kwargs['site']
 		else:
 			site = None
+		
+		if kwargs.has_key('latitude'):
+			latitude = kwargs['latitude']
+		else:
+			latitude = uniform(35.143, 35.144)
+		
+		if kwargs.has_key('longitude'):
+			longitude = kwargs['longitude']
+		else:
+			longitude = uniform(139.988, 139.989)
 
-		node = Node.create(alias = "chibi_temp_dist_%s"%uuid4().hex, latitude = 35.143951, longitude = 139.988560, site = site)
+
+		node = Node.create(alias = "chibi_temp_dist_%s"%uuid4().hex, latitude = latitude, longitude = longitude, site = site)
 
 		st_temp = SensorType('temperature', 'C')
 		st_dist = SensorType('distance', 'cm')

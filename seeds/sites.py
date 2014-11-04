@@ -22,7 +22,9 @@ from random import random
 
 class SiteSeeder():
 	@staticmethod
-	def seed_ricefield_site(n_nodes = 1, n_readings = 5):
+	def seed_ricefield_site(n_nodes = 1, n_readings = 5, **kwargs):
 		site = Site.create(alias = 'site_%s'%uuid.uuid4().hex)
-		nodes = [NodeSeeder.seed_ricefield_node(n_readings = n_readings, site = site) for i in range(n_nodes)]
+		nodes = [NodeSeeder.seed_ricefield_node(n_readings = n_readings, site = site, **kwargs) for i in range(n_nodes)]
 		return site
+
+

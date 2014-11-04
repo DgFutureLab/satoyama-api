@@ -20,3 +20,4 @@ flask_migrate
 requests
 sphinx
 flask-limiter
+numpy
