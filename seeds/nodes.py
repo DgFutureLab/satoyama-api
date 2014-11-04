@@ -11,7 +11,7 @@ class NodeSeeder():
 
 
 	@staticmethod
-	def seed_ricefield_node(max_readings_per_node = 5, **kwargs):
+	def seed_ricefield_node(n_nodes = 3, **kwargs):
 		if kwargs.has_key('site'):
 			site = kwargs['site']
 		else:
@@ -28,7 +28,7 @@ class NodeSeeder():
 		Sensor.create(sensortype = st_hum, node = node, alias = 'humidity')
 
 		for sensor in node.sensors:
-			for r in range(0, randint(0, max_readings_per_node)):
+			for r in range(n_nodes):
 				Reading.create(sensor = sensor, value = random())
 		return node
 

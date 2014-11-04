@@ -2,9 +2,7 @@ from flask import Flask
 
 flapp = Flask('sensor_api')
 
-from helpers import UrlHelper, RequestHelper
-UrlHelper(flapp)
-RequestHelper(flapp)
+
 # def register_helper(self, func):
 # 	setattr(self, func.func_name, func)	
 # flapp.register_helper = register_helper
@@ -30,6 +28,9 @@ flapp.config.update(conf.module_config)
 conf.configure_flapp('dev')
 import satoyama
 
+from helpers import UrlHelper, RequestHelper
+UrlHelper(flapp)
+RequestHelper(flapp)
 
 ### Import modules containing statements that must be executed when the webapp is started (such as adding routes for the REST api)
 import resources, views, conf

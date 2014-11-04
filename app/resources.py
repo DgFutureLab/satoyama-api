@@ -1,4 +1,5 @@
-from app import rest_api, flapp
+from app import flapp
+from app import rest_api
 from satoyama.models import Node, Sensor, Reading
 import exc
 from flask.ext import restful
@@ -62,7 +63,11 @@ class ApiResponse(object):
 			elif self.is_json(obj):
 				self.objects.append(obj)
 			elif hasattr(obj, 'json'):
+				# try:
 				obj_as_json = obj.json()
+				# except Exception, e:
+				# 	print 'OOOOOOOOOOOOOOOOOOOO'
+				# 	print obj.__dict__
 				if self.is_json(obj_as_json):
 					self.objects.append(obj_as_json)
 				else:

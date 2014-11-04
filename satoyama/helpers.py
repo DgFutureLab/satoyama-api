@@ -4,6 +4,7 @@ from definitions import DATETIME_FORMATS
 
 from inspect import getmembers, isfunction, ismethod
 from flask import Flask
+import json
 
 class HelperBase(object):
 	"""
@@ -24,6 +25,16 @@ class HelperBase(object):
 				else:
 					setattr(self.obj, helper, getattr(self, helper))
 
+
+class JSONHelper(HelperBase):
+	
+	@staticmethod
+	def load_string_safe(string):
+		try:
+			loaded = json.loads(string)
+			return loaded
+		except Exception:
+			return 'None'
 
 class DatetimeHelper(HelperBase):
 

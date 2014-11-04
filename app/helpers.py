@@ -5,6 +5,45 @@ from flask import request, Flask
 from satoyama.helpers import HelperBase
 
 
+import unittest
+import json
+from app.resources import ApiResponse
+
+class ApiResponseHelper():
+
+	@staticmethod
+	def assert_response_format(response):
+		"""
+		:param response: An instance of requests.Response
+		Checks if an ApiResponse can be created
+		from the text attribute of the response
+		"""
+		json_dict = json.loads(response.text)
+		assert json_dict.has_key('errors')
+		assert json_dict.has_key('objects')
+		
+
+	@staticmethod
+	def assert_all_ok(response, expect_success = True):
+		"""
+		Takes a requests.Response instance and checks if the status code is OK. ALSO checks if an ApiResponse can be created
+		from the text attribute of the response, and if so, whether or not the ApiResponse status is OK. 
+		"""
+		assert response.ok
+		ApiResponseHelper.assert_response_format(response)
+		api_response = ApiResponseHelper.get_api_response(response)
+		if expect_success:
+			assert api_response.ok
+		else:
+			assert not api_response.ok
+		return api_response
+
+	@staticmethod
+	def get_api_response(response):
+		json_dict = json.loads(response.text)
+		api_response = ApiResponse(**json_dict)
+		return api_response
+
 class UrlHelper(HelperBase):
 	
 	DEFAULT_HOST = 'localhost'

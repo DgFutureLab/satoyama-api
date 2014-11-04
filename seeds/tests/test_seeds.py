@@ -2,13 +2,13 @@ from satoyama.tests.dbtestbase import DBTestBase
 from satoyama.models import *
 from seeds.nodes import NodeSeeder
 from seeds.sites import SiteSeeder
-from seeds import sites
+from seeds.sites import SiteSeeder
 from inspect import getmembers, isfunction
 
 
 class TestSiteSeeds(DBTestBase):
 	def test_singlenode_site_returns_site_with_one_node(self):
-		site = sites.seed_singlenode_site()
+		site = SiteSeeder.seed_ricefield_site()
 		assert isinstance(site, Site)
 		assert len(site.nodes) == 1
 

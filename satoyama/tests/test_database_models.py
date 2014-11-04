@@ -1,10 +1,11 @@
 from satoyama.models import *
-from seeds import networks
 from dbtestbase import DBTestBase
 from uuid import uuid4
 from satoyama.helpers import DatetimeHelper
 from datetime import datetime
 from random import random
+from seeds.sites import SiteSeeder
+from seeds.nodes import NodeSeeder
 # class ModelTester(ApiTestBase):
 
 class JSONTester(object):
@@ -39,7 +40,7 @@ class TestSiteModel(DBTestBase):
 		assert site_inserted.alias == site_retrieved.alias
 
 	def test_site_json_method(self):
-		site = networks.seed_singlenode_site()
+		site = SiteSeeder.seed_ricefield_site()
 		site_json = site.json()
 		JSONTester.test_model_json_method(Site, site_json)
 
@@ -61,7 +62,7 @@ class TestNodeModel(DBTestBase):
 		assert node_inserted.sensors == node_retrieved.sensors
 
 	def test_node_json_method(self):
-		node = networks.seed_singlenode_network(n_readings = 3)
+		node = NodeSeeder.seed_ricefield_node(n_readings = 3)
 		node_json = node.json()
 		JSONTester.test_model_json_method(Node, node_json)
 
@@ -78,7 +79,7 @@ class TestSensorModel(DBTestBase):
 		# assert sensortype_retrieved.node
 
 	def test_sensor_json_method(self):
-		sensor = networks.seed_singlenode_network(n_readings = 3).sensors[0]
+		sensor = NodeSeeder.seed_ricefield_node(n_readings = 3).sensors[0]
 		sensor_json = sensor.json()
 		JSONTester.test_model_json_method(Sensor, sensor_json)
 
@@ -90,7 +91,7 @@ class TestSensorModel(DBTestBase):
 		timestamp = datetime.now()
 		timestamp_str = DatetimeHelper.convert_datetime_to_timestamp(timestamp)
 		
-		sensor = networks.seed_singlenode_network(n_readings = 0).sensors[0]
+		sensor = NodeSeeder.seed_ricefield_node(n_readings = 0).sensors[0]
 		value = random()
 		Reading.create(sensor = sensor, timestamp = timestamp, value = value)
 		

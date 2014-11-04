@@ -5,10 +5,12 @@ from satoyama.models import Node, Sensor, SensorType, Reading
 from app import flapp
 import json
 import os
-from apitestbase import ApiTestBase
-from seeds.nodes import seed_tekrice_node
+from satoyama.tests.dbtestbase import DBTestBase
+from seeds.nodes import NodeSeeder
+from seeds.sites import SiteSeeder
+from app.tests.apitstbase import ApiTestBase
 
-class NodeResourceTests(ApiTestBase):
+class NodeResourceTests(DBTestBase, ApiTestBase):
 
 	#	###############################################################################
 	#	### Tests for node REST URLs [GET, POST] /node
@@ -39,7 +41,7 @@ class NodeResourceTests(ApiTestBase):
 		"""
 		Tests that GET /node/all gives a valid HTTP 200 response
 		"""
-		self.seed_for_node_all()
+		NodeSeeder.seed_ricefield_node()
 		url = flapp.get_url('node', 'all')
 		r = requests.get(url)
 		assert r.ok
@@ -48,7 +50,7 @@ class NodeResourceTests(ApiTestBase):
 		"""
 		Test that GET /node/all gives a JSON response that has no errors in it, and that an ApiResponse object can be instantiated from the response body.
 		"""
-		self.seed_for_node_all()
+		NodeSeeder.seed_ricefield_node(n_readings = 3)
 		url = flapp.get_url('node', 'all')
 		r = requests.get(url)
 		api_response = self.assert_all_ok(r)
@@ -60,7 +62,7 @@ class NodeResourceTests(ApiTestBase):
 
 		{"query": {}, "errors": [], "objects": [{"alias": alias, "latitude": null, "sensors": [], "type": "", "id": id}]}
 		"""
-		self.seed_for_node_all()
+		SiteSeeder.seed_ricefield_site(n_nodes = 3)
 		url = flapp.get_url('node', 'all')
 		r = requests.get(url)
 		api_response = self.assert_all_ok(r)

@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.exc import DataError
 from sqlalchemy.orm import object_mapper, class_mapper, relationship
 from collections import Iterable
-from helpers import DatetimeHelper
+from helpers import DatetimeHelper, JSONHelper
 import json
 from database import Base, manager
 from datetime import datetime
@@ -111,7 +111,7 @@ class Site(SatoyamaBase, Base):
 		return super(Site, self).json(Site.json_column_transformations, Site.json_relationship_representation)
 
 
-
+	
 
 @create
 class Node(SatoyamaBase, Base):
@@ -122,7 +122,7 @@ class Node(SatoyamaBase, Base):
 	json_relationship_representation = {
 		'sensors': {
 			'columns' : ['id', 'alias', 'latest_reading'], 
-			'transformations' : {'latest_reading' : json.loads}
+			'transformations' : {'latest_reading' : JSONHelper.load_string_safe}
 			}
 		}
 	
@@ -201,7 +201,7 @@ class Sensor(SatoyamaBase, Base):
 		self.sensortype = sensortype
 		self.node = node
 		self.alias = alias
-		self.latest_reading = None
+		self.latest_reading = ''
 		
 		for reading in readings:
 			assert isinstance(reading, Reading), 'Each item in readings must be an instance of type Reading'
