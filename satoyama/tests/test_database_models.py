@@ -105,5 +105,66 @@ class TestSensorModel(DBTestBase):
 		assert round(latest_reading['value'], 10) == round(value, 10)
 		assert latest_reading['sensor_id'] == sensor.id
 
+class TestCascades(DBTestBase):
+
+	def test_site_cascade(self):
+		"""
+		Deleting a site should delete all the associated nodes
+
+		"""
+		site = SiteSeeder.seed_ricefield_site(n_nodes = 3)
+		assert len(Site.query.all()) > 0
+		assert len(Node.query.all()) > 0
+		Site.query.delete()
+		assert len(Site.query.all()) == 0
+		assert len(Node.query.all()) == 0
+
+	def test_node_cascade(self):
+		"""
+		Deleting a node should delete all the associated sensors
+
+		"""
+		node = NodeSeeder.seed_ricefield_node()
+		assert len(Node.query.all()) > 0
+		assert len(Sensor.query.all()) > 0
+		Node.query.delete()
+		assert len(Node.query.all()) == 0
+		assert len(Sensor.query.all()) == 0
+
+	def test_sensor_cascade(self):
+		"""
+		Deleting a sensor should delete all the associated readings
+
+		"""
+		n_readings = 5
+		node = NodeSeeder.seed_ricefield_node(n_readings = n_readings)
+		assert len(Sensor.query.all()) > 0
+		assert len(Reading.query.all()) > 0
+		Sensor.query.delete()
+		assert len(Sensor.query.all()) == 0
+		assert len(Reading.query.all()) == 0		
+
+
+	def sensortype_cascade(self):
+		"""
+		Deleting a sensortype should NOT delete any associated sensors
+
+		"""
+		n_readings = 5
+		node = NodeSeeder.seed_ricefield_node(n_readings = n_readings)
+		n_sensors = len(n_sensors)
+
+		assert len(SensorType.query.all()) > 0
+		assert len(Sensor.query.all()) > 0
+		SensorType.query.filter_by(id = node.sensors[0].sensortype.id).delete()
+		assert len(Sensor.query.all()) == n_sensors
+
+
+
+
+
+
+
+
 
 
