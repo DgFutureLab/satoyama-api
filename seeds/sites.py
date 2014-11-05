@@ -2,22 +2,15 @@ import uuid
 from satoyama.models import *
 from nodes import NodeSeeder
 from random import random
+from datetime import datetime
+from multiprocessing import Process
+from numpy.random import shuffle
+import time
 
+def notest(func):
+	setattr(func, 'notest', True)
+	return func
 
-# def seed_singlenode_network(n_readings = 10):
-# 	node = Node.create(alias = uuid.uuid4().hex)
-# 	st = SensorType('Sonar', 'cm')
-# 	sensor = Sensor.create(node = node, sensortype = st, alias = 'distance')
-# 	for i in range(n_readings):
-# 		Reading.create(sensor = sensor, value = random())
-
-# 	return node
-
-
-# def seed_singlenode_site(n_readings = 5):
-# 	node = seed_singlenode_network(n_readings)
-# 	site = Site.create(alias = uuid.uuid4().hex, nodes = [node])
-# 	return site
 
 
 class SiteSeeder():
@@ -26,5 +19,34 @@ class SiteSeeder():
 		site = Site.create(alias = 'site_%s'%uuid.uuid4().hex)
 		nodes = [NodeSeeder.seed_ricefield_node(n_readings = n_readings, site = site, **kwargs) for i in range(n_nodes)]
 		return site
+
+	@staticmethod
+	@notest
+	def simulate_ricefield_site(site_id, n_nodes = None, site_alias = None):
+		
+		def run_simulation(site):
+			total_sensors = sum([len(node.sensors) for node in site.nodes])
+			print total_sensors
+			wait = 3600.0 / total_sensors
+			print wait
+			for node in site.nodes:
+				for sensor in node.sensors:
+					r = Reading.create(sensor = sensor, value = random() * 100, timestamp = datetime.now())
+					print 'Created reading %s at site %s'%(r, site.id)
+					time.sleep(wait)
+
+		site = Site.query.filter_by(id = site_id).first()
+		if not site:
+			if n_nodes and site_alias:
+				site = Site.create(alias = site_alias)
+				for n in xrange(n_nodes):
+					NodeSeeder.seed_ricefield_node(n_readings = 0, site = site)
+			else:
+				print 'No site with the supplied site_id was found. In this case you must supply values for both n_nodes and site_alias. Returning None'
+				return
+
+		Process(target = run_simulation, args = (site, )).run()
+
+
 
 
