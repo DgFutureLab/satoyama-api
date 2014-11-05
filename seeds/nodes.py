@@ -29,8 +29,13 @@ class NodeSeeder():
 		else:
 			longitude = uniform(139.988, 139.989)
 
+		if node_args.has_key('alias'):
+			alias = node_args['alias']
+		else:
+			alias = "ricefield_node_%s"%uuid4().hex
 
-		node = Node.create(alias = "ricefield_node_%s"%uuid4().hex, latitude = latitude, longitude = longitude, site = site)
+
+		node = Node.create(alias = alias, latitude = latitude, longitude = longitude, site = site)
 
 		st_temp = SensorType('temperature', 'C')
 		st_dist = SensorType('distance', 'cm')
