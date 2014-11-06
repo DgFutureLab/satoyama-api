@@ -15,15 +15,17 @@ def notest(func):
 
 class SiteSeeder():
 	@staticmethod
-	def seed_ricefield_site(n_nodes = 1, n_readings = 5, **kwargs):
-		site = Site.create(alias = 'site_%s'%uuid.uuid4().hex)
+	def seed_ricefield_site(site_alias = None, n_nodes = 1, n_readings = 5, **kwargs):
+		if not site_alias: 
+			site_alias = 'site_%s'%uuid.uuid4().hex
+		site = Site.create(alias = site_alias)
 		nodes = [NodeSeeder.seed_ricefield_node(n_readings = n_readings, site = site, **kwargs) for i in range(n_nodes)]
 		return site
 
 	@staticmethod
 	@notest
 	def simulate_ricefield_site(site_id, n_nodes = None, site_alias = None):
-		
+
 		def run_simulation(site):
 			total_sensors = sum([len(node.sensors) for node in site.nodes])
 			print total_sensors

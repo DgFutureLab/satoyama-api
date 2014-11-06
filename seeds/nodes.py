@@ -34,7 +34,6 @@ class NodeSeeder():
 		else:
 			alias = "ricefield_node_%s"%uuid4().hex
 
-
 		node = Node.create(alias = alias, latitude = latitude, longitude = longitude, site = site)
 
 		st_temp = SensorType('temperature', 'C')
