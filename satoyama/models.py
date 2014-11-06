@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.exc import DataError
-from sqlalchemy.orm import object_mapper, class_mapper, relationship
+from sqlalchemy.orm import object_mapper, class_mapper, relationship, backref
 from collections import Iterable
 from helpers import DatetimeHelper, JSONHelper
 import json
@@ -83,6 +83,10 @@ class SatoyamaBase(object):
 		except Exception, e:
 			return False
 
+	# @classmethod
+	# def create_random(cls):
+	# 	settables = 
+
 @create
 class Site(SatoyamaBase, Base):
 
@@ -96,6 +100,14 @@ class Site(SatoyamaBase, Base):
 			}
 		}
 
+	id = Column( Integer, primary_key = True)
+	alias = Column( String(100) )
+	nodes = relationship(
+		'Node',
+		cascade='all,delete-orphan', 
+		backref = backref('site', single_parent = True)
+		)
+
 	def __init__(self, alias, nodes = []):
 		self.alias = alias
 		assert isinstance(nodes, Iterable), 'nodes must be iterable'
@@ -103,9 +115,7 @@ class Site(SatoyamaBase, Base):
 			assert isinstance(node, Node), 'Each item in nodes must be an instance of type Node'
 			self.nodes.append(node)
 
-	id = Column( Integer, primary_key = True)
-	alias = Column( String(100) )
-	nodes = relationship('Node', backref = 'site')
+
 
 	def json(self):
 		return super(Site, self).json(Site.json_column_transformations, Site.json_relationship_representation)
@@ -128,10 +138,16 @@ class Node(SatoyamaBase, Base):
 	
 	id = Column( Integer, primary_key = True )
 	alias = Column( String(100) )
-	sensors = relationship('Sensor', backref = 'node')
 	longitude = Column( Float()) 
 	latitude = Column( Float())
-	site_id = Column( Integer, ForeignKey('sites.id') )
+
+	sensors = relationship(
+		'Sensor', 
+		cascade='all,delete-orphan',
+		backref = backref('node')
+		)
+
+	site_id = Column( Integer, ForeignKey('sites.id', ondelete = 'CASCADE') )
 
 	def __init__(self, site = None, alias = None, sensors = [], longitude = None, latitude = None, **kwargs):
 		super(Node, self).__init__(**kwargs)
@@ -158,7 +174,11 @@ class SensorType(SatoyamaBase, Base):
 	id = Column( Integer, primary_key = True)
 	name = Column( String() )
 	unit = Column( String() )
-	sensors = relationship('Sensor', backref = 'sensortype')
+	
+	sensors = relationship(
+		'Sensor', 
+		backref = backref('sensortype')
+		)
 
 	def __init__(self, name, unit, **kwwargs):
 		super(SensorType, self).__init__()
@@ -187,14 +207,20 @@ class Sensor(SatoyamaBase, Base):
 
 	id = Column( Integer, primary_key = True )
 	alias = Column( String() )
-	readings = relationship('Reading', backref = 'sensor')
 	latest_reading = Column( String() )
-	node_id = Column( Integer, ForeignKey('nodes.id') )
-	sensortype_id = Column( Integer, ForeignKey('sensortypes.id') )
 	
-	def __init__(self, sensortype, node, alias = None, readings = [], **kwargs):
+	readings = relationship(
+		'Reading',
+		 cascade='all,delete-orphan', 
+		 backref = backref('sensor', single_parent = True)
+		 )
+
+	node_id = Column( Integer, ForeignKey('nodes.id', ondelete = 'CASCADE') )
+	sensortype_id = Column( Integer, ForeignKey('sensortypes.id', ondelete = 'SET NULL') )
+	
+	def __init__(self, node, sensortype = None, alias = None, readings = [], **kwargs):
 		super(Sensor, self).__init__(**kwargs)
-		assert isinstance(sensortype, SensorType), 'sensortype must be an instance of type SensorType'
+		# assert isinstance(sensortype, SensorType), 'sensortype must be an instance of type SensorType'
 		assert isinstance(node, Node), 'node must be an instance of type Node'
 		assert isinstance(readings, Iterable), 'readings must iterable'
 		
@@ -232,7 +258,7 @@ class Reading(SatoyamaBase, Base):
 	id = Column( Integer, primary_key = True )
 	timestamp = Column( DateTime() )
 	value = Column( Float() )
-	sensor_id = Column( Integer, ForeignKey('sensors.id') )
+	sensor_id = Column( Integer, ForeignKey('sensors.id', ondelete = 'CASCADE') )
 
 	json_column_transformations = {
 			'timestamp' : DatetimeHelper.convert_datetime_to_timestamp
