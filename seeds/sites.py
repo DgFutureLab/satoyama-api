@@ -30,11 +30,12 @@ class SiteSeeder():
 			total_sensors = sum([len(node.sensors) for node in site.nodes])
 			wait = 3600.0 / total_sensors
 			print 'Simulating site %s with nodes %s'%(site.id, map(lambda node: node.id, site.nodes))
-			for node in site.nodes:
-				for sensor in node.sensors:
-					r = Reading.create(sensor = sensor, value = random() * 100, timestamp = datetime.now())
-					print 'Created reading %s at site %s'%(r, site.id)
-					time.sleep(wait)
+			while True:
+				for node in site.nodes:
+					for sensor in node.sensors:
+						r = Reading.create(sensor = sensor, value = random() * 100, timestamp = datetime.now())
+						print 'Created reading %s at site %s'%(r, site.id)
+						time.sleep(wait)
 
 		site = Site.query.filter_by(id = site_id).first()
 		if not site:
