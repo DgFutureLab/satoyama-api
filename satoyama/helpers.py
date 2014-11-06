@@ -34,7 +34,7 @@ class JSONHelper(HelperBase):
 			loaded = json.loads(string)
 			return loaded
 		except Exception:
-			return 'None'
+			return ''
 
 class DatetimeHelper(HelperBase):
 
