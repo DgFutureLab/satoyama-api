@@ -1,3 +1,6 @@
 [submodule "ext/digitalocean"]
 	path = ext/digitalocean
 	url = git@github.com:dgarage/flsecrets.git
+[submodule "flsecrets"]
+	path = flsecrets
+	url = https://github.com/dgarage/flsecrets.git
