@@ -16,6 +16,7 @@ class NodeResourceTests(DBTestBase, ApiTestBase):
 	#	### Tests for node REST URLs [GET, POST] /node
 	#	###############################################################################
 
+
 	def test_GET_existing_node_by_id(self):
 	 	Node.create() # create the node that we want to GET
 	 	url = flapp.get_url('node', node_id = 1)

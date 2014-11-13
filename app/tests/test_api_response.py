@@ -20,6 +20,7 @@ class TestApiResponse(unittest.TestCase):
 
 	def setUp(self):
 		self.r = ApiResponse()
+		
 
 	def test_add_objects(self):
 		

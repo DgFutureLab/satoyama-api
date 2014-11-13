@@ -202,6 +202,10 @@ class Sensor(SatoyamaBase, Base):
 		'readings': {
 			'columns' : ['id', 'value', 'timestamp'], 
 			'transformations' : {'timestamp': DatetimeHelper.convert_datetime_to_timestamp}
+			},
+		'sensortype': {
+			'columns' : ['unit', 'name'],
+			'transformations': {}
 			}
 		}
 
