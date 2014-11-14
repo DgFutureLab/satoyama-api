@@ -1,10 +1,6 @@
-import unittest
-import app
 import requests
 from satoyama.models import Node, Sensor, SensorType, Reading
 from app import flapp
-import json
-import os
 from satoyama.tests.dbtestbase import DBTestBase
 from seeds.nodes import NodeSeeder
 from seeds.sites import SiteSeeder

@@ -30,6 +30,12 @@ class MissingFieldException(ApiException):
 		super(MissingFieldException, self).__init__(message)
 
 
+class MissingResourceException(ApiException):
+	def __init__(self, resource_type, resource_id):
+		super(MissingResourceException, self).__init__('No %s with id %s'%(resource_type, resource_id))
+
+
+
 class MissingNodeException(ApiException):
 	def __init__(self, node_id):
 		super(MissingNodeException, self).__init__('No such node: %s'%node_id)

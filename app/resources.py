@@ -1,6 +1,6 @@
 from app import flapp
 from app import rest_api
-from satoyama.models import Node, Sensor, Reading
+from satoyama.models import *
 import exc
 from flask.ext import restful
 from flask import request
@@ -40,7 +40,6 @@ class ApiResponse(object):
 
 		if self.is_json(objects):
 			for obj in objects: self += obj
-			# self.objects = objects[:]
 
 		if self.is_json(errors):
 			self.errors = errors[:]
@@ -63,11 +62,7 @@ class ApiResponse(object):
 			elif self.is_json(obj):
 				self.objects.append(obj)
 			elif hasattr(obj, 'json'):
-				# try:
 				obj_as_json = obj.json()
-				# except Exception, e:
-				# 	print 'OOOOOOOOOOOOOOOOOOOO'
-				# 	print obj.__dict__
 				if self.is_json(obj_as_json):
 					self.objects.append(obj_as_json)
 				else:
@@ -91,8 +86,7 @@ class ApiResponse(object):
 
 	def json(self):
 		return dict(zip(ApiResponse.__fields__, map(lambda x: getattr(self, x), ApiResponse.__fields__)))
-		# return 'OK'
-		# return dict(zip(ApiResponse.__fields__, map(lambda x: getattr(self, x), ApiResponse.__fields__)))
+
 
 
 def get_form_data(response, field_name, field_type):
@@ -141,6 +135,21 @@ def get_form_data(response, field_name, field_type):
 # 	def get(self):
 
 
+
+
+class SiteResource(restful.Resource):
+	def get(self, site_id):
+		response = ApiResponse(request)
+		site = Site.query.filter_by(id = site_id).first()
+		if site:
+			response += site
+		else:
+			response += exc.MissingResourceException(type(self), site_id)
+		return response.json()
+
+
+
+rest_api.add_resource(SiteResource, '/site/<int:site_id>')
 
 
 

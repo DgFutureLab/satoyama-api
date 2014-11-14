@@ -58,6 +58,13 @@ class SatoyamaBase(object):
 		return filter(lambda x: x != 'id', [p.key for p in class_mapper(cls).iterate_properties])
 
 	@classmethod
+	def columns(cls):
+		"""
+		Returns a list of all columns (including relations)
+		"""
+		return cls.settables() + ['id']
+
+	@classmethod
 	def deep_validate_pars(cls, **kwargs):
 		"""
 		This methods takes the dictionary provided in kwargs and tries to make an instance AND 
@@ -108,7 +115,7 @@ class Site(SatoyamaBase, Base):
 		backref = backref('site', single_parent = True)
 		)
 
-	def __init__(self, alias, nodes = []):
+	def __init__(self, alias = None, nodes = []):
 		self.alias = alias
 		assert isinstance(nodes, Iterable), 'nodes must be iterable'
 		for node in nodes:
@@ -185,13 +192,6 @@ class SensorType(SatoyamaBase, Base):
 		self.name = name
 		self.unit = unit
 
-	# def __repr__(self):
-	# 	json_dict = {
-	# 				'type' : str(self.__class__),
-	# 				'name' : self.name,
-	# 				'id' : self.id
-	# 				}	
-	# 	return json.dumps(json_dict)
 
 @create
 class Sensor(SatoyamaBase, Base):
@@ -243,17 +243,6 @@ class Sensor(SatoyamaBase, Base):
 	def json(self):
 		return super(Sensor, self).json(Sensor.json_column_transformations, Sensor.json_relationship_representation)
 
-	# def __repr__(self):
-	# 	json_dict = {	
-	# 				'type' : str(self.__class__), 
-	# 				'sensortype' : self.sensortype.name,
-	# 				'latest_reading' : json.loads(self.latest_reading),
-	# 				'id' : self.id
-	# 				}
-	# 	return json.dumps(json_dict)
-
-# class SatoyamaFormatter(object):
-
 
 @create
 class Reading(SatoyamaBase, Base):
@@ -293,12 +282,3 @@ class Reading(SatoyamaBase, Base):
 	def json(self):
 		return super(Reading, self).json(Reading.json_column_transformations, Reading.json_relationship_representation)
 
-
-
-	# def __repr__(self):
-	# 	json_dict = {
-	# 				'type' : str(self.__class__),
-	# 				'value' : self.value,
-	# 				'id' : self.id
-	# 				}
-	# 	return json.dumps(json_dict)
