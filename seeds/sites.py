@@ -1,5 +1,7 @@
 import uuid
+import satoyama
 from satoyama.models import *
+
 from nodes import NodeSeeder
 from random import random
 from datetime import datetime
@@ -26,16 +28,7 @@ class SiteSeeder():
 	@notest
 	def simulate_ricefield_site(site_id, n_nodes = None, site_alias = None):
 
-		def run_simulation(site):
-			total_sensors = sum([len(node.sensors) for node in site.nodes])
-			wait = 3600.0 / total_sensors
-			print 'Simulating site %s with nodes %s'%(site.id, map(lambda node: node.id, site.nodes))
-			while True:
-				for node in site.nodes:
-					for sensor in node.sensors:
-						r = Reading.create(sensor = sensor, value = random() * 100, timestamp = datetime.now())
-						print 'Created reading %s at site %s, node %s'%(r, site.id, node.id)
-						time.sleep(wait)
+		
 
 		site = Site.query.filter_by(id = site_id).first()
 		if not site:
@@ -47,9 +40,23 @@ class SiteSeeder():
 				print 'No site with the supplied site_id was found. In this case you must supply values for both n_nodes and site_alias. Returning None'
 				return
 
-		Process(target = run_simulation, args = (site, )).run()
+		def run_simulation(site):
+			total_sensors = sum([len(node.sensors) for node in site.nodes])
+			wait = 3600.0 / total_sensors
+			node_ids = map(lambda node: node.id, site.nodes)
+			shuffle(node_ids)
+			print 'Simulating site %s with nodes %s'%(site.id, node_ids)
+			while True:
+				for node_id in node_ids:
+					node = Node.query.filter_by(id = node_id).first()
+					for sensor in node.sensors:
+						r = Reading.create(sensor = sensor, value = random() * 100, timestamp = datetime.now())
+						print 'Created reading %s at site %s, node %s'%(r, site.id, node.id)
+						time.sleep(wait)
+
+		run_simulation(site)
+		# Process(target = run_simulation, args = (site, )).run()
 
 
-if __name__ == "__main__":
-	SiteSeeder.simulate_ricefield_site(site_id = 2)
+
 
