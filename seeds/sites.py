@@ -55,7 +55,7 @@ class SiteSeeder():
 						time.sleep(wait)
 
 		run_simulation(site)
-		# Process(target = run_simulation, args = (site, )).run()
+		# Process(target = run_simulation, args = (site, )).start()
 
 
 

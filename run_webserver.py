@@ -8,6 +8,8 @@ def run_webserver(name, env):
 	flapp.logger.debug('Running webserver with config: %s'%flapp.config)
 	socketio.run(flapp, port = flapp.config['PORT'])
 
+import subprocess
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--env', choices = ('test', 'dev', 'prod'), required = True, help = 'Specify environment, which determines which database to use.')
