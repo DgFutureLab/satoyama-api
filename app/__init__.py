@@ -20,7 +20,7 @@ from flask.ext.socketio import SocketIO
 socketio = SocketIO(flapp)
 
 from flask_limiter import Limiter
-limiter = Limiter(flapp, global_limits=["1 per second"])
+limiter = Limiter(flapp, global_limits=["30 per minute"])
 
 ### Before importing other modules, import and setup run configuration
 import conf
