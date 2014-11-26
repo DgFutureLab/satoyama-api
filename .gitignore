@@ -55,3 +55,4 @@ target/
 
 chef/
 doc/
+.vagrant/
