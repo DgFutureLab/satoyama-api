@@ -50,5 +50,6 @@ class SiteSeeder():
 		Process(target = run_simulation, args = (site, )).run()
 
 
-
+if __name__ == "__main__":
+	SiteSeeder.simulate_ricefield_site(site_id = 2)
 
