@@ -34,7 +34,7 @@ class SiteSeeder():
 				for node in site.nodes:
 					for sensor in node.sensors:
 						r = Reading.create(sensor = sensor, value = random() * 100, timestamp = datetime.now())
-						print 'Created reading %s at site %s'%(r, site.id)
+						print 'Created reading %s at site %s, node %s'%(r, site.id, node.id)
 						time.sleep(wait)
 
 		site = Site.query.filter_by(id = site_id).first()
