@@ -2,7 +2,9 @@
 # vi: set ft=ruby :
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+
 VAGRANTFILE_API_VERSION = "2"
+
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # All Vagrant configuration is done here. The most common configuration
@@ -10,7 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "base"
+  # config.vm.box = "base"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -52,6 +54,70 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #   # Use VBoxManage to customize the VM. For example to change memory:
   #   vb.customize ["modifyvm", :id, "--memory", "1024"]
   # end
+  load 'flsecrets/digitalocean_token.rb'
+
+  config.vm.provider 'digital_ocean' do |vb, ovr|
+    ovr.ssh.private_key_path = "~/.ssh/id_rsa_satoyama"
+    ovr.vm.box = "digital_ocean"
+    ovr.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+    ovr.vm.hostname = "satoyama-api"
+    #ovr.vm.synced_folder "./src", "/var/www/test_site", :create => true, :owner => 'vagrant', :group => 'vagrant', :mount_options => ['dmode=777', 'fmode=666']
+
+    vb.token = DIGITALOCEAN_TOKEN
+    vb.ssh_key_name = 'satoyama'
+    # vb.image = 'CentOS 6.5 x64'
+    # vb.image = 'Ubuntu 14.04 x64' # Example
+    vb.image = '14.04 x64' # Example
+    vb.region = 'sgp1'
+    vb.size = '512MB'
+
+    # Use VBoxManage to customize the VM. For example to change memory:
+    #vb.customize ["modifyvm", :id, "--memory", "1024"]
+  end
+  ENV['VAGRANT_DEFAULT_PROVIDER'] = 'digital_ocean'
+
+  # Plugins
+
+
+  # config.vm.provision :chef_solo do |chef|
+  #   chef.add_recipe "nginx"
+
+  # end
+
+  config.vm.provision "shell", inline: "echo wazzup", run: "always"
+  # config.berkshelf.enabled = true  ### berkshelf: Manage a Cookbook or an Application's Cookbook dependencies
+  config.omnibus.chef_version = :latest ### omnibus installs chef
+
+  # # Network
+  # config.vm.network :forwarded_port, guest: 80, host: 8080
+
+  # # Chef solo provisioning
+
+
+  config.vm.provision "chef_solo" do |chef|
+    #chef.cookbooks_path = "chef/cookbooks/"
+    chef.cookbooks_path = ["chef/cookbooks", "chef/site-cookbooks"]
+    chef.data_bags_path = "chef/data_bags"
+    # chef.environment = "production"
+    # chef.environment = "development"
+    # chef.environments_path = "chef/environments"
+    chef.run_list = %w[
+      recipe[apt]
+      recipe[git]
+      recipe[vim]
+      recipe[nginx]
+      recipe[python]
+    ]
+    # recipe[nginx:default]
+    # Put iptables to the above, if you want to
+    # recipe[iptables]
+  end
+
+  # 
+  config.vm.provision "shell", inline: "virtualenv /root/env", run: "always"
+  config.vm.provision "shell", inline: "source /root/env/bin/activate", run: "always"
+  config.vm.provision "shell", inline: "which python", run: "always"
+
   #
   # View the documentation for the provider you're using for more
   # information on available options.
@@ -119,4 +185,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
+
+
+
 end
