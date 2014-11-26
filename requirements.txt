@@ -21,3 +21,4 @@ requests
 sphinx
 flask-limiter
 numpy
+wercker
