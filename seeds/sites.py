@@ -26,10 +26,7 @@ class SiteSeeder():
 
 	@staticmethod
 	@notest
-	def simulate_ricefield_site(site_id, n_nodes = None, site_alias = None):
-
-		
-
+	def simulate_ricefield_site(site_id, n_nodes = 100, site_alias = None):
 		site = Site.query.filter_by(id = site_id).first()
 		if not site:
 			if n_nodes and site_alias:
