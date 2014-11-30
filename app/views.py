@@ -37,6 +37,12 @@ def format_data(sensor_data):
 ###################################################################
 
 
+@flapp.route('/hello', methods = ['GET'])
+def hello():
+	"""	This return info about all nodes. """
+	return 'HELLO!'
+	# return repr(response)
+
 
 @flapp.route('/node/all', methods = ['GET'])
 def get_all_nodes():
