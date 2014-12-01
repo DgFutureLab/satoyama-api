@@ -1,5 +1,5 @@
 # coding: utf-8
-from app import flapp, socketio
+from app import flapp
 from flask import render_template, request
 import datetime
 import json
@@ -19,10 +19,6 @@ def emit_temperature():
 	temperature = json.loads(request.data)
 	socketio.emit('new serial data', {'temperature': format_data(temperature)}, namespace = '/serial')
 	return 'OK'
-
-@socketio.on('request serial data', namespace = '/serial')
-def respond_to_data_request():
-	flapp.logger.debug('Got request for data')
 
 
 def format_data(sensor_data):

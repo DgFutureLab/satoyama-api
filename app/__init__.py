@@ -15,10 +15,6 @@ Bootstrap(flapp)
 from flask.ext import restful
 rest_api = restful.Api(flapp)
 
-### Adds websocket to app
-from flask.ext.socketio import SocketIO
-socketio = SocketIO(flapp)
-
 from flask_limiter import Limiter
 limiter = Limiter(flapp, global_limits=["30 per minute"])
 
