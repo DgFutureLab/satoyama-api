@@ -56,3 +56,5 @@ target/
 chef/
 doc/
 .vagrant/
+
+.db_config.yml

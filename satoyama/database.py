@@ -1,17 +1,19 @@
-
+import sys
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+import yaml
 import inspect
 from definitions import ENVIRONMENTS
 
 Base = declarative_base()
 
-default_db_uri = {
-		'test' : 'postgresql://halfdan:halfdan@localhost/tekrice_test',
-		'dev' :	'postgresql://halfdan:halfdan@localhost/tekrice_dev',
-		'prod' : 'postgresql://halfdan:halfdan@localhost/tekrice_prod'
-			}
+# default_db_uri = {
+# 		'test' : 'postgresql://halfdan:halfdan@localhost/tekrice_test',
+# 		'dev' :	'postgresql://halfdan:halfdan@localhost/tekrice_dev',
+# 		'prod' : 'postgresql://halfdan:halfdan@localhost/tekrice_prod'
+# 			}
+
 
 
 # CURRENT_ENVIRONMENT = 'dev'
@@ -24,10 +26,28 @@ class DBManager(object):
 	def set_environment(self, env):
 		assert env in ENVIRONMENTS
 		self.env = env
+		self.set_databases()
 		self.__confdb__()
 
+	def set_databases(self):
+		with open('db_config.yaml') as f:
+			f = f.read()
+			try:
+				dbconfig = yaml.load(f.read())
+			except Exception:
+				print 'Could not parse db_config.yaml. Did you follow the instructions in the README? :)'
+				sys.exit(1)
+
+		username = dbconfig[self.env]['username']
+		password = dbconfig[self.env]['password']
+		dbname = dbconfig[self.env]['dbname']
+		dbhost = dbconfig[self.env]['dbhost']
+		self.dburi = 'postgresql://%s:%s@%s/%s'%(username, password, dbhost, dbname)
+
+		print self.dburi
+
 	def __confdb__(self):
-		self.engine = create_engine(default_db_uri[self.env], convert_unicode = True)
+		self.engine = create_engine(self.dburi, convert_unicode = True)
 		self.session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=self.engine))
 		Base.query = self.session.query_property()
 
@@ -48,9 +68,9 @@ class DBManager(object):
 		self.init_db()
 
 	def get_db_URI(self):
-		return default_db_uri[self.env]
+		return self.dburi
 
-manager = DBManager('dev')
+manager = DBManager('development')
 
 # engine = create_engine('postgresql://halfdan:halfdan@localhost/tekrice_dev', convert_unicode = True)
 # db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))

@@ -5,8 +5,9 @@ RESTful (more or less) API for working with sensor networks based on Freaklabs o
 
 
 #Installation on ubuntu
-##Install postgresql:
-sudo apt-get libpq-dev postgresql postgresql-contrib
+1) Install postgresql
+sudo apt-get update
+sudo apt-get install libpq-dev postgresql postgresql-contrib
 
 ## Install dependencies
 sudo easy_install virtualenv

@@ -1,4 +1,4 @@
-ENVIRONMENTS = ['test', 'dev', 'prod']
+ENVIRONMENTS = ['test', 'development', 'production']
 
 DATETIME_FORMATS = [
 					'%Y-%m-%d-%H:%M:%S:%f',

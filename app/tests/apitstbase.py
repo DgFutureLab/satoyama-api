@@ -1,8 +1,13 @@
 import unittest
 import json
 from app.resources import ApiResponse
-
+import requests
 class ApiTestBase():
+
+	GET_TIMEOUT = 2
+
+	def get(url, **query_params):
+		return requests.get(url, timeout = ApiTestBase.GET_TIMEOUT, **query_params)
 
 	def assert_response_format(self, response):
 		"""

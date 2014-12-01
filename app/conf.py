@@ -49,10 +49,12 @@ def configure_flapp(env):
 		flapp.config.update(APP_TEST_SETTINGS)
 		limiter.enabled = False
 
-	elif env == 'dev':
+	elif env == 'development':
 		flapp.config.update(APP_DEV_SETTINGS)
 	elif env == 'production':
 		flapp.config.update(APP_PROD_SETTINGS)
+	else:
+		assert False, 'Please specify a valid environment'
 
 	configure_database(env)
 
