@@ -49,6 +49,9 @@ launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
 13. python manage.py db upgrade (creates database schema)
 
 
+14. python run_webserver.py --env development
+
+
 Notes: 
 createuser satoayama —login —superuser —password
 pip freeze
