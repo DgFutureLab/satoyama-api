@@ -1,0 +1,15 @@
+production:
+  username: 'satoyama'
+  password: 'satoyama'
+  dbname: 'satoyama_prod'
+  dbhost: 'localhost'
+development:
+  username: 'satoyama'
+  password: 'satoyama'
+  dbname: 'satoyama_dev'
+  dbhost: 'localhost'
+test:
+  username: 'satoyama'
+  password: 'satoyama'
+  dbname: 'satoyama_test'
+  dbhost: 'localhost'
