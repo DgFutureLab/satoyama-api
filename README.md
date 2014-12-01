@@ -15,6 +15,8 @@ virtualenv env
 source env/bin/activate
 pip install -r requirements.txt
 
+## Setup database:
+sudo -u postgres psql postgres
 
 
 
