@@ -6,7 +6,7 @@ from multiprocessing import Process
 def run_webserver(name, env):
 	conf.configure_flapp(env)
 	flapp.logger.debug('Running webserver with config: %s'%flapp.config)
-	flapp.run(port = 8080)
+	flapp.run(port = flapp.config['PORT'])
 
 
 def run_simulation(site_id):
