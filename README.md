@@ -4,6 +4,21 @@ satoyama-api
 RESTful (more or less) API for working with sensor networks based on Freaklabs open hardware. Test
 
 
+#Installation on ubuntu
+##Install postgresql:
+sudo apt-get libpq-dev postgresql postgresql-contrib
+
+## Install dependencies
+sudo easy_install virtualenv
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+
+
+
+
+
+
 API Usage
 ============
 
