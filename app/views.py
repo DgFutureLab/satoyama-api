@@ -14,13 +14,6 @@ def index():
 	# return 'OK'
 	return render_template('index.html')
 
-@flapp.route('/update_temperature', methods = ['GET', 'POST'])
-def emit_temperature():
-	temperature = json.loads(request.data)
-	socketio.emit('new serial data', {'temperature': format_data(temperature)}, namespace = '/serial')
-	return 'OK'
-
-
 def format_data(sensor_data):
 	sensor_data = map(lambda s: dict(zip(['time', 'addr', u'reading(°C)'], s.split(','))), sensor_data)
 	for reading in sensor_data: reading.update({'time': datetime.datetime.fromtimestamp(float(reading['time'])).strftime('%Y-%m-%d %H:%M:%S')})
