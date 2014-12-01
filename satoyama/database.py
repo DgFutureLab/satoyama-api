@@ -30,10 +30,10 @@ class DBManager(object):
 		self.__confdb__()
 
 	def set_databases(self):
-		with open('db_config.yaml') as f:
+		with open('db_config.yml') as f:
 			f = f.read()
 			try:
-				dbconfig = yaml.load(f.read())
+				dbconfig = yaml.load(f)
 			except Exception:
 				print 'Could not parse db_config.yaml. Did you follow the instructions in the README? :)'
 				sys.exit(1)
@@ -43,8 +43,6 @@ class DBManager(object):
 		dbname = dbconfig[self.env]['dbname']
 		dbhost = dbconfig[self.env]['dbhost']
 		self.dburi = 'postgresql://%s:%s@%s/%s'%(username, password, dbhost, dbname)
-
-		print self.dburi
 
 	def __confdb__(self):
 		self.engine = create_engine(self.dburi, convert_unicode = True)
