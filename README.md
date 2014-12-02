@@ -8,22 +8,20 @@ RESTful (more or less) API for working with sensor networks based on Freaklabs o
 ## Setup database
 First, install postgresql
 
-1. $ sudo apt-get update
-2. $ sudo apt-get install libpq-dev postgresql postgresql-contrib
+$ sudo apt-get update
+$ sudo apt-get install libpq-dev postgresql postgresql-contrib
 
 First, let's download the app from github. If you don't already have git, install it:
 $ sudo apt-get install git
+
 Then clone the app
 $ git clone https://github.com/DgFutureLab/satoyama-api.git
 
 $ cp db_config_sample.yml db_config.yml
 
 
-Now let's create the user that the webapp will use. You will be asked to enter a password, so make 
+Now let's create the user that the webapp will use. You will be asked to enter a password.
 $ createuser satoyama --login --superuser --pwprompt
-
-Log into psql and change the password for the new user
-# alter user satoyama with password 'satoyama';
 
 We also have to create the databases for the webapp
 $ createdb satoyama_test;
@@ -44,7 +42,7 @@ $ source env/bin/activate
 Navigate into the satoyama-api folder and install the webapp dependencies:
 $ pip install -r requirements.txt
 
-Now run the migration script 
+Now run the migration script to create the tables in the database.
 $ python manage.py db upgrade
 
 
