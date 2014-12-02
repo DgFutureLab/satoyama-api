@@ -20,8 +20,10 @@
 3. Make postgresql run everytime:
 
 mkdir -p ~/Library/LaunchAgents
+
 ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents
-launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
+
+launchctl load ~/Library/LaunchAgents homebrew.mxcl.postgresql.plist
 
 4. psql postgres (To get inside the postgres database console)
 
@@ -52,7 +54,10 @@ launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
 14. python run_webserver.py --env development
 
 
+
+
 Notes: 
-createuser satoayama —login —superuser —password
-pip freeze
- 
+createuser satoyama —login —superuser —pwprompt
+
+pip freeze 
+alter user satoyama with password ‘satoyama’;
