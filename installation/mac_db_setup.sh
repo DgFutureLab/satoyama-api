@@ -8,7 +8,8 @@ launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
 
 # Create psql roles and users
 # http://forums.enterprisedb.com/posts/list/3447.page
-createuser satoyama —login —superuser —pwprompt
+psql -d postgres -c "create role satoyama with login"
+psql -d postgres -c "alter role satoyama with superuser"
 createdb satoyama_production;
 createdb satoyama_development;
 createdb satoyama_test;
