@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 import yaml
 import inspect
+import os
 from definitions import ENVIRONMENTS
 
 Base = declarative_base()
@@ -18,6 +19,8 @@ Base = declarative_base()
 
 # CURRENT_ENVIRONMENT = 'dev'
 
+
+
 class DBManager(object):
 
 	def __init__(self, env):
@@ -30,7 +33,8 @@ class DBManager(object):
 		self.__confdb__()
 
 	def set_databases(self):
-		with open('db_config.yml') as f:
+		dbconfig_path = '%s/db_config.yml'%'/'.join(__file__.split('/')[:-2])
+		with open(dbconfig_path) as f:
 			f = f.read()
 			try:
 				dbconfig = yaml.load(f)
