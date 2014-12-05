@@ -12,5 +12,6 @@ sudo apt-get install -y -qq libpq-dev postgresql postgresql-contrib
 sudo apt-get install -y -qq python-psycopg2
 sudo apt-get install -y -qq git
 sudo apt-get install -y -qq python-setuptools python-dev
+sudo apt-get build-dep -y -qq python-psycopg2
 sudo easy_install virtualenv
 echo "${SUCCESS} Installed Ubuntu packages. ${DEFAULT}"
