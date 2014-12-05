@@ -13,4 +13,4 @@ sudo apt-get install -y -qq python-psycopg2
 sudo apt-get install -y -qq git
 sudo apt-get install -y -qq python-setuptools python-dev
 sudo easy_install virtualenv
-echo "${SUCCESS} Installing Ubuntu packages. This may take a while. ${DEFAULT}"
+echo "${SUCCESS} Installed Ubuntu packages. ${DEFAULT}"
