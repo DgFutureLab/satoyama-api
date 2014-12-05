@@ -58,3 +58,8 @@ doc/
 .vagrant/
 
 db_config.yml
+
+
+### File system stuff
+*.swo
+*.swp
