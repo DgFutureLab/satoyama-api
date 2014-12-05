@@ -7,16 +7,17 @@ SUCCESS="$5"
 ERROR="$6"
 
 
-if [ -d "~/$envname" ]; then
+if [ -d "$HOME/$envname" ]; then
 	# if [ -e "~/$envname/"]
-	
-	sudo virtualenv -q "$HOME/$envname"
-	if [ $? -eq 0 ]; then
-		echo "${SUCCESS} Created new Python environment in $HOME/$envname ${DEFAULT}"
+	echo "${ATTENTION} Found existing Python environment in $HOME/$envname"
 	else
-		echo "${ERROR} Could not create new Python environment. Exitting..."
-		exit 1
-	fi
+		sudo virtualenv -q "$HOME/$envname"
+		if [ $? -eq 0 ]; then
+			echo "${SUCCESS} Created new Python environment in $HOME/$envname ${DEFAULT}"
+		else
+			echo "${ERROR} Could not create new Python environment. Exitting..."
+			exit 1
+		fi
 fi
 
 if [ -e "$HOME/$envname/bin/activate" ]; then
