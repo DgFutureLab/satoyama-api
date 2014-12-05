@@ -10,14 +10,14 @@ ERROR="$6"
 if [ -d "$HOME/$envname" ]; then
 	# if [ -e "~/$envname/"]
 	echo "${ATTENTION} Found existing Python environment in $HOME/$envname"
+else
+	sudo virtualenv -q "$HOME/$envname"
+	if [ $? -eq 0 ]; then
+		echo "${SUCCESS} Created new Python environment in $HOME/$envname ${DEFAULT}"
 	else
-		sudo virtualenv -q "$HOME/$envname"
-		if [ $? -eq 0 ]; then
-			echo "${SUCCESS} Created new Python environment in $HOME/$envname ${DEFAULT}"
-		else
-			echo "${ERROR} Could not create new Python environment. Exitting..."
-			exit 1
-		fi
+		echo "${ERROR} Could not create new Python environment. Exitting..."
+		exit 1
+	fi
 fi
 
 if [ -e "$HOME/$envname/bin/activate" ]; then
@@ -36,7 +36,7 @@ fi
 
 if [ -e "$apifolder/requirements.txt" ]; then
 	echo "${ATTENTION} Installing Python modules. This may take a while."
-	pip install -q -r "$apifolder/requirements.txt"
+	pip install -r "$apifolder/requirements.txt"
 	if [ $? -eq 0 ]; then
 		echo "${SUCCESS} Installed Python modules in $HOME/$envname/lib/python2.7/site-packages/ ${DEFAULT}"
 	else
@@ -70,6 +70,7 @@ if [ -e "$apifolder/manage.py" ]; then
 	else
 		echo "${ERROR} Failed to migrate database. Exitting..."
 		exit 1
+	fi
 else
 	echo "${ERROR} Could not find manage.py. Cannot migrate database. Exitting... ${DEFAULT}"
 	exit 1
