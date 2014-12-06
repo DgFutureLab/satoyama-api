@@ -7,13 +7,21 @@ SUCCESS="$5"
 ERROR="$6"
 
 
+echo "${ATTENTION}Setting up database. ${DEFAULT}"
+#sudo -u postgres psql -c "create role root with superuser login"
+#sudo -u postgres psql -c "create database root"
+psql -c "create role satoyama with login superuser"
+psql -c "alter role satoyama with password 'satoyama'"
+psql -c "create database satoyama_dev"
+psql -c "create database satoyama_test"
+psql -c "create database satoyama_prod"
 
-sudo -u postgres psql -c "create role root with superuser login"
-sudo -u postgres psql -c "create database root"
-sudo -u postgres psql -c "create role satoyama with login superuser"
-sudo -u postgres psql -c "alter role satoyama with password 'satoyama'"
-sudo -u postgres psql -c "create database satoyama_dev"
-sudo -u postgres psql -c "create database satoyama_test"
-sudo -u postgres psql -c "create database satoyama_prod"
 
-echo "${SUCCESS} Database setup complete!"
+# sudo -u postgres psql -c "create role satoyama with login superuser"
+# sudo -u postgres psql -c "alter role satoyama with password 'satoyama'"
+# sudo -u postgres psql -c "create database satoyama_dev"
+# sudo -u postgres psql -c "create database satoyama_test"
+# sudo -u postgres psql -c "create database satoyama_prod"
+
+
+echo "${SUCCESS}Database setup complete! ${DEFAULT}"
