@@ -1,17 +1,15 @@
 satoyama-api
 ============
 
-RESTful (more or less) API for working with sensor networks based on Freaklabs open hardware. Test
+REST API for Satoyama sensor networks based on Freaklabs open hardware.
 
 
-# Setup on ubuntu using installation script
-1. If you don't already have it, install git: $ sudo apt-get install git
-2. Next, clone the repository: $ git clone https://github.com/DgFutureLab/satoyama-api.git
-3. Now you should be able to set up everything by running the install script
-    a. Change directory to satoyama-api
-    b. Run installation script: $sh setup_ubuntu.sh
+# Installation on Ubuntu (using install script)
+1. Install git: $ sudo apt-get install git
+2. Get the code: $ git clone https://github.com/DgFutureLab/satoyama-api.git
+3. Run install script: sh satoyama-api/setup_ubuntu.sh
 
-# Setup on Ubuntu manually
+# Installation on Ubuntu (manual)
 ## Setup database
 First, install postgresql
 
@@ -24,7 +22,6 @@ Then clone the app
 $ git clone https://github.com/DgFutureLab/satoyama-api.git
 
 $ cp db_config_sample.yml db_config.yml
-
 
 Now let's create the user that the webapp will use. You will be asked to enter a password, so make 
 $ createuser satoyama --login --superuser --pwprompt
