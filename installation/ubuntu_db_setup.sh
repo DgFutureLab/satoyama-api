@@ -5,6 +5,7 @@ DEFAULT="$3"
 ATTENTION="$4"
 SUCCESS="$5"
 ERROR="$6"
+LOG="$7"
 
 
 echo "${ATTENTION}Setting up database. ${DEFAULT}"
@@ -17,11 +18,11 @@ echo "${ATTENTION}Setting up database. ${DEFAULT}"
 # psql -c "create database satoyama_prod"
 
 
-sudo -u postgres psql -q -c "create role satoyama with login superuser" > /dev/null 2>&1
-sudo -u postgres psql -q -c "alter role satoyama with password 'satoyama'" > /dev/null 2>&1
-sudo -u postgres psql -q -c "create database satoyama_dev" > /dev/null 2>&1
-sudo -u postgres psql -q -c "create database satoyama_test" > /dev/null 2>&1
-sudo -u postgres psql -q -c "create database satoyama_prod" > /dev/null 2>&1
+sudo -u postgres psql -c "create role satoyama with login superuser" >> "$HOME/$LOG" 2>&1
+sudo -u postgres psql -c "alter role satoyama with password 'satoyama'" >> "$HOME/$LOG" 2>&1
+sudo -u postgres psql -c "create database satoyama_dev" >> "$HOME/$LOG" 2>&1
+sudo -u postgres psql -c "create database satoyama_test" >> "$HOME/$LOG" 2>&1
+sudo -u postgres psql -c "create database satoyama_prod" >> "$HOME/$LOG" 2>&1
 
 
 
