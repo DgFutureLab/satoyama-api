@@ -1,17 +1,24 @@
 satoyama-api
 ============
 
-RESTful (more or less) API for working with sensor networks based on Freaklabs open hardware. Test
+REST API for Satoyama sensor networks based on Freaklabs open hardware.
 
 
-# Setup on ubuntu using installation script
-1. If you don't already have it, install git: $ sudo apt-get install git
-2. Next, clone the repository: $ git clone https://github.com/DgFutureLab/satoyama-api.git
-3. Now you should be able to set up everything by running the install script
-    a. Change directory to satoyama-api
-    b. Run installation script: $sh setup_ubuntu.sh
+# Installation on Ubuntu (using install script)
+We've made shell script that painlessly handles the installation. The script has been tested on a clean Ubuntu 14.10 x32 machine. Steps:
 
-# Setup on Ubuntu manually
+1. Install git: $ sudo apt-get install git
+2. Get the code: $ git clone https://github.com/DgFutureLab/satoyama-api.git
+3. Run install script: sh satoyama-api/setup_ubuntu.sh
+
+The script installs all the system packages required by the webserver including postgresql, creates databases for test, development and production modes, and creates a new Python environment in your home folder called satoyama-env. To run the webserver in development mode, change into the new environment and run the webserver startup script:
+
+1. source ~/satoyama-env/bin/activate
+2. python satoyama-api/run_webserver --env development
+
+Enjoy!
+
+# Installation on Ubuntu (manual)
 ## Setup database
 First, install postgresql
 
@@ -25,12 +32,12 @@ $ git clone https://github.com/DgFutureLab/satoyama-api.git
 
 $ cp db_config_sample.yml db_config.yml
 
-
 Now let's create the user that the webapp will use. You will be asked to enter a password, so make 
 $ createuser satoyama --login --superuser --pwprompt
 
 Log into psql and change the password for the new user
-# alter user satoyama with password 'satoyama';
+
+\# alter user satoyama with password 'satoyama';
 
 We also have to create the databases for the webapp
 $ createdb satoyama_test;
