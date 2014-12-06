@@ -36,7 +36,7 @@ Now let's create the user that the webapp will use. You will be asked to enter a
 $ createuser satoyama --login --superuser --pwprompt
 
 Log into psql and change the password for the new user
-# alter user satoyama with password 'satoyama';
+\# alter user satoyama with password 'satoyama';
 
 We also have to create the databases for the webapp
 $ createdb satoyama_test;
