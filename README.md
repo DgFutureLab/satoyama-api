@@ -5,9 +5,18 @@ REST API for Satoyama sensor networks based on Freaklabs open hardware.
 
 
 # Installation on Ubuntu (using install script)
+We've made shell script that painlessly handles the installation. The script has been tested on a clean Ubuntu 14.10 x32 machine. Steps:
+
 1. Install git: $ sudo apt-get install git
 2. Get the code: $ git clone https://github.com/DgFutureLab/satoyama-api.git
 3. Run install script: sh satoyama-api/setup_ubuntu.sh
+
+The script installs all the system packages required by the webserver including postgresql, creates databases for test, development and production modes, and creates a new Python environment in your home folder called satoyama-env. To run the webserver in development mode, change into the new environment and run the webserver startup script:
+
+1. source ~/satoyama-env/bin/activate
+2. python satoyama-api/run_webserver --env development
+
+Enjoy!
 
 # Installation on Ubuntu (manual)
 ## Setup database
