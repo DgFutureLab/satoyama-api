@@ -18,11 +18,11 @@ echo "${ATTENTION}Setting up database. ${DEFAULT}"
 # psql -c "create database satoyama_prod"
 
 
-sudo -u postgres psql -c "create role satoyama with login superuser" >> "$HOME/$LOG" 2>&1
-sudo -u postgres psql -c "alter role satoyama with password 'satoyama'" >> "$HOME/$LOG" 2>&1
-sudo -u postgres psql -c "create database satoyama_dev" >> "$HOME/$LOG" 2>&1
-sudo -u postgres psql -c "create database satoyama_test" >> "$HOME/$LOG" 2>&1
-sudo -u postgres psql -c "create database satoyama_prod" >> "$HOME/$LOG" 2>&1
+sudo -u postgres psql -c "create role satoyama with login superuser" >> "$LOG" 2>&1
+sudo -u postgres psql -c "alter role satoyama with password 'satoyama'" >> "$LOG" 2>&1
+sudo -u postgres psql -c "create database satoyama_dev" >> "$LOG" 2>&1
+sudo -u postgres psql -c "create database satoyama_test" >> "$LOG" 2>&1
+sudo -u postgres psql -c "create database satoyama_prod" >> "$LOG" 2>&1
 
 
 

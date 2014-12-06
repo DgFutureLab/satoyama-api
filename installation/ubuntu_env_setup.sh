@@ -11,7 +11,7 @@ if [ -d "$HOME/$envname" ]; then
 	# if [ -e "~/$envname/"]
 	echo "${ATTENTION}Found existing Python environment in $HOME/$envname ${DEFAULT}"
 else
-	sudo virtualenv "$HOME/$envname"  >> "$HOME/$LOG" 2>&1
+	sudo virtualenv "$HOME/$envname"  >> "$LOG" 2>&1
 	if [ $? -eq 0 ]; then
 		echo "${SUCCESS}Created new Python environment in $HOME/$envname ${DEFAULT}"
 	else
@@ -21,7 +21,7 @@ else
 fi
 
 if [ -e "$HOME/$envname/bin/activate" ]; then
-	. "$HOME/$envname/bin/activate" >> "$HOME/$LOG" 2>&1
+	. "$HOME/$envname/bin/activate" >> "$LOG" 2>&1
 	if [ $? -eq 0 ]; then
 		echo "${SUCCESS}Now using Python interpreter: `which python` ${DEFAULT}"
 	else
@@ -36,7 +36,7 @@ fi
 
 if [ -e "$apifolder/requirements.txt" ]; then
 	echo "${ATTENTION}Installing Python modules. This may take a while... ${DEFAULT}"
-	pip install -r "$apifolder/requirements.txt"  >> "$HOME/$LOG" 2>&1
+	pip install -r "$apifolder/requirements.txt"  >> "$LOG" 2>&1
 	if [ $? -eq 0 ]; then
 		echo "${SUCCESS}Installed Python modules in $HOME/$envname/lib/python2.7/site-packages/ ${DEFAULT}"
 	else
@@ -64,7 +64,7 @@ fi
 
 if [ -e "$apifolder/manage.py" ]; then
 	cd "$apifolder"
-	python manage.py db upgrade >> "$HOME/$LOG" 2>&1
+	python manage.py db upgrade >> "$LOG" 2>&1
 	if [ $? -eq 0 ]; then
 		echo "${SUCCESS}Database migration complete! ${DEFAULT}"
 	else
