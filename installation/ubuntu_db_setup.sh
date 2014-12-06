@@ -17,11 +17,12 @@ echo "${ATTENTION}Setting up database. ${DEFAULT}"
 # psql -c "create database satoyama_prod"
 
 
-sudo -u postgres psql -q -c "create role satoyama with login superuser"
-sudo -u postgres psql -q -c "alter role satoyama with password 'satoyama'"
-sudo -u postgres psql -q -c "create database satoyama_dev"
-sudo -u postgres psql -q -c "create database satoyama_test"
-sudo -u postgres psql -q -c "create database satoyama_prod"
+sudo -u postgres psql -q -c "create role satoyama with login superuser" >> /dev/null
+sudo -u postgres psql -q -c "alter role satoyama with password 'satoyama'" >> /dev/null
+sudo -u postgres psql -q -c "create database satoyama_dev" >> /dev/null
+sudo -u postgres psql -q -c "create database satoyama_test" >> /dev/null
+sudo -u postgres psql -q -c "create database satoyama_prod" >> /dev/null
 
 
-echo "${SUCCESS}Database setup complete! ${DEFAULT}"
+
+echo "${SUCCESS}Database setup complete! Created databases satoyama_test, satoyama_dev and satoyama_prod and database user satoyama.${DEFAULT}"
