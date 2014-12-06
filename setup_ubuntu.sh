@@ -29,3 +29,12 @@ fi
 sh "$apifolder/installation/ubuntu_packages_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR" "$logfile"
 sh "$apifolder/installation/ubuntu_db_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR" "$logfile"
 sh "$apifolder/installation/ubuntu_env_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR" "$logfile"
+
+
+echo " ____   __   ____   __   _  _   __   _  _   __          __   ____   __  
+/ ___) / _\ (_  _) /  \ ( \/ ) / _\ ( \/ ) / _\  ___   / _\ (  _ \ (  ) 
+\___ \/    \  )(  (  O ) )  / /    \/ \/ \/    \(___) /    \ ) __/  )(  
+(____/\_/\_/ (__)  \__/ (__/  \_/\_/\_)(_/\_/\_/      \_/\_/(__)   (__) 
+"
+
+echo "${SUCCESS}Installation complete! All output generated was stored in $logfile${DEFAULT}"
