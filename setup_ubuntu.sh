@@ -3,7 +3,7 @@
 ### Define paths
 envname="satoyama-env"
 apifolder=`dirname $0`
-
+logfile="$HOME/satoyama-install.log"
 ### Define colors
 DEFAULT=`tput sgr0`
 ATTENTION=`tput setaf 3`
@@ -26,6 +26,6 @@ else
 	exit 1
 fi
 
-sh "$apifolder/installation/ubuntu_packages_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR"
-sh "$apifolder/installation/ubuntu_db_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR"
-sh "$apifolder/installation/ubuntu_env_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR"
+sh "$apifolder/installation/ubuntu_packages_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR" "$logfile"
+sh "$apifolder/installation/ubuntu_db_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR" "$logfile"
+sh "$apifolder/installation/ubuntu_env_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR" "$logfile"
