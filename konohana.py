@@ -1,4 +1,37 @@
 from argparse import ArgumentParser, Namespace
+import requests
+verbs = {
+	'create' : 'created',
+	'destroy': 'destroyed'
+}
+
+
+class Konohana(object):
+
+	@classmethod
+	def confirm_destroy(satoyama_type, mid, **kwargs):
+		invalid_choice = True
+		while invalid_choice:
+			choice = raw_input('Are you sure that you want to destroy %s %s and all data it owns? [Y/n]? '%(satoyama_type, mid))
+			if choice in ['Y', 'y', 'Yes', 'yes']:
+				print 'Destroyed %s %s'%(satoyama_type, mid)
+				return True
+			elif choice in ['n', 'N', 'no', 'No']:
+				return False
+			else:
+				print 'Please choose yes or no :)'
+
+	@classmethod
+	def send_raw_input(**args):
+		requsts.post
+
+	@classmethod
+	def create_node(alias, node_type, short_address, site):
+
+
+	
+
+
 
 if __name__ == "__main__":
 	parser = ArgumentParser()
