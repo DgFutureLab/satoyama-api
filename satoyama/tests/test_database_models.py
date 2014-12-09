@@ -1,23 +1,13 @@
 from satoyama.models import *
 from dbtestbase import DBTestBase
 from uuid import uuid4
-from satoyama.helpers import DatetimeHelper
+from satoyama.helpers import DatetimeHelper, JSONHelper
 from datetime import datetime
 from random import random
 from seeds.sites import SiteSeeder
 from seeds.nodes import NodeSeeder
 # class ModelTester(ApiTestBase):
 
-class JSONTester(object):
-
-	@staticmethod
-	def test_model_json_method(cls, json_response):
-		for relation, defining_dict in cls.json_relationship_representation.items():
-			assert json_response.has_key(relation)  ### Check that the json response contains the a key for each of the relations defined in the model (e.g. 'nodes' for an instance of Site)
-			
-			for model_instance in json_response[relation]:
-				for column in defining_dict['columns']:
-					assert model_instance.has_key(column)
 
 
 
@@ -42,7 +32,7 @@ class TestSiteModel(DBTestBase):
 	def test_site_json_method(self):
 		site = SiteSeeder.seed_ricefield_site()
 		site_json = site.json()
-		JSONTester.test_model_json_method(Site, site_json)
+		JSONHelper.test_model_json_method(Site, site_json)
 
 
 class TestNodeModel(DBTestBase):
@@ -64,7 +54,7 @@ class TestNodeModel(DBTestBase):
 	def test_node_json_method(self):
 		node = NodeSeeder.seed_ricefield_node(n_readings = 3)
 		node_json = node.json()
-		JSONTester.test_model_json_method(Node, node_json)
+		JSONHelper.test_model_json_method(Node, node_json)
 
 
 class TestSensorModel(DBTestBase):
@@ -81,7 +71,7 @@ class TestSensorModel(DBTestBase):
 	def test_sensor_json_method(self):
 		sensor = NodeSeeder.seed_ricefield_node(n_readings = 3).sensors[0]
 		sensor_json = sensor.json()
-		JSONTester.test_model_json_method(Sensor, sensor_json)
+		JSONHelper.test_model_json_method(Sensor, sensor_json)
 
 	def test_sensor_latest_reading(self):
 		"""

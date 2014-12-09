@@ -1,9 +1,6 @@
 from datetime import datetime 
-
 from definitions import DATETIME_FORMATS
-
 from inspect import getmembers, isfunction, ismethod
-from flask import Flask
 import json
 
 class HelperBase(object):
@@ -25,9 +22,9 @@ class HelperBase(object):
 				else:
 					setattr(self.obj, helper, getattr(self, helper))
 
+	
 
 class JSONHelper(HelperBase):
-	
 	@staticmethod
 	def load_string_safe(string):
 		try:
@@ -35,6 +32,16 @@ class JSONHelper(HelperBase):
 			return loaded
 		except Exception:
 			return ''
+
+	@staticmethod
+	def test_model_json_method(cls, json_response):
+		for relation, defining_dict in cls.json_relationship_representation.items():
+			assert json_response.has_key(relation)  ### Check that the json response contains the a key for each of the relations defined in the model (e.g. 'nodes' for an instance of Site)
+			
+			for model_instance in json_response[relation]:
+				for column in defining_dict['columns']:
+					assert model_instance.has_key(column)
+
 
 class DatetimeHelper(HelperBase):
 
