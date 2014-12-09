@@ -6,7 +6,6 @@ from datetime import datetime
 from random import random
 from seeds.sites import SiteSeeder
 from seeds.nodes import NodeSeeder
-# class ModelTester(ApiTestBase):
 
 
 

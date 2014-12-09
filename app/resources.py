@@ -9,12 +9,15 @@ import zlib
 import sys
 import json
 from datetime import datetime, timedelta
+from satoyama.helpers import DatetimeHelper
 import inspect
 
 API_UNITS = {
 	'm':'SI meters', 
 	's':'SI seconds'
 	}
+
+
 
 
 class ApiResponse(object):
@@ -174,13 +177,18 @@ class NodeResource(restful.Resource):
 		return response.json()
 		
 
+
+
 class ReadingResource(restful.Resource):
 
 	def get(self, node_id, sensor_alias):
 		node, sensor = None, None
 		response = ApiResponse(request)
-		date_range = request.args.get('date_range', None)
+		from_date = request.args.get('from', None)		
+		until_date = request.args.get('until', None)
 
+		date_range = request.args.get('date_range', None)
+		# Reading.query.filter(Reading.timestamp > before).filter(Reading.timestamp < now).count()
 		try:
 			node = Node.query.filter_by(id = node_id).first()
 		except DataError:
@@ -195,15 +203,20 @@ class ReadingResource(restful.Resource):
 
 		if not sensor: 
 			response += exc.ApiException('Get reading failed: Node has no sensor with alias %s'%sensor_alias)
+			return response.json()
+		
+
+				
+
+		if date_range == '1week':
+			from_date = datetime.now() - timedelta(weeks = 1)
+			readings = Reading.query.filter_by(sensor = sensor).filter(Reading.timestamp > from_date).all()				
 		else:
-			if date_range == '1week':
-				from_date = datetime.now() - timedelta(weeks = 1)
-				readings = Reading.query.filter_by(sensor = sensor).filter(Reading.timestamp > from_date).all()				
-			else:
-				readings = [Reading.query.filter(Reading.sensor == sensor).order_by(Reading.timestamp.desc()).first()]
-			for reading in readings:
-				response += reading
+			readings = [Reading.query.filter(Reading.sensor == sensor).order_by(Reading.timestamp.desc()).first()]
+		for reading in readings:
+			response += reading
 		return response.json()
+		
 	
 	def put(self, node_id, sensor_alias):
 		""" 

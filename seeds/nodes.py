@@ -14,6 +14,10 @@ class NodeSeeder():
 
 	@staticmethod
 	def seed_ricefield_node(n_readings = 0, **node_args):
+		"""
+		Create a new ricefield node.
+		:param n_readings: (default 0) The number of readings with random values that will be generated for each sensor in the node.
+		"""
 		if node_args.has_key('site'):
 			site = node_args['site']
 		else:

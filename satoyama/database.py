@@ -33,7 +33,8 @@ class DBManager(object):
 		self.__confdb__()
 
 	def set_databases(self):
-		dbconfig_path = '%s/db_config.yml'%'/'.join(__file__.split('/')[:-2])
+		dbconfig_path = 'db_config.yml'
+		# dbconfig_path = '%s/db_config.yml'%'/'.join(__file__.split('/')[:-2])
 		with open(dbconfig_path) as f:
 			f = f.read()
 			try:

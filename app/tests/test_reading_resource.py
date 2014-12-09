@@ -9,12 +9,6 @@ from app.helpers import ApiResponseHelper
 class ReadingResourceTests(DBTestBase):
 
 
-	def seed_network_with_one_node_one_sensor_one_reading(self):		
-		node = Node.create()
-		sensortype = SensorType(name = 'Sonar', unit = 'm')
-		sensor = Sensor.create(node = node, sensortype = sensortype, alias="distance")
-		reading = Reading.create(sensor = sensor, value = 2)
-
 	#	###############################################################################
 	#	### Tests for reading GET /reading/node_:id/distance
 	#			  http://127.0.0.1/node/:node_id/sensor/:sensor_id?from_date=&to_date=
@@ -24,13 +18,15 @@ class ReadingResourceTests(DBTestBase):
 	#	###############################################################################
 
 	def test_GET_reading_by_nodeid_and_sensorid(self):
-		NodeSeeder.seed_ricefield_node()
-		# self.seed_network_with_one_node_one_sensor_one_reading()
-		url = flapp.get_url('reading', 'node_1', 'distance')
-		r = requests.get(url)
-		assert r.ok
-		api_response = ApiResponseHelper.get_api_response(r)
-		assert api_response.ok
+		node = NodeSeeder.seed_ricefield_node(n_readings = 1)
+		sensor = node.sensors[0]
+		reading = sensor.readings[0]
+		url = flapp.get_url('reading', 'node_%s'%node.id, sensor.alias)
+		response = requests.get(url)
+		api_response = ApiResponseHelper.assert_all_ok(response)
+		
+		assert api_response.objects[0] == reading.json()
+
 
 	def test_that_when_the_user_does_a_get_request_to_a_reading_it_will_get_single_reading(self):
 		"""

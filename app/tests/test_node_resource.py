@@ -4,9 +4,9 @@ from app import flapp
 from satoyama.tests.dbtestbase import DBTestBase
 from seeds.nodes import NodeSeeder
 from seeds.sites import SiteSeeder
-from app.tests.apitstbase import ApiTestBase
+from helpers import ApiResponseHelper
 
-class NodeResourceTests(DBTestBase, ApiTestBase):
+class NodeResourceTests(DBTestBase):
 
 	#	###############################################################################
 	#	### Tests for node REST URLs [GET, POST] /node
@@ -16,18 +16,19 @@ class NodeResourceTests(DBTestBase, ApiTestBase):
 	def test_GET_existing_node_by_id(self):
 	 	Node.create() # create the node that we want to GET
 	 	url = flapp.get_url('node', node_id = 1)
-	 	r = requests.get(url, data = {'node_id' : 1})
-	 	api_response = self.assert_all_ok(r)
+	 	response = requests.get(url, data = {'node_id' : 1})
+	 	ApiResponseHelper.assert_all_ok(response)
 
 	def test_GET_nonexisting_node_by_id(self):
 		url = flapp.get_url('node')
 		r = requests.get(url, data = {'node_id' : 100000000})
-		self.assert_all_ok(r, expect_success = False)	
+		ApiResponseHelper.assert_all_ok(r, expect_success = False)	
  
-	def test_POST_node(self):
+	def test_POST_create_node(self):
 		url = flapp.get_url('node')
 		r = requests.post(url, data = {'alias' : 'mynode'})
-		api_response = self.assert_all_ok(r)
+		ApiResponseHelper.assert_all_ok(r)
+		
 
 	# 	################################################################################
 	# 	### Tests for /node/all
