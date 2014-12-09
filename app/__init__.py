@@ -7,10 +7,6 @@ flapp = Flask('sensor_api')
 # 	setattr(self, func.func_name, func)	
 # flapp.register_helper = register_helper
 
-### Use Twitter Bootstrap
-from flask_bootstrap import Bootstrap
-Bootstrap(flapp)
-
 ### Restify the app
 from flask.ext import restful
 rest_api = restful.Api(flapp)

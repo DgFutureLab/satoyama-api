@@ -221,6 +221,9 @@ class Sensor(SatoyamaBase, Base):
 
 	node_id = Column( Integer, ForeignKey('nodes.id', ondelete = 'CASCADE') )
 	sensortype_id = Column( Integer, ForeignKey('sensortypes.id', ondelete = 'SET NULL') )
+
+	#minimum_value = Column( Float, ForeignKey('nodes.id', ondelete = 'CASCADE') )
+	#maximum_value = Column( Float, ForeignKey('nodes.id', ondelete = 'CASCADE') )
 	
 	def __init__(self, node, sensortype = None, alias = None, readings = [], **kwargs):
 		super(Sensor, self).__init__(**kwargs)
