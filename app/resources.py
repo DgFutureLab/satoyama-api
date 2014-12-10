@@ -92,7 +92,7 @@ class ApiResponse(object):
 
 
 
-def get_form_data(response, field_name, field_type):
+def get_form_data(response, field_name, field_type, optional = True):
 	"""
 	Helper function for getting and type-validating a named query parameter from HTTP request.
 
@@ -105,8 +105,9 @@ def get_form_data(response, field_name, field_type):
 	try:
 		field = request.form[field_name]
 	except KeyError:
-		response += exc.MissingFieldException('Could not fulfill request. Missing field: %s. All query data must be placed in the request body.'%field_name)
 		field = None
+		if not optional:
+			response += exc.MissingFieldException('Could not fulfill request. Missing field: %s. All query data must be placed in the request body.'%field_name)
 	try: 
 		field = field_type(field)
 	except ValueError, e:
@@ -154,18 +155,26 @@ class SiteResource(restful.Resource):
 
 rest_api.add_resource(SiteResource, '/site/<int:site_id>')
 
+# class NodeList(restful.Resource):
+# 	def get(self):
+# 		return ''
+
+# rest_api.add_resource(NodeList, '/nodes')
 
 
 class NodeResource(restful.Resource):
-	def get(self):
+
+	def get(self, node_id = None):
 		response = ApiResponse(request)
 
-		node_id = get_form_data(response, 'node_id', int)
-		node = Node.query.filter_by(id = node_id).first()
-		if node:
-			response += node
-		else:
-			response += exc.MissingNodeException(node_id)
+		if node_id:
+			node = Node.query.filter_by(id = node_id).first()
+			if node:
+				response += node
+			else:
+				response += exc.MissingNodeException(node_id)
+		else: 
+			response += MissingParameterException('node_id')
 		return response.json()
 			
 		
@@ -176,6 +185,24 @@ class NodeResource(restful.Resource):
 		response += node
 		return response.json()
 		
+rest_api.add_resource(NodeResource, '/node/<string:node_id>', '/node')
+
+
+
+class SensorResource(restful.Resource):
+	def get(self, sensor_id):
+		response = ApiResponse(request)
+		sensor = Sensor.query.filter_by(id = sensor_id).first()
+		if sensor:
+			response += sensor
+		else:
+			response += exc.MissingSensorException(sensor_id)
+		return response.json()
+
+	def post(self):
+		pass
+
+rest_api.add_resource(SensorResource, '/sensor/<string:sensor_id>')
 
 
 
@@ -184,11 +211,7 @@ class ReadingResource(restful.Resource):
 	def get(self, node_id, sensor_alias):
 		node, sensor = None, None
 		response = ApiResponse(request)
-		from_date = request.args.get('from', None)		
-		until_date = request.args.get('until', None)
 
-		date_range = request.args.get('date_range', None)
-		# Reading.query.filter(Reading.timestamp > before).filter(Reading.timestamp < now).count()
 		try:
 			node = Node.query.filter_by(id = node_id).first()
 		except DataError:
@@ -205,17 +228,44 @@ class ReadingResource(restful.Resource):
 			response += exc.ApiException('Get reading failed: Node has no sensor with alias %s'%sensor_alias)
 			return response.json()
 		
+		
+		from_date = get_form_data(response, 'from', str)
+		until_date = get_form_data(response, 'until', str)
+		date_range = get_form_data(response, 'latest', str)
 
-				
 
-		if date_range == '1week':
+		from_date = DatetimeHelper.convert_timestamp_to_datetime(from_date)
+		until_date = DatetimeHelper.convert_timestamp_to_datetime(until_date)
+
+		print from_date, until_date
+		# Reading.query.filter(Reading.timestamp > before).filter(Reading.timestamp < now).count()
+
+
+		if from_date and until_date:
+			readings = Reading.query.filter(Reading.timestamp > from_date).filter(Reading.timestamp < until_date).all()
+			for reading in readings: response += reading
+		elif from_date and not until_date:
+			readings = Reading.query.filter(Reading.timestamp > from_date).filter(Reading.timestamp < datetime.now()).all()
+		elif until_date and not from_date:
+			response += exc.MissingParameterException('from_date')
+		elif date_range:
 			from_date = datetime.now() - timedelta(weeks = 1)
 			readings = Reading.query.filter_by(sensor = sensor).filter(Reading.timestamp > from_date).all()				
-		else:
-			readings = [Reading.query.filter(Reading.sensor == sensor).order_by(Reading.timestamp.desc()).first()]
-		for reading in readings:
-			response += reading
+			for reading in readings: response += reading
 		return response.json()
+
+		# print from_date, until_date, date_range
+		# # from_date = DatetimeHelper.convert_timestamp_to_datetime(from_date)
+		# # until_date = DatetimeHelper.convert_datetime_to_timestamp(until_date)
+		# print from_date, until_date
+
+		# if date_range == '1week':
+			
+		# else:
+		# 	readings = [Reading.query.filter(Reading.sensor == sensor).order_by(Reading.timestamp.desc()).first()]
+		# for reading in readings:
+		# 	response += reading
+		# return response.json()
 		
 	
 	def put(self, node_id, sensor_alias):
@@ -283,7 +333,7 @@ class SensorData(object):
 
 ### For administration
 
-rest_api.add_resource(NodeResource, '/node', '/sensornodes/')
+# rest_api.add_resource(NodeResource, '/node/<string:node_id>/sensor/<string:sensor_id>/')
 
 rest_api.add_resource(ReadingResource, '/reading/node_<string:node_id>/<string:sensor_alias>')
 
