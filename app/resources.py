@@ -152,9 +152,78 @@ rest_api.add_resource(SensorResource, '/sensor/<string:sensor_id>', '/sensor')
 
 class ReadingResource(restful.Resource):
 
-	def get(self, node_id, sensor_alias):
-		node, sensor = None, None
+	# def __init__(self):
+	# 	super(ReadingResource, self).__init__()
+	# 	self.response = ApiResponse(request)
+
+			# from_date = datetime.now() - timedelta(weeks = 1)
+			# readings = Reading.query.filter_by(sensor = sensor).filter(Reading.timestamp > from_date).all()				
+			# for reading in readings: 
+			# 	self.response += reading
+
+
+
+	def get(self, reading_id = None):
+		
 		response = ApiResponse(request)
+
+		# RequestHelper.filter_valid_parameters(Sensor, response, request)
+		
+		sensor_id = RequestHelper.get_form_data(response, 'sensor_id', int)
+		print 'SSSSSSSSSSSSSSSSSSSSSSSSSSSSID'
+		print request.form
+		node_id = RequestHelper.get_form_data(response, 'node_id', int)
+		sensor_alias = RequestHelper.get_form_data(response, 'sensor_alias', str)
+
+		from_date = RequestHelper.get_form_data(response, 'from', str)
+		until_date = RequestHelper.get_form_data(response, 'until', str)
+		latest = RequestHelper.get_form_data(response, 'latest', str)
+
+		
+
+		# RequestHelper.assert_codependent_parameters(response, node_id, sensor_alias)
+		# RequestHelper.assert_codependent_parameters(response, from_date, until_date)
+
+		# if not response.ok: return response.json()
+		readings = list()
+		if reading_id:
+			print 'OK THIS WORKS AAAAAAAAAAAAA'
+			### Retrieve reading directly by ID
+			reading = Reading.query.filter_by(id = reading_id).first()
+			if reading:
+				readings.append(reading)
+			else:
+				response += exc.MissingReadingException(reading_id)
+		
+		elif sensor_id:
+			print 'OK THIS WORKS BBBBBBBBBBBBBBBBBBBBBBBB'
+			# if from_date or until_date or latest:
+			# 	readings = interval_query = Reading.query_interval().interval_query.filter_by(sensor_id = sensor_id).all()
+			# else:
+			readings = Reading.query.filter_by(sensor_id = sensor_id).all()
+
+			# query.filter_by(sensor_id = sensor_id).all()
+			# for reading in readings: response += reading
+		elif node_id and sensor_alias:
+			print 'CCCCCCCCCCCCCCCCCCCCCCCCCCC'
+			node = Node.query.filter_by(id = node_id).first()
+			sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
+			readings = Reading.query.filter_by(sensor_id = sensor.id).all()
+			
+		elif node_id and not sensor_alias:
+			response += exc.MissingParameterException('sensor_alias')
+		elif not node_id and sensor_alias:
+			response += exc.MissingParameterException('node_id')
+		
+
+		for reading in readings: response += reading
+		return response.json()
+
+
+
+	# def get(self, node_id, sensor_alias):
+	# 	node, sensor = None, None
+	# 	response = ApiResponse(request)
 
 		try:
 			node = Node.query.filter_by(id = node_id).first()
@@ -173,30 +242,8 @@ class ReadingResource(restful.Resource):
 			return response.json()
 		
 		
-		from_date = get_form_data(response, 'from', str)
-		until_date = get_form_data(response, 'until', str)
-		date_range = get_form_data(response, 'latest', str)
 
-
-		from_date = DatetimeHelper.convert_timestamp_to_datetime(from_date)
-		until_date = DatetimeHelper.convert_timestamp_to_datetime(until_date)
-
-		print from_date, until_date
-		# Reading.query.filter(Reading.timestamp > before).filter(Reading.timestamp < now).count()
-
-
-		if from_date and until_date:
-			readings = Reading.query.filter(Reading.timestamp > from_date).filter(Reading.timestamp < until_date).all()
-			for reading in readings: response += reading
-		elif from_date and not until_date:
-			readings = Reading.query.filter(Reading.timestamp > from_date).filter(Reading.timestamp < datetime.now()).all()
-		elif until_date and not from_date:
-			response += exc.MissingParameterException('from_date')
-		elif date_range:
-			from_date = datetime.now() - timedelta(weeks = 1)
-			readings = Reading.query.filter_by(sensor = sensor).filter(Reading.timestamp > from_date).all()				
-			for reading in readings: response += reading
-		return response.json()
+		
 
 		# print from_date, until_date, date_range
 		# # from_date = DatetimeHelper.convert_timestamp_to_datetime(from_date)
@@ -226,6 +273,23 @@ class ReadingResource(restful.Resource):
 
 		return response.json()
 
+rest_api.add_resource(ReadingResource, '/reading/<int:reading_id>', '/reading')
+
+
+
+
+class ReadingList(restful.Resource):
+	def get(self):
+		api_response = ApiResponse()
+		readings = Reading.query.all()
+		for reading in readings: api_response += reading
+		return api_response.json()
+
+rest_api.add_resource(ReadingList, '/readings', '/reading/all')
+
+
+
+# rest_api.add_resource(ReadingResource, '/reading/node_<string:node_id>/<string:sensor_alias>')
 
 
 def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_response):
@@ -279,7 +343,7 @@ class SensorData(object):
 
 # rest_api.add_resource(NodeResource, '/node/<string:node_id>/sensor/<string:sensor_id>/')
 
-rest_api.add_resource(ReadingResource, '/reading/node_<string:node_id>/<string:sensor_alias>')
+
 
 #rest_api.add_resource(ReadingResource, '/reading?node_id=1&sensor_alias=distance')
 #rest_api.add_resource(ReadingResource, '/node/<string:node_id>/sensor/distance/reading/1week')
