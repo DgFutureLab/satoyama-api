@@ -7,7 +7,7 @@ from satoyama.helpers import HelperBase
 
 import unittest
 import json
-from app.resources import ApiResponse
+from resources import ApiResponse
 
 class ApiResponseHelper():
 
@@ -24,14 +24,15 @@ class ApiResponseHelper():
 		
 
 	@staticmethod
-	def assert_all_ok(response, expect_success = True):
+	def assert_api_response(response, expect_success = True):
 		"""
 		Takes a requests.Response instance and checks if the status code is OK. ALSO checks if an ApiResponse can be created
 		from the text attribute of the response, and if so, whether or not the ApiResponse status is OK. 
 		"""
-		assert response.ok
+		# assert response.ok
 		ApiResponseHelper.assert_response_format(response)
 		api_response = ApiResponseHelper.get_api_response(response)
+
 		if expect_success:
 			assert api_response.ok
 		else:
@@ -44,68 +45,86 @@ class ApiResponseHelper():
 		api_response = ApiResponse(**json_dict)
 		return api_response
 
-class UrlHelper(HelperBase):
+
+
+class UrlHelper(object):
 	
 	DEFAULT_HOST = 'localhost'
 	DEFAULT_PORT = '8080'
 
-	def __init__(self, flapp):
-		super(UrlHelper, self).__init__(flapp)
-		self.flapp = self.obj
-
-	@staticmethod
-	def example_static_method():
-		print 'hum'
-
-	@classmethod
-	def example_class_method(UrlHelper):
-		print UrlHelper.value
 	
-	def get_root_url(self):
+	
+	@staticmethod
+	def get_root_url(flapp):
 		"""
 		Get root URL for the app. Defaults to 'http://localhost:8080' if app has not been configured with HOST and PORT keys.
 		"""
+		assert isinstance(flapp, Flask)
 		try:
-			host = self.flapp.config['HOST']
+			host = flapp.config['HOST']
 		except KeyError:
-			host = self.DEFAULT_HOST
-			self.flapp.logger.warning('HOST not set for flask app. Using %s instead.'%self.DEFAULT_HOST)
+			host = UrlHelper.DEFAULT_HOST
+			flapp.logger.warning('HOST not set for flask app. Using %s instead.'%UrlHelper.DEFAULT_HOST)
 		try:
-			port = self.flapp.config['PORT']
+			port = flapp.config['PORT']
 		except KeyError:
-			port = self.DEFAULT_PORT
-			self.flapp.logger.warning('PORT not set for flask app. Using %s instead.'%self.DEFAULT_PORT)
+			port = UrlHelper.DEFAULT_PORT
+			flapp.logger.warning('PORT not set for flask app. Using %s instead.'%UrlHelper.DEFAULT_PORT)
 
 		return '%s:%s/'%(host, port)
 
-	
-	def get_url(self, *path, **query_params):
-		"""
-		### *** UNNECCESARRY! REPLACE WITH werkzeug.urls.Href
-		******************************************************
 
+	@staticmethod
+	def get_url(flapp, *path, **query_params):
+		"""
 		Constructs a url from path elements and named query parameters.
 		Example: >>> flapp.get_url('readings', node_id = 2, sensor_alias = 'indoor_temperature', when = 'latest')
 		"""
 		try:
 			path = map(str, path)
-			return self.get_root_url() + '/'.join(path) + '?' + urllib.urlencode(query_params)
+			return UrlHelper.get_root_url(flapp) + '/'.join(path) + '?' + urllib.urlencode(query_params)
 		except ValueError:
 			raise ValueError('All path arguments must be convertible to strings')
 
-# class GeoHelper()		
+
 
 class RequestHelper(HelperBase):
-	def check_query_parameters(self, model, response):
+	@staticmethod
+	def filter_valid_parameters(model, response, request):
 		"""
 		Helper method for checking if a passed query parameter is allowed for a particular model.
 		"""
+		assert isinstance(response, ApiResponse), 'response must an instance of type ApiResponse'
 		query_params = {}
 		settables = model.settables()
 		for par, val in request.form.items():
 			if par in settables:
 				query_params.update({par : val})
 			else:
-				response.add_warning(exc.InvalidAttributeException(par, model))
-		return query_params
+				response += exc.InvalidAttributeException(par, model)
+		return response
+
+	@staticmethod
+	def get_form_data(response, field_name, field_type, optional = True):
+		"""
+		Helper function for getting and type-validating a named query parameter from HTTP request.
+
+		:param response: ApiResponse object
+		:paran field_name: The name of the query parameter
+		:param field_type: data type of the field. Must be a Python builtin type, e.g., int, str, etc.
+		"""
+		assert isinstance(response, ApiResponse), 'response must an instance of type ApiResponse'
+		try:
+			field = request.form[field_name]
+			try:
+				field = field_type(field)
+				return field
+			except ValueError:
+				response += exc.InvalidParameterTypeException(field_name, field_type)
+		except KeyError:
+			if not optional:
+				response += exc.MissingFieldException('Could not fulfill request. Missing field: %s. All query data must be placed in the request body.'%field_name)
+				return None
+
+
 
