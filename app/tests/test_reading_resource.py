@@ -66,33 +66,14 @@ class ReadingResourceTests(DBTestBase):
 		response = requests.get(url, data = data)
 		assert response.ok
 		api_response = ApiResponseHelper.assert_api_response(response, expect_success = False)
-	# def test_GET_all_readings(self):
-	# 	NodeSeeder.seed_ricefield_node(n_readings = 3)
-	# 	n_readings = len(Reading.query.all())
-	# 	url = UrlHelper.get_url(flapp, 'readings')
-	# 	response = requests.get(url)
-	# 	assert response.ok
-	# 	api_response = ApiResponseHelper.assert_api_response(response)
-	# 	assert len(api_response.objects) == n_readings 
+	
 
+	def test_GET_all_readings(self):
+		NodeSeeder.seed_ricefield_node(n_readings = 3)
+		n_readings = len(Reading.query.all())
+		url = UrlHelper.get_url(flapp, 'readings')
+		response = requests.get(url)
+		assert response.ok
+		api_response = ApiResponseHelper.assert_api_response(response)
+		assert len(api_response.objects) == n_readings 
 
-
-
-
-
-	# 	# print 'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR'
-		# print api_response
-		# assert api_response.objects[0] == reading.json()
-
-
-	# def test_that_when_the_user_does_a_get_request_to_a_reading_it_will_get_single_reading(self):
-	# 	"""
-	# 	Make ten readings for a sensor, and make sure that we only get one reading back
-	# 	"""
-	# 	NodeSeeder.seed_ricefield_node(n_readings = 10)
-	# 	url = flapp.get_url('reading', 'node_1', 'distance')
-	# 	r = requests.get(url)
-		
-	# 	api_response = ApiResponseHelper.get_api_response(r)
-	# 	assert len(api_response.objects) == 1 ### This call should only return a single reading
-	# 	assert api_response.objects[0].has_key('value')
