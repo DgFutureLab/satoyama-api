@@ -43,7 +43,13 @@ class MissingNodeException(ApiException):
 
 class MissingSensorException(ApiException):
 	def __init__(self, sensor_id):
-		super(MissingSensorException, self).__init__('No such sensor: %s'%sensor_id)
+		super(MissingSensorException, self).__init__('No such reading: %s'%sensor_id)
+
+
+class MissingReadingException(ApiException):
+	def __init__(self, sensor_id):
+		super(MissingReadingException, self).__init__('No such reading: %s'%sensor_id)
+
 
 class MissingSensorTypeException(ApiException):
 	def __init__(self, sensor_id):
