@@ -1,10 +1,13 @@
 import requests
-from satoyama.models import Node, Sensor, SensorType, Reading
 from app import flapp
 from satoyama.tests.dbtestbase import DBTestBase
 from seeds.nodes import NodeSeeder
 from seeds.sites import SiteSeeder
-from helpers import ApiResponseHelper
+from app.apihelpers import ApiResponseHelper, UrlHelper
+
+
+
+
 
 class NodeResourceTests(DBTestBase):
 
@@ -14,76 +17,81 @@ class NodeResourceTests(DBTestBase):
 
 
 	def test_GET_existing_node_by_id(self):
-	 	Node.create() # create the node that we want to GET
-	 	url = flapp.get_url('node', node_id = 1)
-	 	response = requests.get(url, data = {'node_id' : 1})
-	 	ApiResponseHelper.assert_all_ok(response)
+	 	node = NodeSeeder.seed_empty_node()
+	 	url = UrlHelper.get_url(flapp, 'node', node.id)
+	 	response = requests.get(url)
+	 	assert response.ok
+	 	api_response = ApiResponseHelper.assert_api_response(response)
+	 	assert api_response.objects[0] == node.json() 
+
+	def test_GET_node_by_id_fails_when_node_id_is_not_int(self):
+		node_id = 'NOT AN INTEGER'
+	 	url = UrlHelper.get_url(flapp, 'node', node_id)
+	 	response = requests.get(url)
+	 	assert not response.ok
 
 	def test_GET_nonexisting_node_by_id(self):
-		url = flapp.get_url('node')
-		r = requests.get(url, data = {'node_id' : 100000000})
-		ApiResponseHelper.assert_all_ok(r, expect_success = False)	
+		url = UrlHelper.get_url(flapp, 'node', '123123123')
+		response = requests.get(url)
+		assert response.ok
+		ApiResponseHelper.assert_api_response(response, expect_success = False)	
+
  
-	def test_POST_create_node(self):
-		url = flapp.get_url('node')
-		r = requests.post(url, data = {'alias' : 'mynode'})
-		ApiResponseHelper.assert_all_ok(r)
+	def test_POST_create_node_with_existing_site(self):
+		site = SiteSeeder.seed_empty_site()
+		url = UrlHelper.get_url(flapp, 'node')
+		data = {'alias':'mynode', 'site_id': site.id, 'latitude' : 13.2, 'longitude': 23.2}
+		response = requests.post(url, data = data)
+		assert response.ok
+		api_response = ApiResponseHelper.assert_api_response(response)
+		assert api_response.objects[0]['alias'] == 'mynode'
+		assert api_response.objects[0]['latitude'] == 13.2
+		assert api_response.objects[0]['longitude'] == 23.2
+		assert api_response.objects[0]['site_id'] == 1
+
+	def test_POST_create_node_with_nonexisting_site(self):
+		url = UrlHelper.get_url(flapp, 'node')
+		data = {'alias':'mynode', 'site_id': 1111111111, 'latitude' : 13.2, 'longitude': 23.2}
+		response = requests.post(url, data = data)
+		assert response.ok
+		api_response = ApiResponseHelper.assert_api_response(response)
+		assert api_response.objects[0]['alias'] == 'mynode'
+		assert api_response.objects[0]['latitude'] == 13.2
+		assert api_response.objects[0]['longitude'] == 23.2
+		assert api_response.objects[0]['site_id'] == None
 		
 
 	# 	################################################################################
-	# 	### Tests for /node/all
-	#	################################################################################
+	# # 	### Tests for /node/all
+	# #	################################################################################
 
 
-	def test_GET_all_nodes_HTTP_response_status(self):
+	def test_GET_nodes_HTTP_response_status(self):
 		"""
 		Tests that GET /node/all gives a valid HTTP 200 response
 		"""
 		NodeSeeder.seed_ricefield_node()
-		url = flapp.get_url('node', 'all')
-		r = requests.get(url)
-		assert r.ok
+		url = UrlHelper.get_url(flapp, 'nodes')
+		response = requests.get(url)
+		assert response.ok
 
-	def test_GET_all_nodes_ApiResponse_status(self):
+	def test_GET_nodes_ApiResponse_status(self):
 		"""
 		Test that GET /node/all gives a JSON response that has no errors in it, and that an ApiResponse object can be instantiated from the response body.
 		"""
+		node = NodeSeeder.seed_ricefield_node(n_readings = 3)
 		NodeSeeder.seed_ricefield_node(n_readings = 3)
-		url = flapp.get_url('node', 'all')
+		NodeSeeder.seed_ricefield_node(n_readings = 3)
+		NodeSeeder.seed_ricefield_node(n_readings = 3)
+		url = UrlHelper.get_url(flapp, 'node', 'all')
 		r = requests.get(url)
-		api_response = self.assert_all_ok(r)
-		# assert api_response.ok
+		api_response = ApiResponseHelper.assert_api_response(r)
+		assert api_response.ok
+		assert api_response.first() == node.json(), 'First node in the api response does not match the first node created'
+		assert len(api_response.objects) == 4, 'Expected to get four nodes, but did not'
 
-	def test_GET_all_nodes_response_content_matches_spec(self):
-		"""
-		Test that GET /node/all gives a JSON response that corresponds to the spec:
 
-		{"query": {}, "errors": [], "objects": [{"alias": alias, "latitude": null, "sensors": [], "type": "", "id": id}]}
-		"""
-		SiteSeeder.seed_ricefield_site(n_nodes = 3)
-		url = flapp.get_url('node', 'all')
-		r = requests.get(url)
-		api_response = self.assert_all_ok(r)
-		assert len(api_response.objects) == 3
-		assert len(api_response.errors) == 0
 
-		for obj in api_response.objects:
-			assert obj.has_key('id')
-		for obj in api_response.objects:
-			assert obj.has_key('latitude')
-		for obj in api_response.objects:
-			assert obj.has_key('longitude')
-		for obj in api_response.objects:
-			assert obj.has_key('sensors')
 
-		for obj in api_response.objects:
-			sensors = obj['sensors']
-			for sensor in sensors:
-				assert sensor.has_key('latest_reading')
 
-	# def test_generic_consistency_database_json_response(self):
-	# 	nodes_before = [Node.create(alias = i) for i in range(10)]
-	# 	# Get JSON response
-	# 	wipe database
-	# 	nodes_after = create database objects from json response
-	# 	assert nodes_before.json() == nodes_after.json()
+
