@@ -25,6 +25,7 @@ class InvalidAttributeException(ApiException):
 			message += ' Valid parameters for model %s are: %s'%(model.__name__, model.settables())
 		super(InvalidAttributeException, self).__init__(message)
 
+
 class MissingFieldException(ApiException):
 	def __init__(self, message = None):
 		super(MissingFieldException, self).__init__(message)
@@ -35,10 +36,29 @@ class MissingResourceException(ApiException):
 		super(MissingResourceException, self).__init__('No %s with id %s'%(resource_type, resource_id))
 
 
-
 class MissingNodeException(ApiException):
 	def __init__(self, node_id):
 		super(MissingNodeException, self).__init__('No such node: %s'%node_id)
+
+
+class MissingSensorException(ApiException):
+	def __init__(self, sensor_id):
+		super(MissingSensorException, self).__init__('No such sensor: %s'%sensor_id)
+
+class MissingSensorTypeException(ApiException):
+	def __init__(self, sensor_id):
+		super(MissingSensorTypeException, self).__init__('No such sensortype: %s'%sensor_id)
+
+
+class MissingParameterException(ApiException):
+	def __init__(self, parameter_name):
+		super(MissingParameterException, self).__init__('Could not fulfill request because of missing parameter: %s'%parameter_name)
+
+
+class InvalidParameterTypeException(ApiException):
+	def __init__(self, parameter_name, partype):
+		super(InvalidParameterTypeException, self).__init__('Expected %s to be of type %s.'%(parameter_name, partype))
+
 
 	# def __repr__(self):
 	# 	return json.dumps({'error': self.message})
