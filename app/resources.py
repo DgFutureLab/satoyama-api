@@ -10,134 +10,17 @@ import sys
 import json
 from datetime import datetime, timedelta
 from satoyama.helpers import DatetimeHelper
+from apiresponse import ApiResponse
+
+# import app.helpers
+# print dir(helpers)
 import inspect
+from apihelpers import RequestHelper
 
 API_UNITS = {
 	'm':'SI meters', 
 	's':'SI seconds'
 	}
-
-
-
-
-class ApiResponse(object):
-	"""
-	Designed so that client_side_response = ApiResponse(**server_side_response.json())
-	where server_side_response is itself an ApiResponse instance
-	"""
-	__fields__ = ['errors', 'objects', 'query']
-
-	def __init__(self, request = None, query = {}, objects = [], errors = []):
-		"""
-		
-		"""
-		self.errors = list()
-		self.objects = list()
-		self.ok = True
-		
-		if request:
-			if hasattr(request, 'form'):
-				self.query = dict(request.form.items())
-		else:
-			self.query = {}	
-
-		if self.is_json(objects):
-			for obj in objects: self += obj
-
-		if self.is_json(errors):
-			self.errors = errors[:]
-		
-		self.__validate__()
-
-		
-	def is_json(self, obj):
-		try:
-			json.dumps(obj)
-			return True
-		except TypeError:
-			return False
-
-		
-	def __iadd__(self, obj):
-		if hasattr(obj, '__class__'):
-			if issubclass(obj.__class__, Exception):
-				self.errors.append(getattr(obj, 'message'))
-			elif self.is_json(obj):
-				self.objects.append(obj)
-			elif hasattr(obj, 'json'):
-				obj_as_json = obj.json()
-				if self.is_json(obj_as_json):
-					self.objects.append(obj_as_json)
-				else:
-					self.errors.append(exc.ApiException('object had json method, but json method did not produce json-serializable output.: %s'%obj).__str__())
-			else:
-				self.errors.append(exc.ApiException('object added to response could not be json serialized').__str__())
-		else:
-			self.errors.append(exc.ApiException('obj has no __class__ attribute'))
-		self.__validate__()
-		return self
-
-
-	def __validate__(self):
-		if self.errors:
-			self.ok = False
-		else:
-			self.ok = True
-
-	def __repr__(self):
-		return 'ApiResponse() instance'
-
-	def json(self):
-		return dict(zip(ApiResponse.__fields__, map(lambda x: getattr(self, x), ApiResponse.__fields__)))
-
-
-
-def get_form_data(response, field_name, field_type, optional = True):
-	"""
-	Helper function for getting and type-validating a named query parameter from HTTP request.
-
-	:param response: ApiResponse object
-	:paran field_name: The name of the query parameter
-	:param field_type: data type of the field. Must be a Python builtin type, e.g., int, str, etc.
-	"""
-	assert isinstance(response, ApiResponse), 'response must an instance of type ApiResponse'
-	
-	try:
-		field = request.form[field_name]
-	except KeyError:
-		field = None
-		if not optional:
-			response += exc.MissingFieldException('Could not fulfill request. Missing field: %s. All query data must be placed in the request body.'%field_name)
-	try: 
-		field = field_type(field)
-	except ValueError, e:
-		flapp.logger.exception(e)
-	finally:
-		return field
-
-
-
-
-# class ResponseDecorator(object):
-
-# 	def __init__(self, handler):
-# 		self.handler = handler
-
-
-# 	def __call__(self, *args, **kwargs):
-# 		self.response = ApiResponse()
-# 		self.handler()
-# 		return response.json()
-
-# # def view_decorator(view_func):
-# # 	def wrapper(*args, **kwwargs):
-# # 		self.response = ApiResponse()
-# # 		view_func(*args, **kwargs)
-
-
-# class TestResource(restful.Resource):
-# 	def get(self):
-
 
 
 
@@ -155,16 +38,35 @@ class SiteResource(restful.Resource):
 
 rest_api.add_resource(SiteResource, '/site/<int:site_id>')
 
-# class NodeList(restful.Resource):
-# 	def get(self):
-# 		return ''
+class NodeList(restful.Resource):
+	def get(self):
+		# print 'asdasdasdsdJHHKJKHJHKJKJHKHJHJKKHJ'
+		# print Node.query.all()
 
-# rest_api.add_resource(NodeList, '/nodes')
+		# return ApiResponse(objects = Node.query.all()).json()
 
+		api_response = ApiResponse()
+		nodes = Node.query.all()
+		for node in nodes: api_response += node
+		return api_response.json()
+
+rest_api.add_resource(NodeList, '/nodes', '/node/all')
+
+# /node/1
+# /node
+
+# /reading/node_1/temperature?date_range=1week
 
 class NodeResource(restful.Resource):
+	"""
+		This class represents end nodes in the sensor network
+	"""
 
 	def get(self, node_id = None):
+		"""
+			Use a HTTP GET request to /node/<int> get one node data 
+			where <int> is the unique id of the node.
+		"""
 		response = ApiResponse(request)
 
 		if node_id:
@@ -176,17 +78,33 @@ class NodeResource(restful.Resource):
 		else: 
 			response += MissingParameterException('node_id')
 		return response.json()
-			
-		
+
 	def post(self):
+		"""
+		Use a HTTP POST request to /node to create a new node inside the network
+		
+		Example in Python:
+			>>> import requests
+			>>> r = requests.post('http://localhost:8081/node',
+							   data = {'alias':'mynode', 'site_id':'1', 'latitude' : '13.24234234', 'longitude': 23.222})
+		"""		
 		response = ApiResponse(request)
-		params = flapp.check_query_parameters(Node, response)
-		node = Node.create(**params)
+		RequestHelper.filter_valid_parameters(Node, response, request)
+		node_alias = RequestHelper.get_form_data(response, 'alias', str)
+		site_id = RequestHelper.get_form_data(response, 'site_id', int)
+		longitude = RequestHelper.get_form_data(response, 'longitude', float)
+		latitude = RequestHelper.get_form_data(response, 'latitude', float)
+		
+		print 'ASLDhISOADOASIDHJ'
+		print site_id
+		site = Site.query.filter_by(id = site_id).first()
+
+
+		node = Node.create(alias = node_alias, site = site, latitude = latitude, longitude = longitude)
 		response += node
 		return response.json()
 		
 rest_api.add_resource(NodeResource, '/node/<string:node_id>', '/node')
-
 
 
 class SensorResource(restful.Resource):
@@ -200,9 +118,35 @@ class SensorResource(restful.Resource):
 		return response.json()
 
 	def post(self):
-		pass
+		"""
+		Use a HTTP POST request to /node to create a new node inside the network
+		
+		Example in Python:
+			>>> import requests
+			>>> r = requests.post('http://localhost:8081/node',
+							   data = {'alias':'mynode', 'site_id':'1', 'latitude' : '13.24234234', 'longitude': 23.222})
+		"""		
+		response = ApiResponse(request)
+		RequestHelper.filter_valid_parameters(Sensor, response, request)
+		sensor_alias = RequestHelper.get_form_data(response, 'alias', str)
+		sensortype_alias = RequestHelper.get_form_data(response, 'sensortype', str)
+		node_id = RequestHelper.get_form_data(response, 'node_id', int)
 
-rest_api.add_resource(SensorResource, '/sensor/<string:sensor_id>')
+		node = Node.query.filter_by(id = node_id).first()
+		if not node:
+			response += exc.MissingNodeException(node_id)
+
+		sensortype = SensorType.query.filter_by(name = sensortype_alias).first()
+		if not sensortype:
+			response += exc.MissingSensorTypeException(sensortype_alias)
+		
+		if node and sensortype:
+			sensor = Sensor.create(alias = sensor_alias, sensortype = sensortype, node = node)
+			response += sensor
+
+		return response.json()
+
+rest_api.add_resource(SensorResource, '/sensor/<string:sensor_id>', '/sensor')
 
 
 
