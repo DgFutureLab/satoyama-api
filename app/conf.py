@@ -59,8 +59,9 @@ def configure_flapp(env):
 	configure_database(env)
 
 
+
 def configure_database(env):
-	manager.set_environment(env)
+	manager.set_database_environment(env)
 	flapp.config.update({'SQLALCHEMY_DATABASE_URI' : manager.get_db_URI()})
 	setattr(flapp, 'engine', manager.engine)
 	setattr(flapp, 'db_session', manager.session)
