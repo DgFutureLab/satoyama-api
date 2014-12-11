@@ -66,7 +66,7 @@ class ApiResponse(object):
 	def first(self):
 		try:
 			return self.objects[0]
-		except KeyError:
+		except IndexError:
 			return None
 
 
