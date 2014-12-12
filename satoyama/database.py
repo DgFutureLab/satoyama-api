@@ -24,9 +24,9 @@ Base = declarative_base()
 class DBManager(object):
 
 	def __init__(self, env):
-		self.set_environment(env)
+		self.set_database_environment(env)
 
-	def set_environment(self, env):
+	def set_database_environment(self, env):
 		assert env in ENVIRONMENTS
 		self.env = env
 		self.set_databases()

@@ -1,5 +1,5 @@
 import config, helpers, models, database
-# database.set_environment('dev')
+# database.set_database_environment('dev')
 # engine = database.get_engine()
 # session = database.get_session(engine)
 # from sqlalchemy.ext.declarative import declarative_base

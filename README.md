@@ -62,8 +62,6 @@ Now run the migration script
 $ python manage.py db upgrade
 
 
-
-
 API Usage
 ============
 
@@ -74,7 +72,7 @@ Resource Types
 
 Site
 ----
-Not yet implemented
+Each site has many nodes
 
 Node
 ----
@@ -84,10 +82,10 @@ Sensor
 -----
 Each sensor belongs to one node. Sensors gather information in "readings"
 
-
 Reading
 ----
 Each reading belongs to a sensor.
+
 
 API Calls
 ===================

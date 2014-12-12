@@ -152,112 +152,50 @@ rest_api.add_resource(SensorResource, '/sensor/<string:sensor_id>', '/sensor')
 
 class ReadingResource(restful.Resource):
 
-	# def __init__(self):
-	# 	super(ReadingResource, self).__init__()
-	# 	self.response = ApiResponse(request)
-
-			# from_date = datetime.now() - timedelta(weeks = 1)
-			# readings = Reading.query.filter_by(sensor = sensor).filter(Reading.timestamp > from_date).all()				
-			# for reading in readings: 
-			# 	self.response += reading
-
-
 
 	def get(self, reading_id = None):
 		
 		response = ApiResponse(request)
-
-		# RequestHelper.filter_valid_parameters(Sensor, response, request)
 		
 		sensor_id = RequestHelper.get_form_data(response, 'sensor_id', int)
-		print 'SSSSSSSSSSSSSSSSSSSSSSSSSSSSID'
-		print request.form
+
 		node_id = RequestHelper.get_form_data(response, 'node_id', int)
 		sensor_alias = RequestHelper.get_form_data(response, 'sensor_alias', str)
 
 		from_date = RequestHelper.get_form_data(response, 'from', str)
 		until_date = RequestHelper.get_form_data(response, 'until', str)
-		latest = RequestHelper.get_form_data(response, 'latest', str)
 
-		
-
-		# RequestHelper.assert_codependent_parameters(response, node_id, sensor_alias)
-		# RequestHelper.assert_codependent_parameters(response, from_date, until_date)
-
-		# if not response.ok: return response.json()
+		query = Reading.query
 		readings = list()
 		if reading_id:
-			print 'OK THIS WORKS AAAAAAAAAAAAA'
 			### Retrieve reading directly by ID
-			reading = Reading.query.filter_by(id = reading_id).first()
-			if reading:
-				readings.append(reading)
-			else:
+			reading = query.filter_by(id = reading_id).first()
+			if reading: 
+				response += reading
+			else: 
 				response += exc.MissingReadingException(reading_id)
-		
-		elif sensor_id:
-			print 'OK THIS WORKS BBBBBBBBBBBBBBBBBBBBBBBB'
-			# if from_date or until_date or latest:
-			# 	readings = interval_query = Reading.query_interval().interval_query.filter_by(sensor_id = sensor_id).all()
-			# else:
-			readings = Reading.query.filter_by(sensor_id = sensor_id).all()
-
-			# query.filter_by(sensor_id = sensor_id).all()
-			# for reading in readings: response += reading
-		elif node_id and sensor_alias:
-			print 'CCCCCCCCCCCCCCCCCCCCCCCCCCC'
-			node = Node.query.filter_by(id = node_id).first()
-			sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
-			readings = Reading.query.filter_by(sensor_id = sensor.id).all()
-			
-		elif node_id and not sensor_alias:
-			response += exc.MissingParameterException('sensor_alias')
-		elif not node_id and sensor_alias:
-			response += exc.MissingParameterException('node_id')
-		
-
-		for reading in readings: response += reading
-		return response.json()
-
-
-
-	# def get(self, node_id, sensor_alias):
-	# 	node, sensor = None, None
-	# 	response = ApiResponse(request)
-
-		try:
-			node = Node.query.filter_by(id = node_id).first()
-		except DataError:
-			response += exc.ApiException('node_id must be an integer')
-		if not node: 
-			response += exc.ApiException('Insert reading failed: No node with id %s'%node_id)
-
-		try:
-			sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
-		except DataError:
-			response += exc.ApiException('sensor_id must an integer')
-
-		if not sensor: 
-			response += exc.ApiException('Get reading failed: Node has no sensor with alias %s'%sensor_alias)
 			return response.json()
-		
-		
-
-		
-
-		# print from_date, until_date, date_range
-		# # from_date = DatetimeHelper.convert_timestamp_to_datetime(from_date)
-		# # until_date = DatetimeHelper.convert_datetime_to_timestamp(until_date)
-		# print from_date, until_date
-
-		# if date_range == '1week':
+		else:
 			
-		# else:
-		# 	readings = [Reading.query.filter(Reading.sensor == sensor).order_by(Reading.timestamp.desc()).first()]
-		# for reading in readings:
-		# 	response += reading
-		# return response.json()
-		
+			if sensor_id:
+				query = Reading.query.filter_by(sensor_id = sensor_id)
+				
+			elif node_id and sensor_alias:
+				node = Node.query.filter_by(id = node_id).first()
+				sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
+				query = Reading.query.filter_by(sensor_id = sensor.id)
+			elif node_id and not sensor_alias:
+				response += exc.MissingParameterException('sensor_alias')
+			elif not node_id and sensor_alias:
+				response += exc.MissingParameterException('node_id')
+			
+			readings = query = Reading.query_interval(query, from_date, until_date).all()
+			
+			for reading in readings: 
+				response += reading
+			
+			return response.json()
+
 	
 	def put(self, node_id, sensor_alias):
 		""" 

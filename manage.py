@@ -13,7 +13,7 @@ from satoyama.database import Base
 # parser.add_argument('--env', choices = ('test', 'dev', 'prod'), required = True, help = 'Specify environment, which determines which database to use.')
 # args = parser.parse_args()
 # environment = args.env
-# db_manager.set_environment(environment)
+# db_manager.set_database_environment(environment)
 
 migrate = Migrate(flapp, Base)
 migration_manager = Manager(flapp)

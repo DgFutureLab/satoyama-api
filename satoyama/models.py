@@ -18,9 +18,9 @@ def create(model):						### 'create' is the name of the decorator
 		if instance:
 			try:
 				manager.session.add(instance)			### ..added to the session
-				manager.session.commit()					### ..inserted to the database
 				if isinstance(instance, Reading):   ### If the new object is a Reading, add it as the lastest reading of the sensor
 					instance.sensor.latest_reading = json.dumps(instance.json())				
+				manager.session.commit()
 				return instance 					### ..and returned to the caller
 			except Exception, e:
 				manager.session.rollback()
@@ -90,9 +90,23 @@ class SatoyamaBase(object):
 		except Exception, e:
 			return False
 
-	# @classmethod
-	# def create_random(cls):
-	# 	settables = 
+	@classmethod
+	def query_interval(cls, query = None, from_date = None, until_date = None):
+		if not query: query = cls.query
+		
+		if from_date: from_date = DatetimeHelper.convert_timestamp_to_datetime(from_date)
+		if until_date: until_date = DatetimeHelper.convert_timestamp_to_datetime(until_date)
+
+		if from_date and until_date:
+			query = query.filter(cls.timestamp >= from_date).filter(cls.timestamp <= until_date)
+		elif from_date and not until_date:
+			query = query.filter(cls.timestamp >= from_date)
+		elif not from_date and until_date:
+			query = query.filter(cls.timestamp <= until_date)
+		print query
+		return query
+
+	
 
 @create
 class Site(SatoyamaBase, Base):

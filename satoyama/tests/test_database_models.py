@@ -92,6 +92,7 @@ class TestSensorModel(DBTestBase):
 
 		assert latest_reading['timestamp'] == timestamp_str
 		assert round(latest_reading['value'], 10) == round(value, 10)
+		print latest_reading
 		assert latest_reading['sensor_id'] == sensor.id
 
 

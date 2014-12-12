@@ -126,5 +126,11 @@ class RequestHelper(HelperBase):
 				response += exc.MissingFieldException('Could not fulfill request. Missing field: %s. All query data must be placed in the request body.'%field_name)
 				return None
 
+	@staticmethod
+	def assert_codependent_parameters(response, *pars):
+		for par in pars:
+			if not par:
+				response += MissingParameterException(par) 
+
 
 

@@ -33,14 +33,14 @@ def hello():
 	# return repr(response)
 
 
-@flapp.route('/node/all', methods = ['GET'])
-def get_all_nodes():
-	"""	This return info about all nodes. """
-	response = ApiResponse(request)
-	nodes = Node.query.all()
-	for node in nodes: response += node
-	return json.dumps(response.json())
-	# return repr(response)
+# @flapp.route('/node/all', methods = ['GET'])
+# def get_all_nodes():
+# 	"""	This return info about all nodes. """
+# 	response = ApiResponse(request)
+# 	nodes = Node.query.all()
+# 	for node in nodes: response += node
+# 	return json.dumps(response.json())
+# 	# return repr(response)
 
 
 

@@ -78,3 +78,30 @@ class DatetimeHelper(HelperBase):
 		"""
 		timestamp_str = datetime_instance.strftime(DATETIME_FORMATS[0])
 		return timestamp_str
+
+
+class QueryHelper(HelperBase):
+	
+	@staticmethod
+	def query_interval(query, from_date = None, until_date = None):
+		from_date = DatetimeHelper.convert_timestamp_to_datetime(from_date)
+		until_date = DatetimeHelper.convert_timestamp_to_datetime(until_date)
+
+		# print from_date, until_date
+		# Reading.query.filter(Reading.timestamp > before).filter(Reading.timestamp < now).count()
+
+		# field = getattr(cls, 'time_column')
+
+		if from_date and until_date:
+			query = query.filter(Reading.timestamp > from_date).filter(Reading.timestamp < until_date)
+		elif from_date and not until_date:
+			query = query.filter(Reading.timestamp > from_date)
+		elif until_date and not from_date:
+			pass
+			# self.response += exc.MissingParameterException('from_date')
+		return query
+
+	# @classmethod
+	# def create_random(cls):
+	# 	settables = 
+

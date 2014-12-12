@@ -65,6 +65,8 @@ class InvalidParameterTypeException(ApiException):
 	def __init__(self, parameter_name, partype):
 		super(InvalidParameterTypeException, self).__init__('Expected %s to be of type %s.'%(parameter_name, partype))
 
-
+# class InvalidParameterValueException(ApiException):
+# 	def __init__(self, parameter_name, choices):
+# 		super(InvalidParameterValueException, self).__init__('Parameter %s must be one of %s.'%(parameter_name, partype))
 	# def __repr__(self):
 	# 	return json.dumps({'error': self.message})

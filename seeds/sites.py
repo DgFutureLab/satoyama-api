@@ -17,6 +17,10 @@ def notest(func):
 
 class SiteSeeder():
 	@staticmethod
+	def seed_empty_site():
+		return Site.create()
+
+	@staticmethod
 	def seed_ricefield_site(site_alias = None, n_nodes = 1, n_readings = 5, **kwargs):
 		if not site_alias: 
 			site_alias = 'site_%s'%uuid.uuid4().hex

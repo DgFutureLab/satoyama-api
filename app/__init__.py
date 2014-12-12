@@ -20,12 +20,8 @@ flapp.config.update(conf.module_config)
 conf.configure_flapp('development')
 import satoyama
 
-from helpers import UrlHelper, RequestHelper
-UrlHelper(flapp)
-RequestHelper(flapp)
-
 ### Import modules containing statements that must be executed when the webapp is started (such as adding routes for the REST api)
-import resources, views, conf
+import resources, views, conf, apihelpers
 
 
 
