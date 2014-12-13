@@ -22,25 +22,6 @@ def format_data(sensor_data):
 
 
 ###################################################################
-### BELOW ARE API ROUTES
-###################################################################
-
-
-@flapp.route('/hello', methods = ['GET'])
-def hello():
-	"""	This return info about all nodes. """
-	return 'HELLO!'
-	# return repr(response)
-
-
-# @flapp.route('/node/all', methods = ['GET'])
-# def get_all_nodes():
-# 	"""	This return info about all nodes. """
-# 	response = ApiResponse(request)
-# 	nodes = Node.query.all()
-# 	for node in nodes: response += node
-# 	return json.dumps(response.json())
-# 	# return repr(response)
 
 
 
@@ -53,13 +34,8 @@ def process_multiple_readings():
 		request_json = json.loads(decompressed)
 	except Exception, e:
 		print e
-
-	# if isinstance(request_json, list):
 	for reading in request_json:
 		sensor_reading = SensorData(**reading)
 		put_reading_in_database(api_response = response, **sensor_reading.as_dict())
 	print len(Reading.query.all())
-	# else: 
-	# 	pass
-	# print response.json()
 	return json.dumps(response.json())
