@@ -32,12 +32,12 @@ Each node can have 0 or more sensors attached to it. **Sensor**, each sensor bel
 
 Get the node_ids that belong to the current network
 
-`GET /node/all`
+`GET /nodes`
 
 #### Example
 
 Request:
-`GET /node/all`
+`GET /nodes`
 
 Response:
 ```
@@ -89,10 +89,6 @@ Response:
 
 Tests
 ===================
-
-Still only a few tests have been implemented BUT FEEL FREE TO WRITE MORE.
-## Running tests
-Go to satoyama-api root folder and simply run py.test -v -s
-
-## Writing tests
 As this project uses py.test, writing tests is easy. Place your test in a file prefixed 'test_' in the tests package. The actual tests are methods (class or not) beginning with 'test_'.
+
+1. from satoyama-api root folder and simply run py.test -v -s
