@@ -1,10 +1,9 @@
 satoyama-api
 ============
+REST API for Satoyama sensor networks based on Freaklabs open hardware. Satoyama-api facilitates the collection of data from sensors attached to Chibi or Saboten devices.
 
-REST API for Satoyama sensor networks based on Freaklabs open hardware.
-
-
-# Installation on Ubuntu (using install script)
+# Installation on Ubuntu
+===================
 We've made shell script that painlessly handles the installation. The script has been tested on a clean Ubuntu 14.10 x32 machine. Steps:
 
 1. Install git: $ sudo apt-get install git
@@ -18,77 +17,16 @@ The script installs all the system packages required by the webserver including 
 
 Enjoy!
 
-# Installation on Ubuntu (manual)
-## Setup database
-First, install postgresql
+If you had problems: <a href="https://github.com/DgFutureLab/satoyama-api/blob/master/UBUNTUINSTALL.md">Detailed manual Ubuntu installation</a>.
+For Mac users: <a href="https://github.com/DgFutureLab/satoyama-api/blob/master/MACINSTALL.md">Detailed manual Mac installation</a>.
 
-1. $ sudo apt-get update
-2. $ sudo apt-get install libpq-dev postgresql postgresql-contrib
-
-First, let's download the app from github. If you don't already have git, install it:
-$ sudo apt-get install git
-Then clone the app
-$ git clone https://github.com/DgFutureLab/satoyama-api.git
-
-$ cp db_config_sample.yml db_config.yml
-
-Now let's create the user that the webapp will use. You will be asked to enter a password, so make 
-$ createuser satoyama --login --superuser --pwprompt
-
-Log into psql and change the password for the new user
-
-\# alter user satoyama with password 'satoyama';
-
-We also have to create the databases for the webapp
-$ createdb satoyama_test;
-$ createdb satoyama_dev;
-$ createdb satoyama_prod;
-
-## Setup app environment
-
-Now we install the tools required to make a standalone environment for the app:
-$ sudo apt-get install python-setuptools python-dev
-$ sudo easy_install virtualenv
-
-You can make a new environment with all the binaries and python executables
-$ virtualenv env
-Now change into the new environment:
-$ source env/bin/activate
-
-Navigate into the satoyama-api folder and install the webapp dependencies:
-$ pip install -r requirements.txt
-
-Now run the migration script 
-$ python manage.py db upgrade
-
-
-API Usage
-============
-
+API
+===================
 The API is hosted on Digital Ocean and the current entry point IP address is http://128.199.191.249/
 
-Resource Types
-===================
-
-Site
-----
-Each site has many nodes
-
-Node
-----
-Nodes are computing elements gathering data from the environment. Each node can have 0 or more sensors attached to it.
-
-Sensor
------
-Each sensor belongs to one node. Sensors gather information in "readings"
-
-Reading
-----
-Each reading belongs to a sensor.
-
-
-API Calls
-===================
+Resource Types: **Site**, each site has many nodes. **Node**, nodes are computing elements gathering data from the environment.
+Each node can have 0 or more sensors attached to it. **Sensor**, each sensor belongs to one node. **Sensors** gather information in "readings".
+**Reading**, each reading belongs to a sensor.
 
 Get all current nodes in the network /node/all
 ----
@@ -151,7 +89,6 @@ Response:
     "warnings": []
 }
 ```
-
 
 Tests
 ===================
