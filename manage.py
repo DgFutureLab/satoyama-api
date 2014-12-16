@@ -3,11 +3,8 @@ from flask.ext.migrate import Migrate, MigrateCommand
 import argparse
 from satoyama.database import manager as db_manager
 from app import flapp
-
 from satoyama.models import *
 from satoyama.database import Base
-
-
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument('--env', choices = ('test', 'dev', 'prod'), required = True, help = 'Specify environment, which determines which database to use.')
@@ -17,26 +14,7 @@ from satoyama.database import Base
 
 migrate = Migrate(flapp, Base)
 migration_manager = Manager(flapp)
-
-# class Print(Command):
-
-#         def run(self):
-#             print "hello"
-
-# def test():
-# 	print 'HUUUUUUUUUUUUU'
-
-
-
-# migration_manager.add_command('test', Print)
 migration_manager.add_command('db', MigrateCommand)
-# 
-
-
-
 
 if __name__ == '__main__':
-
-	
-
 	migration_manager.run()
