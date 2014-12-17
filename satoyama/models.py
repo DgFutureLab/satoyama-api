@@ -92,8 +92,7 @@ class SatoyamaBase(object):
 
 	@classmethod
 	def query_interval(cls, query = None, from_date = None, until_date = None):
-		if not query: query = cls.query
-		
+		if not query: query = cls.query		
 		if from_date: from_date = DatetimeHelper.convert_timestamp_to_datetime(from_date)
 		if until_date: until_date = DatetimeHelper.convert_timestamp_to_datetime(until_date)
 
@@ -103,7 +102,6 @@ class SatoyamaBase(object):
 			query = query.filter(cls.timestamp >= from_date)
 		elif not from_date and until_date:
 			query = query.filter(cls.timestamp <= until_date)
-		print query
 		return query
 
 	
@@ -135,8 +133,6 @@ class Site(SatoyamaBase, Base):
 		for node in nodes:
 			assert isinstance(node, Node), 'Each item in nodes must be an instance of type Node'
 			self.nodes.append(node)
-
-
 
 	def json(self):
 		return super(Site, self).json(Site.json_column_transformations, Site.json_relationship_representation)

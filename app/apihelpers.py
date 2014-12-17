@@ -105,7 +105,7 @@ class RequestHelper(HelperBase):
 		return response
 
 	@staticmethod
-	def get_form_data(response, field_name, field_type, optional = True):
+	def get_form_data(response, field_name, field_type, optional = True, http_verb = 'POST'):
 		"""
 		Helper function for getting and type-validating a named query parameter from HTTP request.
 
@@ -114,17 +114,21 @@ class RequestHelper(HelperBase):
 		:param field_type: data type of the field. Must be a Python builtin type, e.g., int, str, etc.
 		"""
 		assert isinstance(response, ApiResponse), 'response must an instance of type ApiResponse'
-		try:
-			field = request.form[field_name]
+		if http_verb == 'POST':
+			field = request.form.get(field_name, None)
+		elif http_verb == 'GET':
+			field = request.args.get(field_name, None)
+		else:
+			assert False, 'http_verb must be either GET or POST'
+		
+		if field: 
 			try:
 				field = field_type(field)
-				return field
 			except ValueError:
 				response += exc.InvalidParameterTypeException(field_name, field_type)
-		except KeyError:
-			if not optional:
-				response += exc.MissingFieldException('Could not fulfill request. Missing field: %s. All query data must be placed in the request body.'%field_name)
-				return None
+		elif not field and not optional:
+			response += exc.MissingFieldException('Could not fulfill request. Missing field: %s. All query data must be placed in the request body.'%field_name)			
+		return field
 
 	@staticmethod
 	def assert_codependent_parameters(response, *pars):

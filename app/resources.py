@@ -132,44 +132,40 @@ class ReadingList(restful.Resource):
 		
 
 		sensor_id = RequestHelper.get_form_data(response, 'sensor_id', int, http_verb = 'GET')
-		print 'AAAAAAAAAAAAAAAAAEDSD'
-		print sensor_id
-		print request.args
-
 		node_id = RequestHelper.get_form_data(response, 'node_id', int, http_verb = 'GET')
 		sensor_alias = RequestHelper.get_form_data(response, 'sensor_alias', str, http_verb = 'GET')
-
 		from_date = RequestHelper.get_form_data(response, 'from', str, http_verb = 'GET')
 		until_date = RequestHelper.get_form_data(response, 'until', str, http_verb = 'GET')
 
 		query = Reading.query
 		readings = list()
 
-		print 'FFFFFFFFFFFFFFFFFFFFFFFFFFFF'
-		
 		if sensor_id:
-			print 'BBBBBBBBBBBBBBBBBBBBBBBB'
 			query = Reading.query.filter_by(sensor_id = sensor_id)
+			readings = Reading.query_interval(query, from_date, until_date).all()
+			for reading in readings: response += reading
+			return response.json()
+
 		elif node_id and sensor_alias:
-			print 'CCCCCCCCCCCCCCCCCCCCCCCCC'
 			node = Node.query.filter_by(id = node_id).first()
 			sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
 			query = Reading.query.filter_by(sensor_id = sensor.id)
-		elif node_id and not sensor_alias:
-			print 'DDDDDDDDDDDDDDDDDDDDDDDDDDD'
-			response += exc.MissingParameterException('sensor_alias')
-		elif not node_id and sensor_alias:
-			print 'EEEEEEEEEEEEEEEEEEEEEEEEEEE'
-			response += exc.MissingParameterException('node_id')
-		
-		if from_date or until_date:
 			readings = Reading.query_interval(query, from_date, until_date).all()
-		else:
-			readings = query.all()
+			for reading in readings: response += reading
+			return response.json()
+
+		elif node_id and not sensor_alias:
+			response += exc.MissingParameterException('sensor_alias')
+			return response.json()
+		elif not node_id and sensor_alias:
+			response += exc.MissingParameterException('node_id')
+			return response.json()
 		
-		for reading in readings: 
-			response += reading
-		return response.json()
+		elif from_date or until_date:
+			readings = Reading.query_interval(query, from_date, until_date).all()
+			for reading in readings: response += reading
+			return response.json()
+		
 
 rest_api.add_resource(ReadingList, '/readings', '/readings/all')
 

@@ -36,6 +36,11 @@ class MissingResourceException(ApiException):
 		super(MissingResourceException, self).__init__('No %s with id %s'%(resource_type, resource_id))
 
 
+class IncompleteURLException(ApiException):
+	def __init__(self, correct_url_format):
+		super(IncompleteURLException, self).__init__('Could not fulfil request. Corrent usage is: %s'%correct_url_format)
+
+
 class MissingNodeException(ApiException):
 	def __init__(self, node_id):
 		super(MissingNodeException, self).__init__('No such node: %s'%node_id)

@@ -22,7 +22,8 @@ class NodeResourceTests(DBTestBase):
 	 	response = requests.get(url)
 	 	assert response.ok
 	 	api_response = ApiResponseHelper.assert_api_response(response)
-	 	assert api_response.objects[0] == node.json() 
+	 	assert api_response.objects[0] == node.json()
+	 	
 
 	def test_GET_node_by_id_fails_when_node_id_is_not_int(self):
 		node_id = 'NOT AN INTEGER'
