@@ -4,7 +4,7 @@ from satoyama.tests.dbtestbase import DBTestBase
 from seeds.nodes import NodeSeeder
 from seeds.sites import SiteSeeder
 from app.apihelpers import ApiResponseHelper, UrlHelper
-
+from satoyama.models import Node
 
 
 
@@ -45,21 +45,17 @@ class NodeResourceTests(DBTestBase):
 		response = requests.post(url, data = data)
 		assert response.ok
 		api_response = ApiResponseHelper.assert_api_response(response)
-		assert api_response.objects[0]['alias'] == 'mynode'
-		assert api_response.objects[0]['latitude'] == 13.2
-		assert api_response.objects[0]['longitude'] == 23.2
-		assert api_response.objects[0]['site_id'] == 1
-
+		node = Node.query.first().json()
+		assert node == api_response.first()
+		
 	def test_POST_create_node_with_nonexisting_site(self):
 		url = UrlHelper.get_url(flapp, 'node')
 		data = {'alias':'mynode', 'site_id': 1111111111, 'latitude' : 13.2, 'longitude': 23.2}
 		response = requests.post(url, data = data)
 		assert response.ok
 		api_response = ApiResponseHelper.assert_api_response(response)
-		assert api_response.objects[0]['alias'] == 'mynode'
-		assert api_response.objects[0]['latitude'] == 13.2
-		assert api_response.objects[0]['longitude'] == 23.2
-		assert api_response.objects[0]['site_id'] == None
+		node = Node.query.first().json()
+		assert node == api_response.first()
 		
 
 	# 	################################################################################
@@ -80,16 +76,13 @@ class NodeResourceTests(DBTestBase):
 		"""
 		Test that GET /node/all gives a JSON response that has no errors in it, and that an ApiResponse object can be instantiated from the response body.
 		"""
-		node = NodeSeeder.seed_ricefield_node(n_readings = 3)
-		NodeSeeder.seed_ricefield_node(n_readings = 3)
-		NodeSeeder.seed_ricefield_node(n_readings = 3)
-		NodeSeeder.seed_ricefield_node(n_readings = 3)
+		for i in range(5): NodeSeeder.seed_ricefield_node(n_readings = 3)
 		url = UrlHelper.get_url(flapp, 'node', 'all')
 		r = requests.get(url)
 		api_response = ApiResponseHelper.assert_api_response(r)
 		assert api_response.ok
-		assert api_response.first() == node.json(), 'First node in the api response does not match the first node created'
-		assert len(api_response.objects) == 4, 'Expected to get four nodes, but did not'
+		nodes = map(lambda n: n.json(), Node.query.all())
+		assert sorted(nodes) == sorted(api_response.objects)
 
 
 
