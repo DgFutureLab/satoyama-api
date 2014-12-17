@@ -98,81 +98,90 @@ class ReadingResourceTests(DBTestBase):
 		"""
 		node = NodeSeeder.seed_ricefield_node(n_readings = 0)
 		sensor = node.sensors[0]
-		url = UrlHelper.get_url(flapp, 'reading', **{'sensor_alias' : sensor.alias})
-		response = requests.get(url, data = data)
+		url = UrlHelper.get_url(flapp, 'readings', **{'sensor_alias' : sensor.alias})
+		response = requests.get(url)
 		assert response.ok
 		ApiResponseHelper.assert_api_response(response, expect_success = False)
 
-	# def test_GET_reading_by_sensor_id_with_interval_time_filtering_success(self):
-	# 	"""
-	# 	GET /reading?sensor_id=<int>&from=2014-1-1&until=2014-2-1
-	# 	"""
-	# 	node = NodeSeeder.seed_ricefield_node(n_readings = 0)
-	# 	sensor = node.sensors[0]
-	# 	start_date = datetime(2014, 12, 1)
-	# 	for day in range(20):
-	# 		Reading.create(sensor = sensor, value = 17, timestamp = start_date + timedelta(days=day))
-
-	# 	data = {'sensor_id' : sensor.id, 'from': '2014-12-1', 'until': '2014-12-11'}
-	# 	url = UrlHelper.get_url(flapp, 'reading')
-	# 	response = requests.get(url, data = data)
-	# 	assert response.ok
-	# 	api_response = ApiResponseHelper.assert_api_response(response)
-	# 	assert len(api_response.objects) == 11
-
-
-	# def test_GET_reading_by_node_id_and_sensor_alias_with_interval_time_filtering_success(self):
-	# 	"""
-	# 	GET /reading?node_id=<int>&sensor_alias=<str>&from=2014-1-1&until=2014-2-1
-	# 	"""
-	# 	node = NodeSeeder.seed_ricefield_node(n_readings = 0)
-	# 	sensor = node.sensors[0]
-	# 	start_date = datetime(2014, 12, 1)
-	# 	for day in range(20):
-	# 		Reading.create(sensor = sensor, value = 17, timestamp = start_date + timedelta(days=day))
-
-	# 	data = {'node_id' : node.id, 'sensor_alias': sensor.alias, 'from': '2014-12-1', 'until': '2014-12-11'}
-	# 	url = UrlHelper.get_url(flapp, 'reading')
-	# 	response = requests.get(url, data = data)
-	# 	assert response.ok
-	# 	api_response = ApiResponseHelper.assert_api_response(response)
-	# 	assert len(api_response.objects) == 11
+	def test_GET_reading_by_sensor_id_with_interval_time_filtering_success(self):
+		"""
+		GET /reading?sensor_id=<int>&from=2014-12-2&until=2014-12-11
+		This call should return all the readings created in the interval from 2014-12-2 until 2014-12-11 for a particular sensor 
+		"""
+		node = NodeSeeder.seed_ricefield_node(n_readings = 0)
+		sensor = node.sensors[0]
+		start_date = datetime(2014, 12, 1)
+		for day in range(20): Reading.create(sensor = sensor, value = 17, timestamp = start_date + timedelta(days=day))
+		url = UrlHelper.get_url(flapp, 'readings', **{'sensor_id' : sensor.id, 'from': '2014-12-2', 'until': '2014-12-11'})
+		response = requests.get(url)
+		assert response.ok
+		readings_in_interval = map(lambda r: r.json(), filter(lambda r: r.timestamp >= datetime(2014,12,2) and r.timestamp <= datetime(2014,12,11), sensor.readings))
+		api_response = ApiResponseHelper.assert_api_response(response)
+		assert sorted(readings_in_interval) == sorted(api_response.objects)
 
 
-	# def test_GET_reading_by_sensor_id_with_from_date_filtering_success(self):
-	# 	"""
-	# 	GET /reading?sensor_id=<int>&from=2014-1-1&until=2014-2-1
+	def test_GET_reading_by_node_id_and_sensor_alias_with_interval_time_filtering_success(self):
+		"""
+		GET /reading?node_id=<int>&sensor_alias=<str>&from=2014-12-2&until=2014-12-11
+		This call should return all the readings created in the interval from 2014-12-2 until 2014-12-11 for a sensor in the specified node
+		"""
+		node = NodeSeeder.seed_ricefield_node(n_readings = 0)
+		sensor = node.sensors[0]
+		start_date = datetime(2014, 12, 1)
+		for day in range(20): Reading.create(sensor = sensor, value = 17, timestamp = start_date + timedelta(days=day))
+		url = UrlHelper.get_url(flapp, 'readings', **{'node_id' : node.id, 'sensor_alias': sensor.alias, 'from': '2014-12-2', 'until': '2014-12-11'})
+		response = requests.get(url)
+		assert response.ok
+		readings_in_interval = map(lambda r: r.json(), filter(lambda r: r.timestamp >= datetime(2014,12,2) and r.timestamp <= datetime(2014,12,11), sensor.readings))
+		api_response = ApiResponseHelper.assert_api_response(response)
+		assert sorted(readings_in_interval) == sorted(api_response.objects)
 
-	# 	"""
-	# 	node = NodeSeeder.seed_ricefield_node(n_readings = 0)
-	# 	sensor = node.sensors[0]
-	# 	start_date = datetime(2014, 12, 1)
-	# 	for day in range(20):
-	# 		Reading.create(sensor = sensor, value = 17, timestamp = start_date + timedelta(days=day))
+	def test_GET_readings_by_sensor_id_with_nonsensical_time_parameters_returns_no_objects(self):
+		"""
+		GET /reading?node_id=<int>&sensor_alias=<str>&from=2014-12-10&until=2013-1-1
+		This call should return no objects as the specified until date is before the from_date
+		"""
+		node = NodeSeeder.seed_ricefield_node(n_readings = 0)
+		sensor = node.sensors[0]
+		start_date = datetime(2014, 12, 1)
+		for day in range(20): Reading.create(sensor = sensor, value = 17, timestamp = start_date + timedelta(days=day))
+		url = UrlHelper.get_url(flapp, 'readings', **{'node_id' : node.id, 'sensor_alias': sensor.alias, 'from': '2014-12-2', 'until': '2013-1-1'})
+		response = requests.get(url)
+		assert response.ok
+		api_response = ApiResponseHelper.assert_api_response(response)
+		assert api_response.first() == None
 
-	# 	data = {'sensor_id' : sensor.id, 'from': '2014-12-1'}
-	# 	url = UrlHelper.get_url(flapp, 'reading')
-	# 	response = requests.get(url, data = data)
-	# 	assert response.ok
-	# 	api_response = ApiResponseHelper.assert_api_response(response)
-	# 	assert len(api_response.objects) == 20
 
-	# def test_GET_reading_by_sensor_id_with_until_date_filtering_success(self):
-	# 	"""
-	# 	GET /reading?sensor_id=<int>&from=2014-1-1&until=2014-2-1
-	# 	"""
-	# 	node = NodeSeeder.seed_ricefield_node(n_readings = 0)
-	# 	sensor = node.sensors[0]
-	# 	start_date = datetime(2014, 12, 1)
-	# 	for day in range(20):
-	# 		Reading.create(sensor = sensor, value = 17, timestamp = start_date + timedelta(days=day))
+	def test_GET_reading_by_sensor_id_with_from_date_filtering_success(self):
+		"""
+		GET /reading?sensor_id=<int>&from=2014-12-2
+		This call should return all the readings created after 2014-12-2
+		"""
+		node = NodeSeeder.seed_ricefield_node(n_readings = 0)
+		sensor = node.sensors[0] 
+		for day in range(20): Reading.create(sensor = sensor, value = 17, timestamp = datetime(2014, 12, 1) + timedelta(days=day))
+		url = UrlHelper.get_url(flapp, 'readings', **{'sensor_id' : sensor.id, 'from': '2014-12-2'})
+		response = requests.get(url)
+		assert response.ok
+		api_response = ApiResponseHelper.assert_api_response(response)
+		readings_in_interval = map(lambda r: r.json(), filter(lambda r: r.timestamp >= datetime(2014,12,2), sensor.readings))
+		api_response = ApiResponseHelper.assert_api_response(response)
+		assert sorted(readings_in_interval) == sorted(api_response.objects)
 
-	# 	data = {'sensor_id' : sensor.id, 'until': '2014-12-1'}
-	# 	url = UrlHelper.get_url(flapp, 'reading')
-	# 	response = requests.get(url, data = data)
-	# 	assert response.ok
-	# 	api_response = ApiResponseHelper.assert_api_response(response)
-	# 	assert len(api_response.objects) == 1
+	def test_GET_reading_by_sensor_id_with_until_date_filtering_success(self):
+		"""
+		GET /reading?sensor_id=<int>&from=2014-1-1&until=2014-2-1
+		"""
+		node = NodeSeeder.seed_ricefield_node(n_readings = 0)
+		sensor = node.sensors[0]
+		for day in range(20): Reading.create(sensor = sensor, value = 17, timestamp = datetime(2014, 12, 1) + timedelta(days=day))
+		url = UrlHelper.get_url(flapp, 'readings', **{'sensor_id' : sensor.id, 'until': '2014-12-1'})
+		response = requests.get(url)
+		assert response.ok
+		api_response = ApiResponseHelper.assert_api_response(response)
+		readings_in_interval = map(lambda r: r.json(), filter(lambda r: r.timestamp <= datetime(2014,12,1), sensor.readings))
+		api_response = ApiResponseHelper.assert_api_response(response)
+		assert sorted(readings_in_interval) == sorted(api_response.objects)
 
 
 	# def test_GET_all_readings(self):
