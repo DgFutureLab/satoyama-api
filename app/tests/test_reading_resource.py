@@ -52,58 +52,56 @@ class ReadingResourceTests(DBTestBase):
 		response = requests.get(url)
 		assert response.ok
 		api_response = ApiResponseHelper.assert_api_response(response)
-		readings_from_db = map(lambda x: x.json(), Reading.query.filter_by(sensor_id = sensor.id).all())
-		assert sorted(readings_from_db) == sorted(api_response.objects)
+		assert sorted(map(lambda x: x.json(), sensor.readings)) == sorted(api_response.objects)
 
-	# def test_GET_readings_by_sensorid_with_nonexisting_sensor_response_empty(self):
-	# 	"""
-	# 	GET /reading?sensor_id=<int>
-	# 	This call should return no readings as sensor 100 does not exist
-	# 	"""
-	# 	NodeSeeder.seed_ricefield_node(n_readings = 3)
-	# 	url = UrlHelper.get_url(flapp, 'readings', **{'sensor_id' : 100})
-	# 	response = requests.get(url)
-	# 	assert response.ok
-	# 	api_response = ApiResponseHelper.assert_api_response(response)
-	# 	assert api_response.first() == None
+	def test_GET_readings_by_sensorid_with_nonexisting_sensor_response_empty(self):
+		"""
+		GET /reading?sensor_id=<int>
+		This call should return no readings as sensor 100 does not exist
+		"""
+		NodeSeeder.seed_ricefield_node(n_readings = 3)
+		url = UrlHelper.get_url(flapp, 'readings', **{'sensor_id' : 100})
+		response = requests.get(url)
+		assert response.ok
+		api_response = ApiResponseHelper.assert_api_response(response)
+		assert api_response.first() == None
 
 
-	# def test_GET_readings_by_nodeid_and_sensoralias_success(self):
-	# 	"""
-	# 	GET /reading?node_id=<int>&sensor_alias=<str>
-	# 	This call should return all readings belonging to the sensor in the specified node, in this case two readings
-	# 	"""
-	# 	node = NodeSeeder.seed_ricefield_node(n_readings = 0)
-	# 	sensor = node.sensors[0]
-	# 	reading = Reading.create(sensor = sensor, value = 17)
-	# 	url = UrlHelper.get_url(flapp, 'readings', **{'node_id' : node.id, 'sensor_alias' : sensor.alias})
-	# 	response = requests.get(url)
-	# 	assert response.ok
-	# 	api_response = ApiResponseHelper.assert_api_response(response)
-	# 	assert api_response.first() == reading.json()
+	def test_GET_readings_by_nodeid_and_sensoralias_success(self):
+		"""
+		GET /reading?node_id=<int>&sensor_alias=<str>
+		This call should return all readings belonging to the sensor in the specified node, in this case two readings
+		"""
+		node = NodeSeeder.seed_ricefield_node(n_readings = 3)
+		sensor = node.sensors[0]
+		url = UrlHelper.get_url(flapp, 'readings', **{'node_id' : node.id, 'sensor_alias' : sensor.alias})
+		response = requests.get(url)
+		assert response.ok
+		api_response = ApiResponseHelper.assert_api_response(response)
+		assert sorted(map(lambda x: x.json(), sensor.readings)) == sorted(api_response.objects)
 
-	# # def test_GET_reading_by_nodeid_but_no_sensoralias_failure(self):
-	# 	"""
-	# 	GET /reading?node_id=<int>
-	# 	"""
-	# 	node = NodeSeeder.seed_ricefield_node(n_readings = 0)
-	# 	data = {'node_id' : node.id}
-	# 	url = UrlHelper.get_url(flapp, 'reading')
-	# 	response = requests.get(url, data = data)
-	# 	assert response.ok
-	# 	ApiResponseHelper.assert_api_response(response, expect_success = False)
+	def test_GET_reading_by_nodeid_but_no_sensoralias_failure(self):
+		"""
+		GET /reading?node_id=<int>
+		This call should return an API error as specifying node_id but no sensor_alias is insuficcient to complete the query
+		"""
+		node = NodeSeeder.seed_ricefield_node(n_readings = 0)
+		url = UrlHelper.get_url(flapp, 'readings', **{'node_id' : node.id})
+		response = requests.get(url)
+		assert response.ok
+		ApiResponseHelper.assert_api_response(response, expect_success = False)
 
-	# def test_GET_reading_by_sensoralias_but_no_nodeid_failure(self):
-	# 	"""
-	# 	GET /reading?sensor_alias=<str>
-	# 	"""
-	# 	node = NodeSeeder.seed_ricefield_node(n_readings = 0)
-	# 	sensor = node.sensors[0]
-	# 	data = {'sensor_alias' : sensor.alias}
-	# 	url = UrlHelper.get_url(flapp, 'reading')
-	# 	response = requests.get(url, data = data)
-	# 	assert response.ok
-	# 	ApiResponseHelper.assert_api_response(response, expect_success = False)
+	def test_GET_reading_by_sensoralias_but_no_nodeid_failure(self):
+		"""
+		GET /reading?sensor_alias=<str>
+		This call should return an API error as specifying sensor_alias but no node_id is insufficient to complete the query
+		"""
+		node = NodeSeeder.seed_ricefield_node(n_readings = 0)
+		sensor = node.sensors[0]
+		url = UrlHelper.get_url(flapp, 'reading', **{'sensor_alias' : sensor.alias})
+		response = requests.get(url, data = data)
+		assert response.ok
+		ApiResponseHelper.assert_api_response(response, expect_success = False)
 
 	# def test_GET_reading_by_sensor_id_with_interval_time_filtering_success(self):
 	# 	"""
