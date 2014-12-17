@@ -17,18 +17,23 @@ class NodeResourceTests(DBTestBase):
 
 
 	def test_GET_existing_node_by_id(self):
+		"""
+		GET /node/1
+		This call should return the node with id=1
+		"""
 	 	node = NodeSeeder.seed_empty_node()
 	 	url = UrlHelper.get_url(flapp, 'node', node.id)
 	 	response = requests.get(url)
 	 	assert response.ok
 	 	api_response = ApiResponseHelper.assert_api_response(response)
-	 	assert api_response.objects[0] == node.json()
+	 	assert api_response.first() == node.json()
 	 	
 
 	def test_GET_node_by_id_fails_when_node_id_is_not_int(self):
 		node_id = 'NOT AN INTEGER'
 	 	url = UrlHelper.get_url(flapp, 'node', node_id)
 	 	response = requests.get(url)
+	 	print response
 	 	assert not response.ok
 
 	def test_GET_nonexisting_node_by_id(self):

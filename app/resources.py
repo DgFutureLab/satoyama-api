@@ -14,6 +14,16 @@ API_UNITS = {
 	}
 
 
+class SiteList(restful.Resource):
+	def get(self):
+		api_response = ApiResponse()
+		sites = Site.query.all()
+		for site in sites: api_response += site
+		print api_response.json()
+		return api_response.json()
+
+rest_api.add_resource(SiteList, '/sites')
+
 class SiteResource(restful.Resource):
 	def get(self, site_id):
 		response = ApiResponse(request)
@@ -267,13 +277,4 @@ class SensorData(object):
 	def __repr__(self):
 		return str(self.__dict__)
 
-
-### For administration
-
-# rest_api.add_resource(NodeResource, '/node/<string:node_id>/sensor/<string:sensor_id>/')
-
-
-
-#rest_api.add_resource(ReadingResource, '/reading?node_id=1&sensor_alias=distance')
-#rest_api.add_resource(ReadingResource, '/node/<string:node_id>/sensor/distance/reading/1week')
 
