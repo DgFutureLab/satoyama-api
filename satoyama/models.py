@@ -114,7 +114,7 @@ class Site(SatoyamaBase, Base):
 	
 	json_relationship_representation = {
 		'nodes': {
-			'columns' : ['id', 'alias', 'sensors'], 
+			'columns' : ['id', 'alias'], 
 			'transformations' : {'id' : str}
 			}
 		}
