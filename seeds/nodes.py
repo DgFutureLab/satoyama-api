@@ -4,6 +4,9 @@ from uuid import uuid4
 from random import random, randint
 from numpy.random import uniform
 
+def notest(func):
+	setattr(func, 'notest', True)
+	return func
 
 class NodeSeeder():
 
@@ -11,6 +14,12 @@ class NodeSeeder():
 	def seed_empty_node():
 		return Node.create()
 
+	
+	@staticmethod
+	@notest
+	def seed_node(node_type, **kwargs):
+		assert node_type in satoyama.definitions.node_types
+		return getattr(NodeSeeder, 'seed_' + node_type + '_node')(**kwargs)
 
 	@staticmethod
 	def seed_ricefield_node(n_readings = 0, **node_args):
@@ -20,6 +29,8 @@ class NodeSeeder():
 		"""
 		if node_args.has_key('site'):
 			site = node_args['site']
+		elif node_args.has_key('site_id'):
+			site = Site.query.filter_by(id = node_args['site_id']).first()
 		else:
 			site = None
 		

@@ -7,6 +7,7 @@ from flask import request
 from sqlalchemy.exc import DataError
 from apiresponse import ApiResponse
 from apihelpers import RequestHelper
+from seeds.nodes import NodeSeeder
 
 API_UNITS = {
 	'm':'SI meters', 
@@ -33,6 +34,10 @@ class SiteResource(restful.Resource):
 		else:
 			response += exc.MissingResourceException(type(self), site_id)
 		return response.json()
+
+	def post(self):
+		response = ApiResponse()
+		node_alias = RequestHelper.get_form_data(response, 'site_type', str)
 
 
 
@@ -81,13 +86,17 @@ class NodeResource(restful.Resource):
 		response = ApiResponse(request)
 		RequestHelper.filter_valid_parameters(Node, response, request)
 		node_alias = RequestHelper.get_form_data(response, 'alias', str)
+		node_type = RequestHelper.get_form_data(response, 'node_type', str, default = 'empty')
 		site_id = RequestHelper.get_form_data(response, 'site_id', int)
 		longitude = RequestHelper.get_form_data(response, 'longitude', float)
 		latitude = RequestHelper.get_form_data(response, 'latitude', float)
-		
+		print 'AAAAAAAAAAAAAAAAAAAAAAAAALKAJDSLIHJAOSKDJ'
+		print node_type, site_id
+
 		site = Site.query.filter_by(id = site_id).first()
 
-		node = Node.create(alias = node_alias, site = site, latitude = latitude, longitude = longitude)
+		node = NodeSeeder.seed_node(node_type, alias = node_alias, site_id = site_id, latitude = latitude, longitude = longitude)
+		# node = Node.create(alias = node_alias, site = site, latitude = latitude, longitude = longitude)
 		response += node
 		return response.json()
 		

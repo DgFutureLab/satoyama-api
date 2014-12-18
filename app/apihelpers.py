@@ -105,7 +105,7 @@ class RequestHelper(HelperBase):
 		return response
 
 	@staticmethod
-	def get_form_data(response, field_name, field_type, optional = True, http_verb = 'POST'):
+	def get_form_data(response, field_name, field_type, optional = True, http_verb = 'POST', default = None):
 		"""
 		Helper function for getting and type-validating a named query parameter from HTTP request.
 
@@ -115,9 +115,9 @@ class RequestHelper(HelperBase):
 		"""
 		assert isinstance(response, ApiResponse), 'response must an instance of type ApiResponse'
 		if http_verb == 'POST':
-			field = request.form.get(field_name, None)
+			field = request.form.get(field_name, default)
 		elif http_verb == 'GET':
-			field = request.args.get(field_name, None)
+			field = request.args.get(field_name, default)
 		else:
 			assert False, 'http_verb must be either GET or POST'
 		

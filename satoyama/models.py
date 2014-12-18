@@ -104,7 +104,6 @@ class SatoyamaBase(object):
 			query = query.filter(cls.timestamp <= until_date)
 		return query
 
-	
 
 @create
 class Site(SatoyamaBase, Base):
@@ -114,8 +113,8 @@ class Site(SatoyamaBase, Base):
 	
 	json_relationship_representation = {
 		'nodes': {
-			'columns' : ['id', 'alias'], 
-			'transformations' : {'id' : str}
+			'columns' : ['id', 'alias', 'longitude', 'latitude', 'sensors'], 
+			'transformations' : {'sensors': lambda sensors: map(lambda sensor: {'id': sensor.id, 'alias': sensor.alias, 'latest_reading': JSONHelper.load_string_safe(sensor.latest_reading)}, sensors)}
 			}
 		}
 
