@@ -103,6 +103,22 @@ class NodeResource(restful.Resource):
 rest_api.add_resource(NodeResource, '/node/<string:node_id>', '/node')
 
 
+from numpy.random import choice
+from random import random
+class YakResource(restful.Resource):
+	def get(self, yak_id):
+		return {
+			'yak_id' : yak_id,
+			'status' : choice(['dead', 'alive', 'sleeping', 'eating', 'yakking']),
+			'mood': choice(['blue', 'euphoric', 'depressed', 'pissed', 'groovy']),
+			'latitude' : random()*180 - 90,
+			'longitude' : random()*360 - 180
+			}
+
+
+
+rest_api.add_resource(YakResource, '/yaks/<int:yak_id>')
+
 class SensorResource(restful.Resource):
 	def get(self, sensor_id):
 		response = ApiResponse(request)

@@ -9,10 +9,14 @@ import zlib
 import sys
 from resources import put_reading_in_database, SensorData
 
+
 @flapp.route('/', methods = ['GET'])
 def index():
 	# return 'OK'
 	return render_template('index.html')
+
+	
+
 
 def format_data(sensor_data):
 	sensor_data = map(lambda s: dict(zip(['time', 'addr', u'reading(°C)'], s.split(','))), sensor_data)
