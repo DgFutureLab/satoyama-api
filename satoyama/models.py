@@ -157,6 +157,8 @@ class Node(SatoyamaBase, Base):
 	longitude = Column( Float()) 
 	latitude = Column( Float())
 
+	short_address = Column(Integer, unique = True)
+
 	sensors = relationship(
 		'Sensor', 
 		cascade='all,delete-orphan',
