@@ -56,6 +56,16 @@ class SatoyamaBase(object):
 	def all(cls):
 		return cls.query.all()
 
+	@classmethod
+	def find(cls, id):
+		return cls.query.filter_by(id = id).first()
+
+	@classmethod
+	def delete(cls, id):
+		cls.query.filter_by(id = id).delete()
+
+	
+
 	def insert(self):
 		pass
 
@@ -172,8 +182,6 @@ class Node(SatoyamaBase, Base):
 	longitude = Column( Float()) 
 	latitude = Column( Float())
 
-	short_address = Column(Integer, unique = True)
-
 	sensors = relationship(
 		'Sensor', 
 		cascade='all,delete-orphan',
@@ -182,7 +190,7 @@ class Node(SatoyamaBase, Base):
 
 	site_id = Column( Integer, ForeignKey('sites.id', ondelete = 'CASCADE') )
 
-	def __init__(self, site = None, alias = None, sensors = [], longitude = None, latitude = None, short_address = None, **kwargs):
+	def __init__(self, site = None, alias = None, sensors = [], longitude = None, latitude = None, **kwargs):
 		super(Node, self).__init__(**kwargs)
 		assert isinstance(sensors, Iterable), 'sensors must be iterable'
 		for sensor in sensors:
@@ -192,7 +200,6 @@ class Node(SatoyamaBase, Base):
 		self.longitude = longitude
 		self.latitude = latitude
 		self.alias = alias
-		self.short_address = short_address
 		if site: 
 			assert isinstance(site, Site), 'site must be an instance of %s'%type(Site)
 			self.site = site
