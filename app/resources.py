@@ -75,6 +75,9 @@ class NodeResource(restful.Resource):
 			response += MissingParameterException('node_id')
 		return response.json()
 
+	def delete(self, node_id):
+		pass
+		
 	def post(self):
 		"""
 		Use a HTTP POST request to /node to create a new node inside the network
@@ -100,6 +103,9 @@ class NodeResource(restful.Resource):
 		else:
 			response += exc.MissingSiteException(site_id)
 		return response.json()
+
+	
+
 		
 rest_api.add_resource(NodeResource, '/node/<string:node_id>', '/node')
 
