@@ -148,6 +148,7 @@ class Site(SatoyamaBase, Base):
 	nodes = relationship(
 		'Node',
 		cascade='all,delete-orphan', 
+		passive_deletes=True,
 		backref = backref('site', single_parent = True)
 		)
 
@@ -185,6 +186,7 @@ class Node(SatoyamaBase, Base):
 	sensors = relationship(
 		'Sensor', 
 		cascade='all,delete-orphan',
+		passive_deletes=True,
 		backref = backref('node')
 		)
 
@@ -252,6 +254,7 @@ class Sensor(SatoyamaBase, Base):
 	readings = relationship(
 		'Reading',
 		 cascade='all,delete-orphan', 
+		 passive_deletes=True,
 		 backref = backref('sensor', single_parent = True)
 		 )
 
