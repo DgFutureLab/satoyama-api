@@ -206,7 +206,9 @@ class Node(SatoyamaBase, Base):
 
 
 	def json(self):
-		return super(Node, self).json(Node.json_column_transformations, Node.json_relationship_representation)
+		json_dict = super(Node, self).json(Node.json_column_transformations, Node.json_relationship_representation)
+		json_dict.update({'short_address': self.id})
+		return json_dict
 
 @create
 class SensorType(SatoyamaBase, Base):
