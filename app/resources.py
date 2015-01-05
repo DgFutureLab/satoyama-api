@@ -38,10 +38,11 @@ class SiteResource(restful.Resource):
 	def post(self):
 		response = ApiResponse()
 		node_alias = RequestHelper.get_form_data(response, 'site_type', str)
+		return 'OK'
 
 
 
-rest_api.add_resource(SiteResource, '/site/<int:site_id>')
+rest_api.add_resource(SiteResource, '/site/<int:site_id>', '/site')
 
 class NodeList(restful.Resource):
 	def get(self):
@@ -84,20 +85,20 @@ class NodeResource(restful.Resource):
 							   data = {'alias':'mynode', 'site_id':'1', 'latitude' : '13.24234234', 'longitude': 23.222})
 		"""		
 		response = ApiResponse(request)
-		RequestHelper.filter_valid_parameters(Node, response, request)
+		# RequestHelper.filter_valid_parameters(Node, response, request)
 		node_alias = RequestHelper.get_form_data(response, 'alias', str)
 		node_type = RequestHelper.get_form_data(response, 'node_type', str, default = 'empty')
 		site_id = RequestHelper.get_form_data(response, 'site_id', int)
 		longitude = RequestHelper.get_form_data(response, 'longitude', float)
 		latitude = RequestHelper.get_form_data(response, 'latitude', float)
-		print 'AAAAAAAAAAAAAAAAAAAAAAAAALKAJDSLIHJAOSKDJ'
-		print node_type, site_id
+		# short_address = RequestHelper.get_form_data(response, 'short_address', int)
 
 		site = Site.query.filter_by(id = site_id).first()
-
-		node = NodeSeeder.seed_node(node_type, alias = node_alias, site_id = site_id, latitude = latitude, longitude = longitude)
-		# node = Node.create(alias = node_alias, site = site, latitude = latitude, longitude = longitude)
-		response += node
+		if site:
+			node = NodeSeeder.seed_node(node_type, alias = node_alias, site_id = site_id, latitude = latitude, longitude = longitude)
+			response += node
+		else:
+			response += exc.MissingSiteException(site_id)
 		return response.json()
 		
 rest_api.add_resource(NodeResource, '/node/<string:node_id>', '/node')
