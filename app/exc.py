@@ -41,6 +41,11 @@ class IncompleteURLException(ApiException):
 		super(IncompleteURLException, self).__init__('Could not fulfil request. Corrent usage is: %s'%correct_url_format)
 
 
+class MissingSiteException(ApiException):
+	def __init__(self, site_id):
+		super(MissingSiteException, self).__init__('No such site: %s'%site_id)
+
+
 class MissingNodeException(ApiException):
 	def __init__(self, node_id):
 		super(MissingNodeException, self).__init__('No such node: %s'%node_id)
