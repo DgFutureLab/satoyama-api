@@ -31,7 +31,7 @@ class JSONHelper(HelperBase):
 			loaded = json.loads(string)
 			return loaded
 		except Exception:
-			return ''
+			return None
 
 	@staticmethod
 	def test_model_json_method(cls, json_response):

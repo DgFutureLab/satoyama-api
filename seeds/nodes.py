@@ -11,7 +11,7 @@ def notest(func):
 class NodeSeeder():
 
 	@staticmethod
-	def seed_empty_node():
+	def seed_empty_node(**kwargs):
 		return Node.create()
 
 	
