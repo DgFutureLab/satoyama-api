@@ -41,6 +41,21 @@ class SatoyamaBase(object):
 		# 	raise Exception('Please use the "create" method to create instances that are meant to be commited to the database, or set the for_testing argument to True')
 		pass
 
+	def __repr__(self):
+		return str({'type': self.__class__, 'id': self.id})
+
+	@classmethod
+	def first(cls):
+		return cls.query.first()
+
+	@classmethod
+	def last(cls):
+		return cls.query.order_by(cls.id.desc()).first()
+
+	@classmethod
+	def all(cls):
+		return cls.query.all()
+
 	def insert(self):
 		pass
 
@@ -167,7 +182,7 @@ class Node(SatoyamaBase, Base):
 
 	site_id = Column( Integer, ForeignKey('sites.id', ondelete = 'CASCADE') )
 
-	def __init__(self, site = None, alias = None, sensors = [], longitude = None, latitude = None, **kwargs):
+	def __init__(self, site = None, alias = None, sensors = [], longitude = None, latitude = None, short_address = None, **kwargs):
 		super(Node, self).__init__(**kwargs)
 		assert isinstance(sensors, Iterable), 'sensors must be iterable'
 		for sensor in sensors:
@@ -177,6 +192,7 @@ class Node(SatoyamaBase, Base):
 		self.longitude = longitude
 		self.latitude = latitude
 		self.alias = alias
+		self.short_address = short_address
 		if site: 
 			assert isinstance(site, Site), 'site must be an instance of %s'%type(Site)
 			self.site = site
