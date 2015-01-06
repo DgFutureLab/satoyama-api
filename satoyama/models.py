@@ -62,7 +62,9 @@ class SatoyamaBase(object):
 
 	@classmethod
 	def delete(cls, id):
-		cls.query.filter_by(id = id).delete()
+		success = cls.query.filter_by(id = id).delete()
+		manager.session.commit()
+		return success
 
 	
 
