@@ -2,12 +2,14 @@ from app import flapp
 from app import rest_api
 from satoyama.models import *
 import exc
+from exc import *
 from flask.ext import restful
 from flask import request
 from sqlalchemy.exc import DataError
 from apiresponse import ApiResponse
 from apihelpers import RequestHelper
 from seeds.nodes import NodeSeeder
+from seeds.sites import SiteSeeder
 
 API_UNITS = {
 	'm':'SI meters', 
@@ -35,10 +37,22 @@ class SiteResource(restful.Resource):
 			response += exc.MissingResourceException(type(self), site_id)
 		return response.json()
 
+	def delete(self, site_id):
+		response = ApiResponse(request)
+		site = Site.query.filter_by(id = site_id).first()
+		if site:
+			response += site
+			
+			succes = Site.delete(site_id)
+		else:
+			response += MissingSiteException(site_id)
+		return response.json()
+
 	def post(self):
-		response = ApiResponse()
-		node_alias = RequestHelper.get_form_data(response, 'site_type', str)
-		return 'OK'
+		respons1e = ApiResponse()
+		response += SiteSeeder.seed_empty_site()
+		# site_type = RequestHelper.get_form_data(response, 'site_type', str)
+		return response.json()
 
 
 
@@ -76,8 +90,16 @@ class NodeResource(restful.Resource):
 		return response.json()
 
 	def delete(self, node_id):
-		pass
-		
+		response = ApiResponse(request)
+		node = Node.query.filter_by(id = node_id).first()
+		if node:
+			response += node
+				
+			succes = Node.delete(node_id)
+		else:
+			response += MissingNodeException(node_id)
+		return response.json()
+
 	def post(self):
 		"""
 		Use a HTTP POST request to /node to create a new node inside the network
@@ -94,7 +116,6 @@ class NodeResource(restful.Resource):
 		site_id = RequestHelper.get_form_data(response, 'site_id', int)
 		longitude = RequestHelper.get_form_data(response, 'longitude', float)
 		latitude = RequestHelper.get_form_data(response, 'latitude', float)
-		# short_address = RequestHelper.get_form_data(response, 'short_address', int)
 
 		site = Site.query.filter_by(id = site_id).first()
 		if site:
