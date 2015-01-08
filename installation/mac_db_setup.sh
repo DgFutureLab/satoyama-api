@@ -1,6 +1,15 @@
 #!/bin/bash
+LOG="$7"
 #Postgresql install
-brew install postgresql
+
+brew install postgresql 2>&1
+if [ $? -eq 0 ]; then
+	echo "Psql installed"
+else
+	echo "Psql already install, proceed manually"
+	exit 1
+fi
+
 postgres -D /usr/local/var/postgres &
 mkdir -p ~/Library/LaunchAgents
 ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents launchctl
