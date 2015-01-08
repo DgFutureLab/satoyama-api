@@ -58,9 +58,7 @@ class NodeResourceTests(DBTestBase):
 		data = {'alias':'mynode', 'site_id': 1111111111, 'latitude' : 13.2, 'longitude': 23.2}
 		response = requests.post(url, data = data)
 		assert response.ok
-		api_response = ApiResponseHelper.assert_api_response(response, expect_success = False)
-		# node = Node.query.first().json()
-		# assert node == api_response.first()
+		ApiResponseHelper.assert_api_response(response, expect_success = False)
 		
 
 	# 	################################################################################

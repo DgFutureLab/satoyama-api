@@ -49,7 +49,7 @@ class SiteResource(restful.Resource):
 		return response.json()
 
 	def post(self):
-		respons1e = ApiResponse()
+		response = ApiResponse()
 		response += SiteSeeder.seed_empty_site()
 		# site_type = RequestHelper.get_form_data(response, 'site_type', str)
 		return response.json()
