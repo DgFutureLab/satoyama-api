@@ -23,8 +23,22 @@ else
 fi
 
 sh "$apifolder/installation/ubuntu_packages_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR" "$logfile"
+if [ $? -eq 1 ]; then
+	echo "Failed to install required packages..."
+	exit 1
+fi
+
 sh "$apifolder/installation/ubuntu_db_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR" "$logfile"
+if [ $? -eq 1 ]; then
+	echo "Failed to setup database..."
+	exit 1
+fi
+
 sh "$apifolder/installation/ubuntu_env_setup.sh" "$apifolder" "$envname" "$DEFAULT" "$ATTENTION" "$SUCCESS" "$ERROR" "$logfile"
+if [ $? -eq 1 ]; then
+	echo "Failed to setup python environment..."
+	exit 1
+fi
 
 echo " ____   __   ____   __   _  _   __   _  _   __          __   ____   __  
 / ___) / _\ (_  _) /  \ ( \/ ) / _\ ( \/ ) / _\  ___   / _\ (  _ \ (  ) 
