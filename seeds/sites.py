@@ -17,8 +17,8 @@ def notest(func):
 
 class SiteSeeder():
 	@staticmethod
-	def seed_empty_site():
-		return Site.create()
+	def seed_empty_site(site_alias = None):
+		return Site.create(alias = site_alias)
 
 	@staticmethod
 	def seed_ricefield_site(site_alias = None, n_nodes = 1, n_readings = 5, **kwargs):

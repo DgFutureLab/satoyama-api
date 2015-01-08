@@ -50,8 +50,11 @@ class SiteResource(restful.Resource):
 
 	def post(self):
 		response = ApiResponse()
-		response += SiteSeeder.seed_empty_site()
-		# site_type = RequestHelper.get_form_data(response, 'site_type', str)
+		site_alias = RequestHelper.get_form_data(response, 'alias', str)
+		print 'ASKJDHAISHD'
+		print site_alias
+		response += SiteSeeder.seed_empty_site(site_alias = site_alias)
+		
 		return response.json()
 
 
