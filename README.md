@@ -83,7 +83,30 @@ Get a list of all nodes:
 
 `GET /nodes`
 
-## Sensor Resource
+## Sensor & Sensors Resource
+Not implemented yet.
+
+## Readings Resource
+There are several ways to access readings using the following query parameters:
+
+Get readings from sensor 10:
+
+`GET /readings?sensor_id=10`
+
+Get readings from the sensor with alias "temperature" attached to node 3:
+
+`GET /readings?sensor_alias=temperature&node_id=3`
+
+### Interval queries
+You also can use query parameters to specify a datetime interval for the readings:
+* from
+* until
+
+For instance, get all readings from sensor 6 from January 1st 2015 to January 10th 2015:
+
+`GET /readings?sensor_id=10&from=2015-1-1&until=2015-1-10`
+
+# Detailed examples
 
 ## Get all the nodes in the network
 
