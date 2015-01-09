@@ -51,13 +51,16 @@ class NodeSeeder():
 
 		node = Node.create(alias = alias, latitude = latitude, longitude = longitude, site = site)
 
-		st_temp = SensorType('temperature', 'C')
-		st_dist = SensorType('distance', 'cm')
-		st_hum = SensorType('humidity', '%')
+		st_temp = SensorType.query.filter(SensorType.unit == 'C' and SensorType.name == 'temperature').first()
+		if not st_temp: st_temp = SensorType.create(unit = 'C', name = 'temperature')
+		st_dist = SensorType.query.filter(SensorType.unit == 'cm' and SensorType.name == 'distance').first()
+		if not st_dist: st_dist = SensorType.create(unit = 'cm', name = 'distance')
+		st_humidity = SensorType.query.filter(SensorType.unit == '%' and SensorType.name == 'humidity').first()
+		if not st_humidity: st_humidity = SensorType.create(unit = '%', name = 'humidity')
 
 		Sensor.create(sensortype = st_temp, node = node, alias = 'temperature')
 		Sensor.create(sensortype = st_dist, node = node, alias = 'distance')
-		Sensor.create(sensortype = st_hum, node = node, alias = 'humidity')
+		Sensor.create(sensortype = st_humidity, node = node, alias = 'humidity')
 
 		for sensor in node.sensors:
 			for r in range(n_readings):
