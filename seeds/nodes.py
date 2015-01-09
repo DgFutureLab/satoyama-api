@@ -57,10 +57,13 @@ class NodeSeeder():
 		if not st_dist: st_dist = SensorType.create(unit = 'cm', name = 'distance')
 		st_humidity = SensorType.query.filter(SensorType.unit == '%' and SensorType.name == 'humidity').first()
 		if not st_humidity: st_humidity = SensorType.create(unit = '%', name = 'humidity')
+		st_voltage = SensorType.query.filter(SensorType.unit == 'V' and SensorType.name == 'voltage').first()
+		if not st_voltage: st_voltage = SensorType.create(unit = 'V', name = 'voltage')
 
 		Sensor.create(sensortype = st_temp, node = node, alias = 'temperature')
 		Sensor.create(sensortype = st_dist, node = node, alias = 'distance')
 		Sensor.create(sensortype = st_humidity, node = node, alias = 'humidity')
+		Sensor.create(sensortype = st_voltage, node = node, alias = 'vbat')
 
 		for sensor in node.sensors:
 			for r in range(n_readings):
