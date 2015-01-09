@@ -30,13 +30,14 @@ Each node can have 0 or more sensors attached to it. **Sensor**, each sensor bel
 
 # API Endpoints
 Each of the following are resources that can be accessed via HTTP methods.
-1. Site [GET, POST, DELETE]
-2. Sites [GET]
-3. Node [GET, POST, DELETE]
-4. Nodes [GET]
-5. Sensor [GET, POST]
-6. Sensors [GET]
-7. Readings [GET]
+
+* Site [GET, POST, DELETE]
+* Sites [GET]
+* Node [GET, POST, DELETE]
+* Nodes [GET]
+* Sensor [GET, POST]
+* Sensors [GET]
+* Readings [GET]
 
 The following sections documents how to use these endpoints.
 
