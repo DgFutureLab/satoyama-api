@@ -28,6 +28,59 @@ Resource Types: **Site**, each site has many nodes. **Node**, nodes are computin
 Each node can have 0 or more sensors attached to it. **Sensor**, each sensor belongs to one node. **Sensors** gather information in "readings".
 **Reading**, each reading belongs to a sensor.
 
+# API Endpoints
+Each of the following are resources that can be accessed via HTTP methods.
+1. Site [GET, POST, DELETE]
+2. Sites [GET]
+3. Mode [GET, POST, DELETE]
+4. Nodes [GET]
+5. Sensor [GET, POST]
+6. Sensors [GET]
+7. Readings [GET]
+
+The following sections documents how to use these endpoints.
+
+## Site resource
+Get data for site 1:
+
+`GET /site/1`
+
+Make a new site with no nodes:
+
+`POST /site`
+
+Delete site 1:
+
+`DELETE /site/1`
+
+## Sites resource
+Get a list of all sites:
+
+`GET /sites`
+
+## Node resource
+Get data for node 1:
+
+`GET /node/1`
+
+Delete node 1:
+
+`DELETE /node/1`
+
+Create a new node at site 1:
+
+`POST /node`
+
+POST parameters are:
+1. alias: The name of the node
+2. node_type: The type of the node, e.g. "ricefield"
+3. site_id: The id of the site that the node will belong to
+4. latitude
+5. longitude
+
+
+
+
 ## Get all the nodes in the network
 
 Get the node_ids that belong to the current network
