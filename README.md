@@ -32,7 +32,7 @@ Each node can have 0 or more sensors attached to it. **Sensor**, each sensor bel
 Each of the following are resources that can be accessed via HTTP methods.
 1. Site [GET, POST, DELETE]
 2. Sites [GET]
-3. Mode [GET, POST, DELETE]
+3. Node [GET, POST, DELETE]
 4. Nodes [GET]
 5. Sensor [GET, POST]
 6. Sensors [GET]
@@ -78,8 +78,12 @@ POST parameters are:
 * latitude
 * longitude
 
+## Nodes Resource
+Get a list of all nodes:
 
+`GET /nodes`
 
+## Sensor Resource
 
 ## Get all the nodes in the network
 
