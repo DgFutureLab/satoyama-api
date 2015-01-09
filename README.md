@@ -72,11 +72,11 @@ Create a new node at site 1:
 `POST /node`
 
 POST parameters are:
-1. alias: The name of the node
-2. node_type: The type of the node, e.g. "ricefield"
-3. site_id: The id of the site that the node will belong to
-4. latitude
-5. longitude
+* alias: The name of the node
+* node_type: The type of the node, e.g. "ricefield"
+* site_id: The id of the site that the node will belong to
+* latitude
+* longitude
 
 
 
