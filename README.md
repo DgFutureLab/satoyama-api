@@ -42,7 +42,7 @@ Each of the following are resources that can be accessed via HTTP methods.
 The following sections documents how to use these endpoints.
 
 ## Site resource
-Get data for site 1:
+Get all nodes belonging to site 1:
 
 `GET /site/1`
 
