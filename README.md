@@ -28,6 +28,87 @@ Resource Types: **Site**, each site has many nodes. **Node**, nodes are computin
 Each node can have 0 or more sensors attached to it. **Sensor**, each sensor belongs to one node. **Sensors** gather information in "readings".
 **Reading**, each reading belongs to a sensor.
 
+# API Endpoints
+Each of the following are resources that can be accessed via HTTP methods.
+
+* Site [GET, POST, DELETE]
+* Sites [GET]
+* Node [GET, POST, DELETE]
+* Nodes [GET]
+* Sensor [GET, POST]
+* Sensors [GET]
+* Readings [GET]
+
+The following sections documents how to use these endpoints.
+
+## Site resource
+Get data for site 1:
+
+`GET /site/1`
+
+Make a new site with no nodes:
+
+`POST /site`
+
+Delete site 1:
+
+`DELETE /site/1`
+
+## Sites resource
+Get a list of all sites:
+
+`GET /sites`
+
+## Node resource
+Get data for node 1:
+
+`GET /node/1`
+
+Delete node 1:
+
+`DELETE /node/1`
+
+Create a new node at site 1:
+
+`POST /node`
+
+POST parameters are:
+* alias: The name of the node
+* node_type: The type of the node, e.g. "ricefield"
+* site_id: The id of the site that the node will belong to
+* latitude
+* longitude
+
+## Nodes Resource
+Get a list of all nodes:
+
+`GET /nodes`
+
+## Sensor & Sensors Resource
+Not implemented yet.
+
+## Readings Resource
+There are several ways to access readings using the following query parameters:
+
+Get readings from sensor 10:
+
+`GET /readings?sensor_id=10`
+
+Get readings from the sensor with alias "temperature" attached to node 3:
+
+`GET /readings?sensor_alias=temperature&node_id=3`
+
+### Interval queries
+You also can use query parameters to specify a datetime interval for the readings:
+* from
+* until
+
+For instance, get all readings from sensor 6 from January 1st 2015 to January 10th 2015:
+
+`GET /readings?sensor_id=10&from=2015-1-1&until=2015-1-10`
+
+# Detailed examples
+
 ## Get all the nodes in the network
 
 Get the node_ids that belong to the current network
