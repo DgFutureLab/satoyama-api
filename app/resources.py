@@ -150,46 +150,46 @@ class YakResource(restful.Resource):
 
 rest_api.add_resource(YakResource, '/yaks/<int:yak_id>')
 
-class SensorResource(restful.Resource):
-	def get(self, sensor_id):
-		response = ApiResponse(request)
-		sensor = Sensor.query.filter_by(id = sensor_id).first()
-		if sensor:
-			response += sensor
-		else:
-			response += exc.MissingSensorException(sensor_id)
-		return response.json()
+# class SensorResource(restful.Resource):
+# 	def get(self, sensor_id):
+# 		response = ApiResponse(request)
+# 		sensor = Sensor.query.filter_by(id = sensor_id).first()
+# 		if sensor:
+# 			response += sensor
+# 		else:
+# 			response += exc.MissingSensorException(sensor_id)
+# 		return response.json()
 
-	def post(self):
-		"""
-		Use a HTTP POST request to /node to create a new node inside the network
+# 	def post(self):
+# 		"""
+# 		Use a HTTP POST request to /node to create a new node inside the network
 		
-		Example in Python:
-			>>> import requests
-			>>> r = requests.post('http://localhost:8081/node',
-							   data = {'alias':'mynode', 'site_id':'1', 'latitude' : '13.24234234', 'longitude': 23.222})
-		"""		
-		response = ApiResponse(request)
-		RequestHelper.filter_valid_parameters(Sensor, response, request)
-		sensor_alias = RequestHelper.get_form_data(response, 'alias', str)
-		sensortype_alias = RequestHelper.get_form_data(response, 'sensortype', str)
-		node_id = RequestHelper.get_form_data(response, 'node_id', int)
+# 		Example in Python:
+# 			>>> import requests
+# 			>>> r = requests.post('http://localhost:8081/node',
+# 							   data = {'alias':'mynode', 'site_id':'1', 'latitude' : '13.24234234', 'longitude': 23.222})
+# 		"""		
+# 		response = ApiResponse(request)
+# 		RequestHelper.filter_valid_parameters(Sensor, response, request)
+# 		sensor_alias = RequestHelper.get_form_data(response, 'alias', str)
+# 		sensortype_alias = RequestHelper.get_form_data(response, 'sensortype', str)
+# 		node_id = RequestHelper.get_form_data(response, 'node_id', int)
 
-		node = Node.query.filter_by(id = node_id).first()
-		if not node:
-			response += exc.MissingNodeException(node_id)
+# 		node = Node.query.filter_by(id = node_id).first()
+# 		if not node:
+# 			response += exc.MissingNodeException(node_id)
 
-		sensortype = SensorType.query.filter_by(name = sensortype_alias).first()
-		if not sensortype:
-			response += exc.MissingSensorTypeException(sensortype_alias)
+# 		sensortype = SensorType.query.filter_by(name = sensortype_alias).first()
+# 		if not sensortype:
+# 			response += exc.MissingSensorTypeException(sensortype_alias)
 		
-		if node and sensortype:
-			sensor = Sensor.create(alias = sensor_alias, sensortype = sensortype, node = node)
-			response += sensor
+# 		if node and sensortype:
+# 			sensor = Sensor.create(alias = sensor_alias, sensortype = sensortype, node = node)
+# 			response += sensor
 
-		return response.json()
+# 		return response.json()
 
-rest_api.add_resource(SensorResource, '/sensor/<string:sensor_id>', '/sensor')
+# rest_api.add_resource(SensorResource, '/sensor/<string:sensor_id>', '/sensor')
 
 
 class ReadingList(restful.Resource):
@@ -231,6 +231,8 @@ class ReadingList(restful.Resource):
 			readings = Reading.query_interval(query, from_date, until_date).all()
 			for reading in readings: response += reading
 			return response.json()
+
+	# def post(self, node_id):
 		
 
 rest_api.add_resource(ReadingList, '/readings', '/readings/all')
@@ -289,6 +291,7 @@ rest_api.add_resource(ReadingResource, '/reading/<int:reading_id>', '/reading')
 
 def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_response):
 	### Would be cool to make this an instance method in SensorData
+	print 'NODE: %s'%node_id
 	node, sensor = None, None
 
 	try:
@@ -311,6 +314,8 @@ def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_respons
 			Reading.create(sensor = sensor, value = value, timestamp = timestamp)
 		except Exception, e:
 			api_response += e
+
+	print api_response.json()
 
 
 

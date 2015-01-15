@@ -31,6 +31,7 @@ def format_data(sensor_data):
 
 @flapp.route('/reading/batch', methods = ['POST'])
 def process_multiple_readings():
+	# api_response = ApiResponse()
 	flapp.logger.info('Received %s bytes of compressed data'%sys.getsizeof(request.data))
 	decompressed = zlib.decompress(request.data)
 	response = ApiResponse(request)
@@ -40,6 +41,7 @@ def process_multiple_readings():
 		print e
 	for reading in request_json:
 		sensor_reading = SensorData(**reading)
+		print sensor_reading
 		put_reading_in_database(api_response = response, **sensor_reading.as_dict())
 	print len(Reading.query.all())
 	return json.dumps(response.json())
