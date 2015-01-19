@@ -1,0 +1,24 @@
+edge:
+  sensors:
+    - alias: battery_voltage
+      sensortype:
+        unit: V
+        name: voltage
+ricefield:
+  sensors:
+    - alias: battery_voltage
+      sensortype:
+        unit: V
+        name: voltage
+    - alias: water_level
+      sensortype:
+        unit: m
+        name: sonar_distance
+    - alias: ambient temperature
+      sensortype:
+        unit: C
+        name: temperature
+    - alias: air humidity
+      sensortype:
+        unit: percent
+        name: humidity

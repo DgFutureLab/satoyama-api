@@ -1,4 +1,6 @@
 import config, helpers, models, database
+import yaml
+
 with open('satoyama/nodetypes.yml') as f: 
 	nodetypes = yaml.load(f)
 

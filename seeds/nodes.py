@@ -1,4 +1,4 @@
-import satoyama
+from satoyama import nodetypes
 from satoyama.models import *
 from uuid import uuid4
 from random import random, randint
@@ -15,9 +15,32 @@ class NodeSeeder():
 		return Node.create()
 	
 	@staticmethod
-	def seed_new_node(node_type):
-		assert node_type in satoyama.nodetypes.keys(), 'Node type "%s" does not exist on this server'%node_type
+	def seed_new_node(node_type, **node_args):
+		site = Site.query.filter_by(id = node_args.get('site_id', None)).first()
+		latitude = node_args.get('latitude', None)
+		longitude = node_args.get('longitude', None)
+		alias = node_args.get('alias', uuid4().hex)
 
+		assert node_type in nodetypes.keys(), 'Node type "%s" is not defined on this server'%node_type
+		node_type = NodeType.query.filter(NodeType.name == node_type).first()
+		if not node_type: 
+			node_type = NodeType.create(name = node_type)
+		
+		node = Node.create(node_type = node_type, alias = alias, latitude = latitude, longitude = longitude, site = site)
+
+		
+		for sensor in nodetypes[node_type.name]['sensors']:
+			sensortype_unit = sensor['sensortype']['unit']
+			sensortype_name = sensor['sensortype']['name']
+			sensortype = SensorType.query.filter(SensorType.unit == sensortype_unit and SensorType.name == sensortype_name).first()
+
+			if not sensortype: 
+				sensortype = SensorType.create(unit = sensortype_unit, name = sensortype_name)
+			
+			Sensor.create(sensortype = sensortype, alias = sensor['alias'], node = node)
+		return node
+		
+		# node_type = 
 	
 	@staticmethod
 	@notest

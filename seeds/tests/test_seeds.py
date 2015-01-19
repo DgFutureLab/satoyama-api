@@ -5,14 +5,6 @@ from seeds.nodes import NodeSeeder
 from seeds.sites import SiteSeeder
 from inspect import getmembers, isfunction
 
-[
-{
-'name':'ricefield',
-
-},
-{}
-]
-
 class TestSiteSeeds(DBTestBase):
 	def test_ricefield_site_returns_site_with_one_node(self):
 		site = SiteSeeder.seed_ricefield_site()
@@ -22,7 +14,7 @@ class TestSiteSeeds(DBTestBase):
 	def test_seed_ricefield_node_returns_one_node_with_four_sensors(self):
 		node = NodeSeeder.seed_ricefield_node()
 		assert isinstance(node, Node)
-		assert len(node.sensors) == len()
+		assert len(node.sensors) == len(nodetypes['ricefield']['sensors'])
 
 	def test_seed_ricefield_node_has_correct_coordinates(self):
 		latitude = 1.5
