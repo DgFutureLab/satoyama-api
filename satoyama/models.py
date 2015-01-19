@@ -184,6 +184,7 @@ class Node(SatoyamaBase, Base):
 	alias = Column( String(100) )
 	longitude = Column( Float()) 
 	latitude = Column( Float())
+	nodetype_id = Column( Integer, ForeignKey('nodetypes.id', ondelete = 'SET NULL') )
 
 	sensors = relationship(
 		'Sensor', 
@@ -194,7 +195,7 @@ class Node(SatoyamaBase, Base):
 
 	site_id = Column( Integer, ForeignKey('sites.id', ondelete = 'CASCADE') )
 
-	def __init__(self, site = None, alias = None, sensors = [], longitude = None, latitude = None, **kwargs):
+	def __init__(self, node_type, site = None, alias = None, sensors = [], longitude = None, latitude = None, **kwargs):
 		super(Node, self).__init__(**kwargs)
 		assert isinstance(sensors, Iterable), 'sensors must be iterable'
 		for sensor in sensors:
@@ -204,6 +205,8 @@ class Node(SatoyamaBase, Base):
 		self.longitude = longitude
 		self.latitude = latitude
 		self.alias = alias
+		self.nodetype = node_type
+
 		if site: 
 			assert isinstance(site, Site), 'site must be an instance of %s'%type(Site)
 			self.site = site
@@ -213,6 +216,25 @@ class Node(SatoyamaBase, Base):
 		json_dict = super(Node, self).json(Node.json_column_transformations, Node.json_relationship_representation)
 		json_dict.update({'short_address': self.id})
 		return json_dict
+
+@create
+class NodeType(SatoyamaBase, Base):
+	__tablename__ = 'nodetypes'
+	id = Column(Integer(), primary_key = True)
+	name = Column(String(), unique = True)
+	nodes = relationship(
+		'Node',
+		backref = backref('nodetype')
+		)
+
+	def __init__(self, name, nodes = []):
+		super(NodeType, self).__init__(self)
+		self.name = name
+		assert isinstance(nodes, Iterable), 'nodes must be iterable'
+		for node in nodes:
+			assert isinstance(node, Node), 'Each item in nodes must be an instance of type Node'
+			self.nodes.append(node)
+
 
 @create
 class SensorType(SatoyamaBase, Base):
