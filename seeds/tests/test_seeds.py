@@ -1,8 +1,17 @@
 from satoyama.tests.dbtestbase import DBTestBase
 from satoyama.models import *
+from satoyama import nodetypes
 from seeds.nodes import NodeSeeder
 from seeds.sites import SiteSeeder
 from inspect import getmembers, isfunction
+
+[
+{
+'name':'ricefield',
+
+},
+{}
+]
 
 class TestSiteSeeds(DBTestBase):
 	def test_ricefield_site_returns_site_with_one_node(self):
@@ -10,10 +19,10 @@ class TestSiteSeeds(DBTestBase):
 		assert isinstance(site, Site)
 		assert len(site.nodes) == 1
 
-	def test_seed_ricefield_node_returns_one_node_with_three_sensors(self):
+	def test_seed_ricefield_node_returns_one_node_with_four_sensors(self):
 		node = NodeSeeder.seed_ricefield_node()
 		assert isinstance(node, Node)
-		assert len(node.sensors) == 3
+		assert len(node.sensors) == len()
 
 	def test_seed_ricefield_node_has_correct_coordinates(self):
 		latitude = 1.5

@@ -13,6 +13,10 @@ class NodeSeeder():
 	@staticmethod
 	def seed_empty_node(**kwargs):
 		return Node.create()
+	
+	@staticmethod
+	def seed_new_node(node_type):
+		assert node_type in satoyama.nodetypes.keys(), 'Node type "%s" does not exist on this server'%node_type
 
 	
 	@staticmethod
