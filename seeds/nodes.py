@@ -18,6 +18,7 @@ class NodeSeeder():
 	@staticmethod
 	@notest
 	def seed_node(node_type, **kwargs):
+
 		assert node_type in satoyama.definitions.node_types
 		return getattr(NodeSeeder, 'seed_' + node_type + '_node')(**kwargs)
 
@@ -27,6 +28,7 @@ class NodeSeeder():
 		Create a new ricefield node.
 		:param n_readings: (default 0) The number of readings with random values that will be generated for each sensor in the node.
 		"""
+
 		if node_args.has_key('site'):
 			site = node_args['site']
 		elif node_args.has_key('site_id'):
@@ -49,7 +51,12 @@ class NodeSeeder():
 		else:
 			alias = "ricefield_node_%s"%uuid4().hex
 
-		node = Node.create(alias = alias, latitude = latitude, longitude = longitude, site = site)
+		
+
+		node_type = NodeType.query.filter(NodeType.name == 'ricefield').first()
+		if not node_type: node_type = NodeType.create(name = 'ricefield')
+
+		node = Node.create(node_type = node_type, alias = alias, latitude = latitude, longitude = longitude, site = site)
 
 		st_temp = SensorType.query.filter(SensorType.unit == 'C' and SensorType.name == 'temperature').first()
 		if not st_temp: st_temp = SensorType.create(unit = 'C', name = 'temperature')
