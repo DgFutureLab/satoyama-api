@@ -27,11 +27,11 @@ class SiteResourceTests(DBTestBase):
 	 	assert response.ok
 	 	api_response = ApiResponseHelper.assert_api_response(response, expect_success = False)
 	 	
-	# def test_POST_empty_site(self):
-	#  	url = UrlHelper.get_url(flapp, 'site')
-	# 	data = {'alias':'Kamogawa_east'}
-	# 	response = requests.post(url, data = data)
-	# 	assert response.ok
-	# 	api_response = ApiResponseHelper.assert_api_response(response)
-	# 	print api_response.objects
-	# 	assert api_response.first()['alias'] == 'Kamogawa_east'
+	def test_POST_empty_site(self):
+	 	url = UrlHelper.get_url(flapp, 'site')
+		data = {'alias':'Kamogawa_east'}
+		response = requests.post(url, data = data)
+		assert response.ok
+		api_response = ApiResponseHelper.assert_api_response(response)
+		print api_response.objects
+		assert api_response.first()['alias'] == 'Kamogawa_east'

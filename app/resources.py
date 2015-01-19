@@ -51,8 +51,6 @@ class SiteResource(restful.Resource):
 	def post(self):
 		response = ApiResponse()
 		site_alias = RequestHelper.get_form_data(response, 'alias', str)
-		print 'ASKJDHAISHD'
-		print site_alias
 		response += SiteSeeder.seed_empty_site(site_alias = site_alias)
 		
 		return response.json()
@@ -119,6 +117,9 @@ class NodeResource(restful.Resource):
 		site_id = RequestHelper.get_form_data(response, 'site_id', int)
 		longitude = RequestHelper.get_form_data(response, 'longitude', float)
 		latitude = RequestHelper.get_form_data(response, 'latitude', float)
+
+		print 'ASDuHASIDUAISUDHAISUHDoihAIUDHIU'
+		print longitude
 
 		site = Site.query.filter_by(id = site_id).first()
 		if site:
