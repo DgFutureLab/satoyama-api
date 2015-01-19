@@ -42,11 +42,52 @@ Each of the following are resources that can be accessed via HTTP methods.
 The following sections documents how to use these endpoints.
 
 ## Site resource
-Get data for site 1:
+
+Get all nodes belonging to site 1:
 
 `GET /site/1`
 
-Make a new site with no nodes:
+Output:
+```
+{
+    "errors": [], 
+    "objects": [
+        {
+            "alias": "hackerfarm", 
+            "id": 17, 
+            "nodes": [
+                {
+                    "alias": "garden5", 
+                    "id": 7, 
+                    "latitude": 35.144828, 
+                    "longitude": 139.962516, 
+                    "sensors": [
+                        {
+                            "alias": "temperature", 
+                            "id": 18, 
+                            "latest_reading": null
+                        }, 
+                        {
+                            "alias": "distance", 
+                            "id": 19, 
+                            "latest_reading": null
+                        }, 
+                        {
+                            "alias": "humidity", 
+                            "id": 20, 
+                            "latest_reading": null
+                        }, 
+                        {
+                            "alias": "vbat", 
+                            "id": 21, 
+                            "latest_reading": null
+                        }
+                    ]
+                }
+}
+```
+
+Create a new site with no nodes:
 
 `POST /site`
 
