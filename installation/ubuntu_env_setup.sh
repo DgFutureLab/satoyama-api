@@ -64,7 +64,7 @@ fi
 
 if [ -e "$apifolder/manage.py" ]; then
 	cd "$apifolder"
-	python manage.py db upgrade >> "$LOG" 2>&1
+	python migrate_dev.py db upgrade >> "$LOG" 2>&1
 	if [ $? -eq 0 ]; then
 		echo "${SUCCESS}Database migration complete! ${DEFAULT}"
 	else
@@ -72,7 +72,7 @@ if [ -e "$apifolder/manage.py" ]; then
 		exit 1
 	fi
 else
-	echo "${ERROR}Could not find manage.py. Cannot migrate database. Exitting... ${DEFAULT}"
+	echo "${ERROR}Could not find migrate_dev.py. Cannot migrate database. Exitting... ${DEFAULT}"
 	exit 1
 fi
 
