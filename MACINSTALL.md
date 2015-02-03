@@ -27,9 +27,9 @@ launchctl load ~/Library/LaunchAgents homebrew.mxcl.postgresql.plist
 
 4. psql postgres (To get inside the postgres database console)
 
-5. create role satoyama with login;
+5. create role satoyama with login superuser;
 
-6. alter role satoyama with superuser;
+6. alter role satoyama with password 'satoyama';
 
 (Optional: create database your-macosx-username , this step will allow you to login to postgres just using “psql” instead of “psql postgres”)
 
