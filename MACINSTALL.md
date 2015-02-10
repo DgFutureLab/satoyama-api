@@ -9,7 +9,7 @@
 
 ## Repository setup
 
-1. git clone git@github.com:DgFutureLab/satoyama-api.git
+1. git clone git@github.com/DgFutureLab/satoyama-api.git
 2. cd satoyama-api/
 3. pip install -r requirements.txt
 
