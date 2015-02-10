@@ -43,7 +43,7 @@ launchctl load ~/Library/LaunchAgents homebrew.mxcl.postgresql.plist
 
 (Optional: \l to list the the databases)
 
-11. cp db-config-sample.yml db-config.yml
+11. cp db_config_sample.yml db_config.yml
 
 12. Replace the values of “username” and “password” with the ones you have setup on the previous steps. If you have used the default values when creating the psql database and roles you can leave you can skip this step.
 
