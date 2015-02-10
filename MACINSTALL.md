@@ -33,9 +33,9 @@ launchctl load ~/Library/LaunchAgents homebrew.mxcl.postgresql.plist
 
 (Optional: create database your-macosx-username , this step will allow you to login to postgres just using “psql” instead of “psql postgres”)
 
-7. create database satoyama_production;
+7. create database satoyama_prod;
 
-8. create database satoyama_development;
+8. create database satoyama_dev;
 
 9. create database satoyama_test;
 
