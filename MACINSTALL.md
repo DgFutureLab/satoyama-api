@@ -4,7 +4,7 @@
 
 1. cd ~/
 2. sudo easy_install virtualenv
-3. virtualenv env
+3. sudo virtualenv env
 4. source env/bin/activate
 
 ## Repository setup
