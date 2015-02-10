@@ -47,17 +47,8 @@ launchctl load ~/Library/LaunchAgents homebrew.mxcl.postgresql.plist
 
 12. Replace the values of “username” and “password” with the ones you have setup on the previous steps. If you have used the default values when creating the psql database and roles you can leave you can skip this step.
 
-
 13. python migrate_dev.py db upgrade (creates database schema)
-
 
 14. python run_webserver.py --env development
 
-
-
-
-Notes: 
-createuser satoyama —login —superuser —pwprompt
-
-pip freeze 
-alter user satoyama with password ‘satoyama’;
+15. load http://127.0.0.1:8080 on your browser
