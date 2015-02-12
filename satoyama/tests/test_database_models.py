@@ -38,8 +38,7 @@ class TestSiteModel(DBTestBase):
 class TestNodeModel(DBTestBase):
 
 	def test_node_insert(self):
-		node_alias = uuid4().hex
-		node_inserted = Node.create(alias = node_alias)
+		node_inserted = NodeSeeder.seed_node('ricefield', alias = uuid4().hex)
 		node_retrieved = Node.query.first()
 		assert node_inserted.id == node_retrieved.id
 		assert node_inserted.alias == node_retrieved.alias
