@@ -22,3 +22,5 @@ ricefield:
       sensortype:
         unit: percent
         name: humidity
+empty:
+  sensors: []
