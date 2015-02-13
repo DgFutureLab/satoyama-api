@@ -19,11 +19,11 @@ launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
 # http://forums.enterprisedb.com/posts/list/3447.page
 psql -d postgres -c "create role satoyama with login"
 psql -d postgres -c "alter role satoyama with superuser"
-createdb satoyama_production;
-createdb satoyama_development;
+createdb satoyama_prod;
+createdb satoyama_dev;
 createdb satoyama_test;
 
 # Migration
 cd ..
-cp db-config-sample.yml db-config.yml
-python manage.py db upgrade
+cp db_config-sample.yml db_config.yml
+python migrate_dev.py db upgrade
