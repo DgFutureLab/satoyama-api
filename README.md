@@ -1,10 +1,10 @@
-satoyama-api
+Satoyama API
 ============
-REST API for sensor networks based on Freaklabs open hardware. Satoyama-api facilitates the collection of data from sensors attached to Chibi or Saboten devices.
+REST API for sensor networks created by <a href="http://fljapan.com/">Future Lab</a> based on <a href="http://www.freaklabsstore.com">Freaklabs open hardware</a>. Satoyama API facilitates the collection of data from sensors attached to Chibi or Saboten devices.
 
 Installation on Ubuntu
 ===================
-We've made shell script that painlessly handles the installation. The script has been tested on a clean Ubuntu 14.10 x32 machine. Steps:
+The script has been tested on a clean Ubuntu 14.10 x32 machine:
 
 1. Install git: $ sudo apt-get install git
 2. Get the code: $ git clone https://github.com/DgFutureLab/satoyama-api.git
@@ -22,11 +22,10 @@ For Mac users: <a href="https://github.com/DgFutureLab/satoyama-api/blob/master/
 
 API
 ===================
-The API is hosted on Digital Ocean and the current entry point IP address is http://128.199.191.249/
+The API is hosted on Digital Ocean and the current entry point for production sensor networks is http://satoyamacloud.com, for testing purposes use http://128.199.120.30/
 
 Resource Types: **Site**, each site has many nodes. **Node**, nodes are computing elements gathering data from the environment.
-Each node can have 0 or more sensors attached to it. **Sensor**, each sensor belongs to one node. **Sensors** gather information in "readings".
-**Reading**, each reading belongs to a sensor.
+Each node can have 0 or more sensors attached to it. **Sensor**, each sensor belongs to one node. **Sensors** gather information in "readings". **Reading**, each reading belongs to a sensor. You can see more details about the current ERD <a href="https://github.com/DgFutureLab/satoyama-api/blob/master/docs/SatoyamaApiERD.jpg">here</a>.
 
 # API Endpoints
 Each of the following are resources that can be accessed via HTTP methods.
