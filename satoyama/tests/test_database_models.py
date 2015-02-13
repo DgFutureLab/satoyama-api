@@ -44,7 +44,7 @@ class TestNodeModel(DBTestBase):
 		assert node_inserted.alias == node_retrieved.alias
 
 	def test_add_sensors_to_node(self):
-		node_inserted = Node.create()
+		node_inserted = NodeSeeder.seed_node('empty')
 		sensortype = SensorType(name = 'Sonar', unit = 'm')
 		for i in range(3): Sensor.create(sensortype = sensortype, node = node_inserted)
 		node_retrieved = Node.query.first()
