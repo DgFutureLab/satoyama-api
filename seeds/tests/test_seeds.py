@@ -26,6 +26,7 @@ class TestSiteSeeds(DBTestBase):
 	def test_quick_and_dirty(self):
 		for seeder in [NodeSeeder, SiteSeeder]:
 			for name, attr in getmembers(seeder):
+				print name, attr
 				if isfunction(attr) and not hasattr(attr, 'notest'):
 					try:
 						attr()

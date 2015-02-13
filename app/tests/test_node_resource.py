@@ -21,7 +21,7 @@ class NodeResourceTests(DBTestBase):
 		GET /node/1
 		This call should return the node with id=1
 		"""
-	 	node = NodeSeeder.seed_empty_node()
+	 	node = NodeSeeder.seed_node('empty')
 	 	url = UrlHelper.get_url(flapp, 'node', node.id)
 	 	response = requests.get(url)
 	 	assert response.ok
@@ -70,7 +70,7 @@ class NodeResourceTests(DBTestBase):
 		"""
 		Tests that GET /node/all gives a valid HTTP 200 response
 		"""
-		NodeSeeder.seed_ricefield_node()
+		NodeSeeder.seed_node('ricefield')
 		url = UrlHelper.get_url(flapp, 'nodes')
 		response = requests.get(url)
 		assert response.ok

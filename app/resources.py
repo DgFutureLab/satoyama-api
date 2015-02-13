@@ -151,15 +151,15 @@ class YakResource(restful.Resource):
 
 rest_api.add_resource(YakResource, '/yaks/<int:yak_id>')
 
-# class SensorResource(restful.Resource):
-# 	def get(self, sensor_id):
-# 		response = ApiResponse(request)
-# 		sensor = Sensor.query.filter_by(id = sensor_id).first()
-# 		if sensor:
-# 			response += sensor
-# 		else:
-# 			response += exc.MissingSensorException(sensor_id)
-# 		return response.json()
+class SensorResource(restful.Resource):
+	def get(self, sensor_id):
+		response = ApiResponse(request)
+		sensor = Sensor.query.filter_by(id = sensor_id).first()
+		if sensor:
+			response += sensor
+		else:
+			response += exc.MissingSensorException(sensor_id)
+		return response.json()
 
 # 	def post(self):
 # 		"""

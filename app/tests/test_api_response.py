@@ -3,6 +3,7 @@ from satoyama.models import *
 import unittest
 from datetime import datetime
 import json
+from seeds.nodes import NodeSeeder
 
 class Badboy(object):
 
@@ -36,8 +37,9 @@ class TestApiResponse(unittest.TestCase):
 		assert len(self.r.objects) == 0
 
 	def test_add_obj_with_json_method(self):
-		node_dict = {'alias': 'supernode'}
-		node = Node(**node_dict)
+		# node_dict = {'node_type_str': 'empty', 'alias': 'supernode'}
+		node = NodeSeeder.seed_node('ricefield', alias = 'mynode')
+		# node = Node.create(**node_dict)
 		self.r += node
 		assert len(self.r.objects) == 1
 		assert self.r.objects[0] == node.json()
@@ -71,9 +73,10 @@ class TestApiResponse(unittest.TestCase):
 
 		try:
 			### ApiResponse with object
-			self.r += Node.create()
+			self.r += NodeSeeder.seed_node('ricefield')
 			json.dumps(self.r.json())
-		except Exception:
+		except Exception, e:
+			print e
 			assert False
 
 		try:
