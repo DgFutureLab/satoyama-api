@@ -15,20 +15,18 @@ The script installs all the system packages required by the webserver including 
 1. source ~/satoyama-env/bin/activate
 2. python satoyama-api/run_webserver --env development
 
-Enjoy!
-
 If you had problems: <a href="https://github.com/DgFutureLab/satoyama-api/blob/master/UBUNTUINSTALL.md">Detailed manual Ubuntu installation</a>.
 For Mac users: <a href="https://github.com/DgFutureLab/satoyama-api/blob/master/MACINSTALL.md">Detailed manual Mac installation</a>.
 
-API
-===================
+# Entry point and resources:
+
 The API is hosted on Digital Ocean and the current entry point for production sensor networks is http://satoyamacloud.com, for testing purposes use http://128.199.120.30/
 
 Resource Types: **Site**, each site has many nodes. **Node**, nodes are computing elements gathering data from the environment.
 Each node can have 0 or more sensors attached to it. **Sensor**, each sensor belongs to one node. **Sensors** gather information in "readings". **Reading**, each reading belongs to a sensor. You can see more details about the current ERD <a href="https://github.com/DgFutureLab/satoyama-api/blob/master/docs/SatoyamaApiERD.jpg">here</a>.
 
 # API Endpoints
-Each of the following are resources that can be accessed via HTTP methods.
+Each of the following are resources that can be accessed via HTTP requests.
 
 * Site [GET, POST, DELETE]
 * Sites [GET]
@@ -120,9 +118,28 @@ POST parameters are:
 * longitude
 
 ## Nodes Resource
-Get a list of all nodes:
+Get a list of all nodes in the network.
 
+Request:
 `GET /nodes`
+
+Response:
+```
+{
+    "data": [
+        {
+            "nodes" : [{"node_id" : 1,
+                        "node_alias": "Chris Hatake North side",
+                        "sensors" : [{"sensor_alias" : "temperature",
+                        "latest_reading" : {"value" : 26.0, "time"}},
+                        {"sensor_alias" : "distance"}]}]
+        }
+    ],
+    "errors": [],
+    "request": {},
+    "warnings": []
+}
+```
 
 ## Sensor & Sensors Resource
 Not implemented yet.
@@ -146,41 +163,6 @@ You also can use query parameters to specify a datetime interval for the reading
 For instance, get all readings from sensor 6 from January 1st 2015 to January 10th 2015:
 
 `GET /readings?sensor_id=10&from=2015-1-1&until=2015-1-10`
-
-# Detailed examples
-
-## Get all the nodes in the network
-
-Get the node_ids that belong to the current network
-
-`GET /nodes`
-
-#### Example
-
-Request:
-`GET /nodes`
-
-Response:
-```
-{
-    "data": [
-        {
-            "nodes" : [{"node_id" : 1,
-                        "node_alias": "Chris Hatake North side",
-                        "sensors" : [{"sensor_alias" : "temperature",
-                        "latest_reading" : {"value" : 26.0, "time"}},
-                        {"sensor_alias" : "distance"}]}]
-        }
-    ],
-    "errors": [],
-    "request": {},
-    "warnings": []
-}
-```
-
-## Get data readings from sensors
-
-This is what you will use for storing and accessing readings from sensors.
 
 #### Get the most recent reading from a sensor
 
@@ -208,8 +190,12 @@ Response:
 }
 ```
 
-Tests
-===================
+# Tests
+
 As this project uses py.test, writing tests is easy. Place your test in a file prefixed 'test_' in the tests package. The actual tests are methods (class or not) beginning with 'test_'.
 
 1. from satoyama-api root folder and simply run py.test -v -s
+
+# <a href="https://github.com/DgFutureLab/satoyama-api/blob/master/LICENSE">The MIT License (MIT)</a>
+
+Hacker Farm - Future Lab
