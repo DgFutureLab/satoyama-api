@@ -192,7 +192,8 @@ Response:
 
 # Current active nodes
 
-Digital Garage building: 
+## Digital Garage building: 
+
      NODE ID 18: http://satoyamacloud.com/node/18, Temperature sensor readings from this node: http://satoyamacloud.com/readings?sensor_id=50 , Humidity sensor reading from this sensor: http://satoyamacloud.com/readings?sensor_id=52
 
 # Tests
