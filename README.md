@@ -190,6 +190,17 @@ Response:
 }
 ```
 
+# Current active nodes
+
+## Digital Garage building: 
+
+### NODE ID 18: 
+
+http://satoyamacloud.com/node/18, 
+Temperature sensor readings from this node: 
+http://satoyamacloud.com/readings?sensor_id=50 , 
+Humidity sensor reading from this sensor: http://satoyamacloud.com/readings?sensor_id=52
+
 # Tests
 
 As this project uses py.test, writing tests is easy. Place your test in a file prefixed 'test_' in the tests package. The actual tests are methods (class or not) beginning with 'test_'.
