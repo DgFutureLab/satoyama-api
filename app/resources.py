@@ -118,9 +118,6 @@ class NodeResource(restful.Resource):
 		longitude = RequestHelper.get_form_data(response, 'longitude', float)
 		latitude = RequestHelper.get_form_data(response, 'latitude', float)
 
-		print 'ASDuHASIDUAISUDHAISUHDoihAIUDHIU'
-		print longitude
-
 		site = Site.query.filter_by(id = site_id).first()
 		if site:
 			node = NodeSeeder.seed_node(node_type, alias = node_alias, site_id = site_id, latitude = latitude, longitude = longitude)

@@ -8,10 +8,6 @@ def notest(func):
 	setattr(func, 'notest', True)
 	return func
 
-from termcolor import colored
-def debug(msg):
-	print colored(msg, 'red')
-
 class NodeSeeder():
 
 	@staticmethod
