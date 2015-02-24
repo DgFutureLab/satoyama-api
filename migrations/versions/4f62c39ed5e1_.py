@@ -1,4 +1,4 @@
-"""empty message
+"""Adds node_type table
 
 Revision ID: 4f62c39ed5e1
 Revises: 1df2cc880b08
