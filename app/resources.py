@@ -229,6 +229,9 @@ class ReadingList(restful.Resource):
 			readings = Reading.query_interval(query, from_date, until_date).all()
 			for reading in readings: response += reading
 			return response.json()
+		else:
+			response += exc.MissingParameterException('sensor_id OR node_id and sensor_alias')
+			return response.json()
 
 	# def post(self, node_id):
 		
