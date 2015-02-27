@@ -117,10 +117,11 @@ class NodeResource(restful.Resource):
 		site_id = RequestHelper.get_form_data(response, 'site_id', int)
 		longitude = RequestHelper.get_form_data(response, 'longitude', float)
 		latitude = RequestHelper.get_form_data(response, 'latitude', float)
+		node_readings = RequestHelper.get_form_data(response, 'node_readings', int, default = 0)
 
 		site = Site.query.filter_by(id = site_id).first()
 		if site:
-			node = NodeSeeder.seed_node(node_type, alias = node_alias, site_id = site_id, latitude = latitude, longitude = longitude)
+			node = NodeSeeder.seed_node(node_type, alias = node_alias, site_id = site_id, latitude = latitude, longitude = longitude, node_readings = node_readings)
 			response += node
 		else:
 			response += exc.MissingSiteException(site_id)
