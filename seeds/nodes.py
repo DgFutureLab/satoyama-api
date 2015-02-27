@@ -3,7 +3,7 @@ from satoyama.models import *
 from uuid import uuid4
 from random import random, randint
 from numpy.random import uniform
-
+from datetime import datetime, timedelta
 def notest(func):
 	setattr(func, 'notest', True)
 	return func
@@ -21,7 +21,7 @@ class NodeSeeder():
 		:param alias (optional): The alias of the node
 		:param node_readings (optional): The number of dateless dummy data generated per sensor in the node
 		"""
-		# assert isinstance(node_type_str, str)
+		assert node_type_str in nodetypes.keys(), 'Node type "%s" is not defined on this server'%node_type_str
 		# assert isinstance(latitude, float)
 		# assert isinstance(longitude, float)
 		# assert isinstance(alias, str)
@@ -31,8 +31,9 @@ class NodeSeeder():
 		latitude = node_args.get('latitude', None)
 		longitude = node_args.get('longitude', None)
 		alias = node_args.get('alias', uuid4().hex)
+		populate = node_args.get('populate', None)
 
-		assert node_type_str in nodetypes.keys(), 'Node type "%s" is not defined on this server'%node_type_str
+		
 		node_type = NodeType.query.filter(NodeType.name == node_type_str).first()
 		if not node_type: 
 			node_type = NodeType.create(name = node_type_str)
@@ -49,10 +50,11 @@ class NodeSeeder():
 			
 			Sensor.create(sensortype = sensortype, alias = sensor['alias'], node = node)
 		
-		n_readings = node_args.get('node_readings', 0)
-		for sensor in node.sensors:
-			for r in range(n_readings):
-				Reading.create(sensor = sensor, value = random())
+		if populate:
+			for sensor in node.sensors:
+				for td in range(-30, 0): 
+					timestamp = datetime.now() + timedelta(td)
+					Reading.create(sensor = sensor, value = random(), timestamp = timestamp)
 		return node
 		
 		# node_type = 
