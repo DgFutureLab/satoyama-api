@@ -31,7 +31,7 @@ class NodeSeeder():
 		latitude = node_args.get('latitude', None)
 		longitude = node_args.get('longitude', None)
 		alias = node_args.get('alias', uuid4().hex)
-		populate = node_args.get('populate', None)
+		populate = node_args.get('populate', False)
 
 		
 		node_type = NodeType.query.filter(NodeType.name == node_type_str).first()
@@ -49,10 +49,10 @@ class NodeSeeder():
 				sensortype = SensorType.create(unit = sensortype_unit, name = sensortype_name)
 			
 			Sensor.create(sensortype = sensortype, alias = sensor['alias'], node = node)
-		
-		if populate:
+
+		if populate != 0:
 			for sensor in node.sensors:
-				for td in range(-30, 0): 
+				for td in range(-populate, 0): 
 					timestamp = datetime.now() + timedelta(td)
 					Reading.create(sensor = sensor, value = random(), timestamp = timestamp)
 		return node
