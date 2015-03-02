@@ -73,6 +73,18 @@ class NodeResource(restful.Resource):
 		This class represents end nodes in the sensor network
 	"""
 
+	def __parse_form_data(self):
+		form = {}
+		form.update({
+			'node_alias' : RequestHelper.get_form_data(response, 'alias', str),
+			'node_type' : RequestHelper.get_form_data(response, 'node_type', str, default = 'empty'),
+			'site_id' : RequestHelper.get_form_data(response, 'site_id', int),
+			'longitude' : RequestHelper.get_form_data(response, 'longitude', float),
+			'latitude' : RequestHelper.get_form_data(response, 'latitude', float),
+			'node_readings' : RequestHelper.get_form_data(response, 'node_readings', int, default = 0)
+			})
+		return form
+
 	def get(self, node_id = None):
 		"""
 			Use a HTTP GET request to /node/<int> get one node data 
