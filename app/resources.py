@@ -120,7 +120,7 @@ class NodeResource(restful.Resource):
 		Example in Python:
 			>>> import requests
 			>>> r = requests.post('http://localhost:8081/node',
-							   data = {'alias':'mynode', 'site_id':'1', 'latitude' : '13.24234234', 'longitude': 23.222})
+							   data = {'alias':'mynode', 'site_id':'1', 'latitude':'13.24234234', 'longitude':23.222, 'populate':True, 'node_type':'ricefield'})
 		"""		
 		response = ApiResponse(request)
 		# RequestHelper.filter_valid_parameters(Node, response, request)
@@ -129,11 +129,11 @@ class NodeResource(restful.Resource):
 		site_id = RequestHelper.get_form_data(response, 'site_id', int)
 		longitude = RequestHelper.get_form_data(response, 'longitude', float)
 		latitude = RequestHelper.get_form_data(response, 'latitude', float)
-		node_readings = RequestHelper.get_form_data(response, 'node_readings', int, default = 0)
+		populate = RequestHelper.get_form_data(response, 'populate', int, default = 0)
 
 		site = Site.query.filter_by(id = site_id).first()
 		if site:
-			node = NodeSeeder.seed_node(node_type, alias = node_alias, site_id = site_id, latitude = latitude, longitude = longitude, node_readings = node_readings)
+			node = NodeSeeder.seed_node(node_type, alias = node_alias, site_id = site_id, latitude = latitude, longitude = longitude, populate = populate)
 			response += node
 		else:
 			response += exc.MissingSiteException(site_id)
