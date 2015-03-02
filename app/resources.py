@@ -107,8 +107,8 @@ class NodeResource(restful.Resource):
 		
 		Example in Python:
 			>>> import requests
-			>>> r = requests.post('http://localhost:8081/node',
-							   data = {'alias':'mynode', 'site_id':'1', 'latitude':'13.24234234', 'longitude':23.222, 'populate':True, 'node_type':'ricefield'})
+			>>> r = requests.post('http://localhost:8080/node',
+							   data = {'alias':'mynode', 'site_id':'1', 'latitude':'13.24234234', 'longitude':23.222, 'populate':3, 'node_type':'ricefield'})
 		"""		
 		response = ApiResponse(request)
 		# RequestHelper.filter_valid_parameters(Node, response, request)
