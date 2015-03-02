@@ -31,7 +31,7 @@ class NodeSeeder():
 		latitude = node_args.get('latitude', None)
 		longitude = node_args.get('longitude', None)
 		alias = node_args.get('alias', uuid4().hex)
-		populate = node_args.get('populate', False)
+		populate = node_args.get('populate', 0)
 
 		
 		node_type = NodeType.query.filter(NodeType.name == node_type_str).first()
