@@ -5,7 +5,7 @@ from seeds.nodes import NodeSeeder
 from seeds.sites import SiteSeeder
 from app.apihelpers import ApiResponseHelper, UrlHelper
 from satoyama.models import Node
-
+from satoyama.models import Reading
 
 
 
@@ -87,8 +87,27 @@ class NodeResourceTests(DBTestBase):
 		nodes = map(lambda n: n.json(), Node.query.all())
 		assert sorted(nodes) == sorted(api_response.objects)
 
+	def test_POST_nodes_populate(self):
+		"""
+		Test that populate options creates the valid number of readings data
+		"""
+		populate_number = 3
+		site = SiteSeeder.seed_empty_site()
+		args = {'site_id': site.id, 'latitude': 13.2, 'longitude': 23.2, 'populate': populate_number}
+		node = NodeSeeder.seed_node('ricefield', **args)
 
-
-
-
-
+		url = UrlHelper.get_url(flapp, 'nodes')
+		r = requests.get(url)
+		api_response = ApiResponseHelper.assert_api_response(r)
+		assert api_response.ok
+		nodes = map(lambda n: n.json(), Node.query.all())
+		# get readings?sensor_id=xxxx and check whether the number of the value of readings is equal to 3
+		for n in nodes:
+			for s in n['sensors']:
+				url = UrlHelper.get_url(flapp, 'readings')
+				url += 'sensor_id='+str(s['id'])
+				response = requests.get(url)
+			 	assert response.ok
+				api_response = ApiResponseHelper.assert_api_response(response)
+				assert api_response.ok
+			 	assert len(api_response.objects) ==  populate_number		
