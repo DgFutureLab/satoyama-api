@@ -36,7 +36,7 @@ class NodeSeeder():
 		node_type = NodeType.query.filter(NodeType.name == node_type_str).first()
 		if not node_type: 
 			node_type = NodeType.create(name = node_type_str)
-		
+
 		node = Node.create(node_type = node_type, alias = alias, latitude = latitude, longitude = longitude, site = site)
 
 		for sensor in nodetypes[node_type.name]['sensors']:
@@ -46,23 +46,13 @@ class NodeSeeder():
 
 			if not sensortype: 
 				sensortype = SensorType.create(unit = sensortype_unit, name = sensortype_name)
-			
-			Sensor.create(sensortype = sensortype, alias = sensor['alias'], node = node)
 
-		if populate != 0:
-			for sensor in node.sensors:
+			createdSensor = Sensor.create(sensortype = sensortype, alias = sensor['alias'], node = node)
+
+			if populate != 0:
 				for td in range(-populate, 0): 
 					timestamp = datetime.now() + timedelta(td)
-					if sensor.alias == 'battery_voltage':
-						Reading.create(sensor = sensor, value = uniform(0, 1), timestamp = timestamp)
-					elif sensor.alias == 'water_level':
-						Reading.create(sensor = sensor, value = uniform(60, 95), timestamp = timestamp)
-					elif sensor.alias == 'ambient temperature':
-						Reading.create(sensor = sensor, value = uniform(10, 20), timestamp = timestamp)
-					elif sensor.alias == 'air humidity':
-						Reading.create(sensor = sensor, value = uniform(20, 40), timestamp = timestamp)
-					else:
-						Reading.create(sensor = sensor, value = random(), timestamp = timestamp)
+					Reading.create(sensor = createdSensor, value = uniform(sensor['sensortype']['dummyMin'], sensor['sensortype']['dummyMax']), timestamp = timestamp)
 		return node
 		
 		# node_type = 
