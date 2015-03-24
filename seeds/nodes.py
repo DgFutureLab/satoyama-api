@@ -1,7 +1,7 @@
 from satoyama import nodetypes
 from satoyama.models import *
 from uuid import uuid4
-from random import random, randint
+from random import random, randint, uniform
 from numpy.random import uniform
 from datetime import datetime, timedelta
 def notest(func):
@@ -32,12 +32,11 @@ class NodeSeeder():
 		longitude = node_args.get('longitude', None)
 		alias = node_args.get('alias', uuid4().hex)
 		populate = node_args.get('populate', 0)
-
 		
 		node_type = NodeType.query.filter(NodeType.name == node_type_str).first()
 		if not node_type: 
 			node_type = NodeType.create(name = node_type_str)
-		
+
 		node = Node.create(node_type = node_type, alias = alias, latitude = latitude, longitude = longitude, site = site)
 
 		for sensor in nodetypes[node_type.name]['sensors']:
@@ -47,14 +46,13 @@ class NodeSeeder():
 
 			if not sensortype: 
 				sensortype = SensorType.create(unit = sensortype_unit, name = sensortype_name)
-			
-			Sensor.create(sensortype = sensortype, alias = sensor['alias'], node = node)
 
-		if populate != 0:
-			for sensor in node.sensors:
+			createdSensor = Sensor.create(sensortype = sensortype, alias = sensor['alias'], node = node)
+
+			if populate != 0:
 				for td in range(-populate, 0): 
 					timestamp = datetime.now() + timedelta(td)
-					Reading.create(sensor = sensor, value = random(), timestamp = timestamp)
+					Reading.create(sensor = createdSensor, value = uniform(sensor['sensortype']['dummyMin'], sensor['sensortype']['dummyMax']), timestamp = timestamp)
 		return node
 		
 		# node_type = 
