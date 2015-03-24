@@ -104,8 +104,7 @@ class NodeResourceTests(DBTestBase):
 		# get readings?sensor_id=xxxx and check whether the number of the value of readings is equal to 3
 		for n in nodes:
 			for s in n['sensors']:
-				url = UrlHelper.get_url(flapp, 'readings')
-				url += 'sensor_id='+str(s['id'])
+				url = UrlHelper.get_url(flapp, 'readings', sensor_id = s['id'])
 				response = requests.get(url)
 			 	assert response.ok
 				api_response = ApiResponseHelper.assert_api_response(response)
