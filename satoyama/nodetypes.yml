@@ -5,7 +5,7 @@ edge:
         unit: V
         name: voltage
         dummyMin: 0
-        dummyMax: 100
+        dummyMax: 5
 ricefield:
   sensors:
     - alias: battery_voltage
@@ -13,7 +13,7 @@ ricefield:
         unit: V
         name: voltage
         dummyMin: 0
-        dummyMax: 10
+        dummyMax: 5
     - alias: water_level
       sensortype:
         unit: m
