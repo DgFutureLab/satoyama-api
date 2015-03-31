@@ -59,6 +59,15 @@ class NodeResourceTests(DBTestBase):
 		response = requests.post(url, data = data)
 		assert response.ok
 		ApiResponseHelper.assert_api_response(response, expect_success = False)
+
+	def test_DELETE_node_by_id(self):
+		node = NodeSeeder.seed_node('empty')
+	 	url = UrlHelper.get_url(flapp, 'node', node.id)
+	 	response = requests.delete(url)
+	 	assert response.ok
+		response = requests.get(url)
+	 	assert response.ok
+	 	ApiResponseHelper.assert_api_response(response, expect_success = False)
 		
 
 	# 	################################################################################
