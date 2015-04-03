@@ -25,7 +25,9 @@ class SiteList(restful.Resource):
 		print api_response.json()
 		return api_response.json()
 
+
 rest_api.add_resource(SiteList, '/sites')
+
 
 class SiteResource(restful.Resource):
 	def get(self, site_id):
@@ -112,6 +114,7 @@ class NodeResource(restful.Resource):
 		else:
 			response += MissingNodeException(node_id)
 		return response.json()
+
 
 	def post(self):
 		"""
@@ -246,7 +249,12 @@ class ReadingList(restful.Resource):
 			response += exc.MissingParameterException('sensor_id OR node_id and sensor_alias')
 			return response.json()
 
-	# def post(self, node_id):
+	def post(self):
+		# In [8]: d = [{'node_id': 1, 'readings': [{'distance':1, 'time': '2015-03-27'}]}]
+		# In [9]: json.dumps(d)
+		
+		print "data: {}".format(request.data)
+		return "OK"
 		
 
 rest_api.add_resource(ReadingList, '/readings', '/readings/all')
