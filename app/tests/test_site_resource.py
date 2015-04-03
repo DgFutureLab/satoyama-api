@@ -35,3 +35,12 @@ class SiteResourceTests(DBTestBase):
 		api_response = ApiResponseHelper.assert_api_response(response)
 		print api_response.objects
 		assert api_response.first()['alias'] == 'Kamogawa_east'
+
+	def test_DELETE_site(self):
+		site = SiteSeeder.seed_empty_site()
+		url = UrlHelper.get_url(flapp, 'site', site.id)
+		response = requests.delete(url)
+		assert response.ok
+	 	response = requests.get(url)
+	 	assert response.ok
+	 	api_response = ApiResponseHelper.assert_api_response(response, expect_success = False)
