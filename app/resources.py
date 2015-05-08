@@ -142,7 +142,7 @@ class NodeResource(restful.Resource):
 	
 
 		
-rest_api.add_resource(NodeResource, '/node/<string:node_id>', '/node')
+rest_api.add_resource(NodeResource, '/node/<int:node_id>', '/node')
 
 
 from numpy.random import choice
@@ -225,10 +225,12 @@ class ReadingList(restful.Resource):
 
 		elif node_id and sensor_alias:
 			node = Node.query.filter_by(id = node_id).first()
+			
 			sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
-			query = Reading.query.filter_by(sensor_id = sensor.id)
-			readings = Reading.query_interval(query, from_date, until_date).all()
-			for reading in readings: response += reading
+			if sensor:
+				query = Reading.query.filter_by(sensor_id = sensor.id)
+				readings = Reading.query_interval(query, from_date, until_date).all()
+				for reading in readings: response += reading
 			return response.json()
 
 		elif node_id and not sensor_alias:
@@ -305,8 +307,6 @@ rest_api.add_resource(ReadingResource, '/reading/<int:reading_id>', '/reading')
 
 def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_response):
 	### Would be cool to make this an instance method in SensorData
-	print 'NODE: %s'%node_id
-	node, sensor = None, None
 
 	try:
 		node = Node.query.filter_by(id = node_id).first()

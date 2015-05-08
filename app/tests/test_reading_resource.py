@@ -91,6 +91,7 @@ class ReadingResourceTests(DBTestBase):
 		assert response.ok
 		ApiResponseHelper.assert_api_response(response, expect_success = False)
 
+
 	def test_GET_reading_by_sensoralias_but_no_nodeid_failure(self):
 		"""
 		GET /reading?sensor_alias=<str>
