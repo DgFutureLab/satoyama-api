@@ -12,8 +12,7 @@ from resources import put_reading_in_database, SensorData
 
 @flapp.route('/', methods = ['GET'])
 def index():
-	# return 'OK'
-	return render_template('index.html')
+	return '<h1>Hello!</h1>'
 
 	
 
