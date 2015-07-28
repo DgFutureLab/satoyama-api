@@ -5,7 +5,7 @@ from satoyama.definitions import ENVIRONMENTS
 def run_webserver(name, env):
 	conf.configure_flapp(env)
 	flapp.logger.debug('Running webserver with config: %s'%flapp.config)
-	flapp.run(port = flapp.config['PORT'])
+	flapp.run()
 
 
 if __name__ == "__main__":
