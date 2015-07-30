@@ -63,7 +63,7 @@ fi
 
 
 if [ -e "$apifolder/migrate_prod.py" ]; then
-	cd "$apifolder"
+	# cd "$apifolder"
 	python "$apifolder/migrate_prod.py" db upgrade
 	# >> "$LOG" 2>&1
 	if [ $? -eq 0 ]; then
