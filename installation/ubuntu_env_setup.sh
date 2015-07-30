@@ -64,7 +64,8 @@ fi
 
 if [ -e "$apifolder/migrate_prod.py" ]; then
 	cd "$apifolder"
-	python "$apifolder/migrate_prod.py" db upgrade >> "$LOG" 2>&1
+	python "$apifolder/migrate_prod.py" db upgrade
+	# >> "$LOG" 2>&1
 	if [ $? -eq 0 ]; then
 		echo "${SUCCESS}Database migration complete! ${DEFAULT}"
 	else
