@@ -10,4 +10,3 @@ alembic==0.7.4
 pytest==2.6.4
 requests==2.4.3
 numpy==1.9.1
-wercker==0.9.0
