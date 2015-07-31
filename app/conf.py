@@ -17,7 +17,6 @@ shared_config = {
 APP_TEST_SETTINGS = {
 			'DEBUG' : True,
 			'PROPAGATE_EXCEPTIONS' : False,
-			'HOST' : 'http://127.0.0.1',
 			'PORT' : 8081,
 			'LOGLEVEL' : 'DEBUG',
 			'ENVIRONMENT' : 'TEST',
@@ -26,7 +25,6 @@ APP_TEST_SETTINGS = {
 APP_DEV_SETTINGS = {
 			'DEBUG' : True,
 			'PROPAGATE_EXCEPTIONS' : False,
-			'HOST' : 'http://127.0.0.1',
 			'PORT' : 8080,
 			'LOGLEVEL' : 'DEBUG',
 			'ENVIRONMENT' : 'DEVELOPMENT',
@@ -35,8 +33,7 @@ APP_DEV_SETTINGS = {
 APP_PROD_SETTINGS = {
 			'DEBUG' : True,
 			'PROPAGATE_EXCEPTIONS' : False,
-			'HOST' : 'http://107.170.251.142',
-			'PORT' : 80,
+			'PORT' : 8081,
 			'LOGLEVEL' : 'WARNING',
 			'ENVIRONMENT' : 'PRODUCTION',
 }
@@ -56,11 +53,11 @@ def configure_flapp(env):
 	else:
 		assert False, 'Please specify a valid environment'
 
-	configure_database(env)
+	__configure_database(env)
 
 
 
-def configure_database(env):
+def __configure_database(env):
 	manager.set_database_environment(env)
 	flapp.config.update({'SQLALCHEMY_DATABASE_URI' : manager.get_db_URI()})
 	setattr(flapp, 'engine', manager.engine)
