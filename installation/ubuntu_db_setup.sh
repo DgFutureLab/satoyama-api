@@ -17,7 +17,8 @@ echo "${ATTENTION}Setting up database. ${DEFAULT}"
 # psql -c "create database satoyama_test"
 # psql -c "create database satoyama_prod"
 
-
+sudo -u postgres psql -c "create role root with login superuser" >> "$LOG" 2>&1
+sudo -u postgres psql -c "create database root" >> "$LOG" 2>&1
 sudo -u postgres psql -c "create role satoyama with login superuser" >> "$LOG" 2>&1
 sudo -u postgres psql -c "alter role satoyama with password 'satoyama'" >> "$LOG" 2>&1
 sudo -u postgres psql -c "create database satoyama_dev" >> "$LOG" 2>&1
