@@ -1,9 +1,7 @@
-from app import debug
 import config, helpers, models, database
 import yaml
 import os
 
-debug(os.path.split(__file__)[0] + '/nodetypes.yml')
 
 with open(os.path.split(__file__)[0] + '/nodetypes.yml') as f: 
 	nodetypes = yaml.load(f)
