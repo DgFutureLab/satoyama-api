@@ -4,21 +4,33 @@ edge:
       sensortype:
         unit: V
         name: voltage
+        dummyMin: 0
+        dummyMax: 5
 ricefield:
   sensors:
     - alias: battery_voltage
       sensortype:
         unit: V
         name: voltage
+        dummyMin: 0
+        dummyMax: 5
     - alias: water_level
       sensortype:
         unit: m
         name: sonar_distance
+        dummyMin: 50
+        dummyMax: 95
     - alias: ambient temperature
       sensortype:
         unit: C
         name: temperature
+        dummyMin: 5
+        dummyMax: 20
     - alias: air humidity
       sensortype:
         unit: percent
         name: humidity
+        dummyMin: 10
+        dummyMax: 80
+empty:
+  sensors: []

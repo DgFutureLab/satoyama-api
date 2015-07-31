@@ -73,6 +73,18 @@ class NodeResource(restful.Resource):
 		This class represents end nodes in the sensor network
 	"""
 
+	def __parse_form_data(self):
+		form = {}
+		form.update({
+			'node_alias' : RequestHelper.get_form_data(response, 'alias', str),
+			'node_type' : RequestHelper.get_form_data(response, 'node_type', str, default = 'empty'),
+			'site_id' : RequestHelper.get_form_data(response, 'site_id', int),
+			'longitude' : RequestHelper.get_form_data(response, 'longitude', float),
+			'latitude' : RequestHelper.get_form_data(response, 'latitude', float),
+			'node_readings' : RequestHelper.get_form_data(response, 'node_readings', int, default = 0)
+			})
+		return form
+
 	def get(self, node_id = None):
 		"""
 			Use a HTTP GET request to /node/<int> get one node data 
@@ -107,8 +119,8 @@ class NodeResource(restful.Resource):
 		
 		Example in Python:
 			>>> import requests
-			>>> r = requests.post('http://localhost:8081/node',
-							   data = {'alias':'mynode', 'site_id':'1', 'latitude' : '13.24234234', 'longitude': 23.222})
+			>>> r = requests.post('http://localhost:8080/node',
+							   data = {'alias':'mynode', 'site_id':'1', 'latitude':'13.24234234', 'longitude':23.222, 'populate':3, 'node_type':'ricefield'})
 		"""		
 		response = ApiResponse(request)
 		# RequestHelper.filter_valid_parameters(Node, response, request)
@@ -117,13 +129,11 @@ class NodeResource(restful.Resource):
 		site_id = RequestHelper.get_form_data(response, 'site_id', int)
 		longitude = RequestHelper.get_form_data(response, 'longitude', float)
 		latitude = RequestHelper.get_form_data(response, 'latitude', float)
-
-		print 'ASDuHASIDUAISUDHAISUHDoihAIUDHIU'
-		print longitude
+		populate = RequestHelper.get_form_data(response, 'populate', int, default = 0)
 
 		site = Site.query.filter_by(id = site_id).first()
 		if site:
-			node = NodeSeeder.seed_node(node_type, alias = node_alias, site_id = site_id, latitude = latitude, longitude = longitude)
+			node = NodeSeeder.seed_node(node_type, alias = node_alias, site_id = site_id, latitude = latitude, longitude = longitude, populate = populate)
 			response += node
 		else:
 			response += exc.MissingSiteException(site_id)
@@ -132,7 +142,7 @@ class NodeResource(restful.Resource):
 	
 
 		
-rest_api.add_resource(NodeResource, '/node/<string:node_id>', '/node')
+rest_api.add_resource(NodeResource, '/node/<int:node_id>', '/node')
 
 
 from numpy.random import choice
@@ -151,15 +161,15 @@ class YakResource(restful.Resource):
 
 rest_api.add_resource(YakResource, '/yaks/<int:yak_id>')
 
-# class SensorResource(restful.Resource):
-# 	def get(self, sensor_id):
-# 		response = ApiResponse(request)
-# 		sensor = Sensor.query.filter_by(id = sensor_id).first()
-# 		if sensor:
-# 			response += sensor
-# 		else:
-# 			response += exc.MissingSensorException(sensor_id)
-# 		return response.json()
+class SensorResource(restful.Resource):
+	def get(self, sensor_id):
+		response = ApiResponse(request)
+		sensor = Sensor.query.filter_by(id = sensor_id).first()
+		if sensor:
+			response += sensor
+		else:
+			response += exc.MissingSensorException(sensor_id)
+		return response.json()
 
 # 	def post(self):
 # 		"""
@@ -215,10 +225,12 @@ class ReadingList(restful.Resource):
 
 		elif node_id and sensor_alias:
 			node = Node.query.filter_by(id = node_id).first()
+			
 			sensor = Sensor.query.filter_by(alias = sensor_alias, node = node).first()
-			query = Reading.query.filter_by(sensor_id = sensor.id)
-			readings = Reading.query_interval(query, from_date, until_date).all()
-			for reading in readings: response += reading
+			if sensor:
+				query = Reading.query.filter_by(sensor_id = sensor.id)
+				readings = Reading.query_interval(query, from_date, until_date).all()
+				for reading in readings: response += reading
 			return response.json()
 
 		elif node_id and not sensor_alias:
@@ -231,6 +243,9 @@ class ReadingList(restful.Resource):
 		elif from_date or until_date:
 			readings = Reading.query_interval(query, from_date, until_date).all()
 			for reading in readings: response += reading
+			return response.json()
+		else:
+			response += exc.MissingParameterException('sensor_id OR node_id and sensor_alias')
 			return response.json()
 
 	# def post(self, node_id):
@@ -292,8 +307,6 @@ rest_api.add_resource(ReadingResource, '/reading/<int:reading_id>', '/reading')
 
 def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_response):
 	### Would be cool to make this an instance method in SensorData
-	print 'NODE: %s'%node_id
-	node, sensor = None, None
 
 	try:
 		node = Node.query.filter_by(id = node_id).first()

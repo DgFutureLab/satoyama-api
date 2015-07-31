@@ -1,16 +1,13 @@
+from app import flapp, conf
+from satoyama.database import manager as db_manager
+conf.configure_flapp('development')
+
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 import argparse
-from satoyama.database import manager as db_manager
-from app import flapp
 from satoyama.models import *
 from satoyama.database import Base
 
-# parser = argparse.ArgumentParser()
-# parser.add_argument('--env', choices = ('test', 'dev', 'prod'), required = True, help = 'Specify environment, which determines which database to use.')
-# args = parser.parse_args()
-# environment = args.env
-# db_manager.set_database_environment(environment)
 
 migrate = Migrate(flapp, Base)
 migration_manager = Manager(flapp)

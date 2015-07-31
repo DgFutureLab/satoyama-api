@@ -1,9 +1,9 @@
 from satoyama import nodetypes
 from satoyama.models import *
 from uuid import uuid4
-from random import random, randint
+from random import random, randint, uniform
 from numpy.random import uniform
-
+from datetime import datetime, timedelta
 def notest(func):
 	setattr(func, 'notest', True)
 	return func
@@ -11,24 +11,34 @@ def notest(func):
 class NodeSeeder():
 
 	@staticmethod
-	def seed_empty_node(**kwargs):
-		return Node.create()
-	
-	@staticmethod
-	def seed_new_node(node_type, **node_args):
+	@notest
+	def seed_node(node_type_str, **node_args):
+		"""
+		The omni-node seeder. Use this to create new nodes of any type defined in nodetypes.yml
+		:param node_type_str (required): e.g. 'ricefield', 'edge', etc.
+		:param latitude (optional): The latitude of the node
+		:param longitude (optional): The longitude of the node
+		:param alias (optional): The alias of the node
+		:param node_readings (optional): The number of dateless dummy data generated per sensor in the node
+		"""
+		assert node_type_str in nodetypes.keys(), 'Node type "%s" is not defined on this server'%node_type_str
+		# assert isinstance(latitude, float)
+		# assert isinstance(longitude, float)
+		# assert isinstance(alias, str)
+		# assert isinstance(node_readings, int)
+
 		site = Site.query.filter_by(id = node_args.get('site_id', None)).first()
 		latitude = node_args.get('latitude', None)
 		longitude = node_args.get('longitude', None)
 		alias = node_args.get('alias', uuid4().hex)
-
-		assert node_type in nodetypes.keys(), 'Node type "%s" is not defined on this server'%node_type
-		node_type = NodeType.query.filter(NodeType.name == node_type).first()
-		if not node_type: 
-			node_type = NodeType.create(name = node_type)
+		populate = node_args.get('populate', 0)
 		
+		node_type = NodeType.query.filter(NodeType.name == node_type_str).first()
+		if not node_type: 
+			node_type = NodeType.create(name = node_type_str)
+
 		node = Node.create(node_type = node_type, alias = alias, latitude = latitude, longitude = longitude, site = site)
 
-		
 		for sensor in nodetypes[node_type.name]['sensors']:
 			sensortype_unit = sensor['sensortype']['unit']
 			sensortype_name = sensor['sensortype']['name']
@@ -36,18 +46,23 @@ class NodeSeeder():
 
 			if not sensortype: 
 				sensortype = SensorType.create(unit = sensortype_unit, name = sensortype_name)
-			
-			Sensor.create(sensortype = sensortype, alias = sensor['alias'], node = node)
+
+			createdSensor = Sensor.create(sensortype = sensortype, alias = sensor['alias'], node = node)
+
+			if populate != 0:
+				for td in range(-populate, 0): 
+					timestamp = datetime.now() + timedelta(td)
+					Reading.create(sensor = createdSensor, value = uniform(sensor['sensortype']['dummyMin'], sensor['sensortype']['dummyMax']), timestamp = timestamp)
 		return node
 		
 		# node_type = 
 	
-	@staticmethod
-	@notest
-	def seed_node(node_type, **kwargs):
+	# @staticmethod
+	# @notest
+	# def seed_node(node_type, **kwargs):
 
-		assert node_type in satoyama.definitions.node_types
-		return getattr(NodeSeeder, 'seed_' + node_type + '_node')(**kwargs)
+	# 	assert node_type in satoyama.definitions.node_types
+	# 	return getattr(NodeSeeder, 'seed_' + node_type + '_node')(**kwargs)
 
 	@staticmethod
 	def seed_ricefield_node(n_readings = 0, **node_args):

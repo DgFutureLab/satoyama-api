@@ -1,3 +1,4 @@
+from app import debug
 import sys
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
@@ -33,7 +34,8 @@ class DBManager(object):
 		self.__confdb__()
 
 	def set_databases(self):
-		dbconfig_path = 'db_config.yml'
+		dbconfig_path = '/'.join(__file__.split('/')[:-2]) + '/db_config.yml' #Not pretty but it works for now. 
+		debug(dbconfig_path)
 		# dbconfig_path = '%s/db_config.yml'%'/'.join(__file__.split('/')[:-2])
 		with open(dbconfig_path) as f:
 			f = f.read()
