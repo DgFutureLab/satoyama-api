@@ -2,6 +2,10 @@ from flask import Flask
 
 flapp = Flask('sensor_api')
 
+from termcolor import cprint
+def debug(string):
+	cprint(string, 'red')
+
 
 # def register_helper(self, func):
 # 	setattr(self, func.func_name, func)	
@@ -23,9 +27,6 @@ import satoyama
 ### Import modules containing statements that must be executed when the webapp is started (such as adding routes for the REST api)
 import resources, views, conf, apihelpers
 
-from termcolor import cprint
-def debud(string):
-	cprint(string, 'red')
 
 
 
