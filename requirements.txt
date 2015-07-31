@@ -12,3 +12,4 @@ requests==2.4.3
 numpy==1.9.1
 pyyaml
 termcolor
+uwsgi
