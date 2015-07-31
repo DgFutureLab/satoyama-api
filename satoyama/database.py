@@ -34,13 +34,13 @@ class DBManager(object):
 
 	def set_databases(self):
 		dbconfig_path = '/'.join(__file__.split('/')[:-2]) + '/db_config.yml' #Not pretty but it works for now. 
-			with open(dbconfig_path) as f:
+		with open(dbconfig_path) as f:
 			f = f.read()
-			try:
-				dbconfig = yaml.load(f)
-			except Exception:
-				print 'Could not parse db_config.yaml. Did you follow the instructions in the README? :)'
-				sys.exit(1)
+		try:
+			dbconfig = yaml.load(f)
+		except Exception:
+			print 'Could not parse db_config.yaml. Did you follow the instructions in the README? :)'
+			sys.exit(1)
 
 		username = dbconfig[self.env]['username']
 		password = dbconfig[self.env]['password']
