@@ -21,7 +21,7 @@ limiter = Limiter(flapp, global_limits=["30 per minute"])
 ### Before importing other modules, import and setup run configuration
 import conf
 flapp.config.update(conf.module_config)
-# conf.configure_flapp('production')
+conf.configure_flapp('production')
 import satoyama
 
 ### Import modules containing statements that must be executed when the webapp is started (such as adding routes for the REST api)
