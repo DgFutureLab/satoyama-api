@@ -282,15 +282,12 @@ class ReadingResource(restful.Resource):
 
 
 	def post(self):
-		print 'OOOOOOOOOOOOOOST'
-		print request.headers
-		print 'Slut med ost'
 		response = ApiResponse(request)
 		sensor_id = RequestHelper.get_form_data(response, 'sensor_id', int)
 		value = RequestHelper.get_form_data(response, 'value', float)
 		# timestamp = RequestHelper.get_form_data(response, 'value', float)
 		if sensor_id:
-			sensor = Sensor.query.filter_by(id = sensor_id)
+			sensor = Sensor.query.filter_by(id = sensor_id).first()
 			if sensor:
 				Reading.create(sensor = sensor, value = value)
 			else:
