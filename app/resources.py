@@ -298,41 +298,11 @@ class ReadingResource(restful.Resource):
 				response += exc.MissingSensorException(sensor_id)
 		return response.json()
 
-			
-		# node_id = RequestHelper.get_form_data(response, 'node_id', int)
-
-
-	# def put(self, node_id, sensor_alias):
-	# 	""" 
-	# 	:param node_uuid: uuid of the node
-	# 	:param sensor_identifier: Can be either sensor uuid or sensor alias. 
-	# 	"""
-	# 	response = ApiResponse(request)
-
-	# 	timestamp = get_form_data(response, 'timestamp')
-	# 	value = get_form_data(response, 'value')
-
-	# 	put_reading_in_database(node_id, sensor_alias, value, timestamp, response)
-
-	# 	return response.json()
 
 rest_api.add_resource(ReadingResource, '/reading/<int:reading_id>', '/reading')
 
 
 
-
-# class ReadingList(restful.Resource):
-# 	def get(self):
-# 		api_response = ApiResponse()
-# 		readings = Reading.query.all()
-# 		for reading in readings: api_response += reading
-# 		return api_response.json()
-
-# rest_api.add_resource(ReadingList, '/readings', '/reading/all')
-
-
-
-# rest_api.add_resource(ReadingResource, '/reading/node_<string:node_id>/<string:sensor_alias>')
 
 
 def put_reading_in_database(node_id, sensor_alias, value, timestamp, api_response):
