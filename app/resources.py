@@ -257,7 +257,7 @@ class ReadingResource(restful.Resource):
 
 
 	def get(self, reading_id = None):
-		response = ApiResponse()
+		response = ApiResponse(request)
 		if reading_id:
 			reading = Reading.query.filter_by(id = reading_id).first()
 			if reading: 
@@ -271,7 +271,26 @@ class ReadingResource(restful.Resource):
 
 
 	def post(self):
-		pass
+		print 'OOOOOOOOOOOOOOST'
+		print request.headers
+		print 'Slut med ost'
+		response = ApiResponse(request)
+		sensor_id = RequestHelper.get_form_data(response, 'sensor_id', int)
+		value = RequestHelper.get_form_data(response, 'value', float)
+		# timestamp = RequestHelper.get_form_data(response, 'value', float)
+		if sensor_id:
+			sensor = Sensor.query.filter_by(id = sensor_id)
+			if sensor:
+				Reading.create(sensor = sensor, value = value)
+			else:
+				response += exc.MissingSensorException(sensor_id)
+		
+		return response.json()
+
+			
+		# node_id = RequestHelper.get_form_data(response, 'node_id', int)
+
+
 	# def put(self, node_id, sensor_alias):
 	# 	""" 
 	# 	:param node_uuid: uuid of the node
