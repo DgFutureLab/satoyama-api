@@ -1,6 +1,7 @@
 import requests
 from satoyama.models import Node, Sensor, SensorType, Reading
 from satoyama.definitions import DATETIME_FORMATS
+from satoyama.helpers import DatetimeHelper
 from app import flapp
 from satoyama.tests.dbtestbase import DBTestBase
 import seeds
@@ -209,7 +210,31 @@ class ReadingResourcePostTests(DBTestBase):
 		print url
 		response = requests.post(url, data = {'sensor_id': sensor.id, 'value': 42, 'timestamp': timestamp_str})
 		assert response.ok
+		api_response = ApiResponseHelper.assert_api_response(response)
 		assert len(Reading.query.all()) == 1
+
+	def test_post_reading_timestamp_integrity(self):
+		"""
+		Tests that timestamps are stored with the accuracy with which they were provided
+		"""
+		node = NodeSeeder.seed_ricefield_node(n_readings = 0)
+		sensor = node.sensors[0]
+		for timestamp_format in DATETIME_FORMATS:
+			timestamp = datetime.now()
+			timestamp_str = timestamp.strftime(timestamp_format)
+			post_url = UrlHelper.get_url(flapp, 'reading')
+			### POST reading with timestamp to API
+			post_response = requests.post(post_url, data = {'sensor_id': sensor.id, 'value': 42, 'timestamp': timestamp_str})
+			post_response = ApiResponseHelper.assert_api_response(post_response)
+			reading_id = post_response.objects[0]['id']
+			### GET that same reading and check that the timestamp is correct
+			get_url = UrlHelper.get_url(flapp, 'reading', reading_id)
+			get_response = requests.get(get_url)
+			get_response = ApiResponseHelper.assert_api_response(get_response)
+			received_timestamp_str = get_response.objects[0]['timestamp']
+			received_timestamp = DatetimeHelper.convert_timestamp_to_datetime(received_timestamp_str)
+			assert datetime.strptime(timestamp_str, timestamp_format) == received_timestamp
+
 
 	def test_post_reading_missing_sensor_id(self):
 		pass
@@ -219,3 +244,10 @@ class ReadingResourcePostTests(DBTestBase):
 
 	def test_post_reading_wrong_timestamp(self):
 		pass
+
+
+
+
+
+
+
