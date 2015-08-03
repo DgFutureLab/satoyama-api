@@ -22,7 +22,7 @@ class SiteList(restful.Resource):
 		api_response = ApiResponse()
 		sites = Site.query.all()
 		for site in sites: api_response += site
-		print api_response.json()
+		# print api_response.json()
 		return api_response.json()
 
 rest_api.add_resource(SiteList, '/sites')
@@ -170,6 +170,17 @@ class SensorResource(restful.Resource):
 		else:
 			response += exc.MissingSensorException(sensor_id)
 		return response.json()
+
+class SensorList(restful.Resource):
+	def get(self):
+		api_response = ApiResponse()
+		sensors = Sensor.query.all()
+		for sensor in sensors: api_response += sensor
+		# print api_response.json()
+		return api_response.json()
+
+rest_api.add_resource(SensorList, '/sensors')
+
 
 # 	def post(self):
 # 		"""
