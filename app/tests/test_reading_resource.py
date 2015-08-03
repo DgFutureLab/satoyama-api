@@ -1,12 +1,13 @@
 import requests
 from satoyama.models import Node, Sensor, SensorType, Reading
+from satoyama.definitions import DATETIME_FORMATS
 from app import flapp
 from satoyama.tests.dbtestbase import DBTestBase
 import seeds
 from seeds.nodes import NodeSeeder
 from app.apihelpers import ApiResponseHelper, UrlHelper
 from datetime import datetime, timedelta
-class ReadingResourceTests(DBTestBase):
+class ReadingResourceGetTests(DBTestBase):
 
 
 	#	###############################################################################
@@ -184,8 +185,7 @@ class ReadingResourceTests(DBTestBase):
 		api_response = ApiResponseHelper.assert_api_response(response)
 		assert sorted(readings_in_interval) == sorted(api_response.objects)
 
-
-	# def test_GET_all_readings(self):
+		# def test_GET_all_readings(self):
 	# 	"""
 	# 	GET /readings
 	# 	"""
@@ -197,3 +197,25 @@ class ReadingResourceTests(DBTestBase):
 	# 	api_response = ApiResponseHelper.assert_api_response(response)
 	# 	assert len(api_response.objects) == n_readings 
 
+
+class ReadingResourcePostTests(DBTestBase):
+
+	def test_correct_post_reading(self):
+		assert len(Reading.query.all()) == 0
+		node = NodeSeeder.seed_ricefield_node(n_readings = 0)
+		sensor = node.sensors[0]
+		timestamp_str = datetime.now().strftime(DATETIME_FORMATS[0])
+		url = UrlHelper.get_url(flapp, 'reading')
+		print url
+		response = requests.post(url, data = {'sensor_id': sensor.id, 'value': 42, 'timestamp': timestamp_str})
+		assert response.ok
+		assert len(Reading.query.all()) == 1
+
+	def test_post_reading_missing_sensor_id(self):
+		pass
+
+	def test_post_reading_missing_value(self):
+		pass
+
+	def test_post_reading_wrong_timestamp(self):
+		pass
