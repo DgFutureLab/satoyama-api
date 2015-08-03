@@ -264,6 +264,7 @@ class ReadingList(restful.Resource):
 
 rest_api.add_resource(ReadingList, '/readings', '/readings/all')
 
+from satoyama.helpers import DatetimeHelper
 class ReadingResource(restful.Resource):
 
 
@@ -285,14 +286,16 @@ class ReadingResource(restful.Resource):
 		response = ApiResponse(request)
 		sensor_id = RequestHelper.get_form_data(response, 'sensor_id', int)
 		value = RequestHelper.get_form_data(response, 'value', float)
-		# timestamp = RequestHelper.get_form_data(response, 'value', float)
+		timestamp = RequestHelper.get_form_data(response, 'timestamp', str)
+		timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp)
+		print timestamp
 		if sensor_id:
 			sensor = Sensor.query.filter_by(id = sensor_id).first()
 			if sensor:
-				Reading.create(sensor = sensor, value = value)
+				reading = Reading.create(sensor = sensor, value = value, timestamp = timestamp)
+				response += reading
 			else:
 				response += exc.MissingSensorException(sensor_id)
-		
 		return response.json()
 
 			
