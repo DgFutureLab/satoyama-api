@@ -71,7 +71,7 @@ class UrlHelper(object):
 			port = UrlHelper.DEFAULT_PORT
 			flapp.logger.warning('PORT not set for flask app. Using %s instead.'%UrlHelper.DEFAULT_PORT)
 
-		return '%s:%s/'%(host, port)
+		return 'http://%s:%s/'%(host, port)
 
 
 	@staticmethod
