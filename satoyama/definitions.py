@@ -6,5 +6,3 @@ DATETIME_FORMATS = [
 					'%Y-%m-%d-%H:%M',
 					'%Y-%m-%d'
 					]
-
-node_types = ['ricefield', 'herbs', 'empty']
