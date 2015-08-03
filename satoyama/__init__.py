@@ -1,4 +1,4 @@
-import config, helpers, models, database
+import config, helpers, models, database, definitions
 import yaml
 import os
 
