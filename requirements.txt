@@ -13,3 +13,4 @@ numpy==1.9.1
 pyyaml
 termcolor
 uwsgi
+ujson
