@@ -10,6 +10,7 @@ from apiresponse import ApiResponse
 from apihelpers import RequestHelper
 from seeds.nodes import NodeSeeder
 from seeds.sites import SiteSeeder
+import ujson
 
 API_UNITS = {
 	'm':'SI meters', 
@@ -259,7 +260,28 @@ class ReadingList(restful.Resource):
 			response += exc.MissingParameterException('sensor_id OR node_id and sensor_alias')
 			return response.json()
 
-	# def post(self, node_id):
+	def post(self):
+		# key = RequestHelper.get_form_data(response, 'key', int, http_verb = 'GET')
+		response = ApiResponse(request)
+		# [{'sensor_id': 1, 'value': 23},
+		# {'sensor_id': 2, 'value': 64},
+		# {'sensor_id': 3, 'value': 72}]
+		try:
+			data = ujson.loads(request.form['data'])
+			assert isinstance(data, Iterable)
+			for reading in data:
+				assert data.has_key('sensor_id')
+				assert data.has_key('value')
+				assert data.has_key('timestamp')
+				sensor = Sensor.query.filter_by(id = sensor_id).first()
+				if sensor:
+					reading = Reading.create(sensor = sensor, value = data['value'], timestamp = data['timestamp'])
+					response += reading
+				else:
+					response += exc.MissingSensorException(sensor_id)
+		except Exception, e:
+			response += e
+
 		
 
 rest_api.add_resource(ReadingList, '/readings', '/readings/all')
@@ -288,7 +310,7 @@ class ReadingResource(restful.Resource):
 		value = RequestHelper.get_form_data(response, 'value', float)
 		timestamp = RequestHelper.get_form_data(response, 'timestamp', str)
 		timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp)
-		print timestamp
+		print request.headers
 		if sensor_id:
 			sensor = Sensor.query.filter_by(id = sensor_id).first()
 			if sensor:
