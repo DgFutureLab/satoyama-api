@@ -281,43 +281,23 @@ class ReadingList(restful.Resource):
 			return response.json()
 
 	def post(self):
-		# key = RequestHelper.get_form_data(response, 'key', int, http_verb = 'GET')
 		response = ApiResponse(request)
-		# [{'sensor_id': 1, 'value': 23},
-		# {'sensor_id': 2, 'value': 64},
-		# {'sensor_id': 3, 'value': 72}]
 		try:
 			data = ujson.loads(request.form['data'])
 			# print data
-		except Exception:
+		except Exception, e:
 			response += Exception('Could not parse json data')
 			print e
-		assert isinstance(data, Iterable)
-		print len(data)
-		# print data[0]
-		# print data[1]
-		for reading in data:
-			print reading
-			sensor_id = reading.get('sensor_id', None)
-			value = reading.get('value', None)
-			timestamp_str = reading.get('timestamp', None)
-			store_reading(response, sensor_id, value, timestamp_str)
-			# if not sensor_id: 
-			# 	response += exc.MissingReadingParameterException('sensor_id')
-			# elif not value: 
-			# 	response += exc.MissingReadingParameterException('value')
-			# elif not timestamp: 
-			# 	response += exc.MissingReadingParameterException('timestamp')
-			# else:
-			# 	sensor = Sensor.query.filter_by(id = reading['sensor_id']).first()
-			# 	if sensor:
-			# 		# print 'CREATING READING'
-			# 		reading = Reading.create(sensor = sensor, value = value, timestamp = timestamp)
-			# 		# print reading
-			# 		response += reading
-			# 	else:
-			# 		response += exc.MissingSensorException(sensor_id)
-	
+		if isinstance(data, Iterable):
+			for reading in data:
+				print reading
+				sensor_id = reading.get('sensor_id', None)
+				value = reading.get('value', None)
+				timestamp_str = reading.get('timestamp', None)
+				store_reading(response, sensor_id, value, timestamp_str)
+		else:
+			response += Exception('Please submit data as a JSON list')
+
 		return response.json()
 
 	
