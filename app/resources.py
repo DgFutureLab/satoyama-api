@@ -268,21 +268,38 @@ class ReadingList(restful.Resource):
 		# {'sensor_id': 3, 'value': 72}]
 		try:
 			data = ujson.loads(request.form['data'])
+			# print data
 			assert isinstance(data, Iterable)
+			print len(data)
+			# print data[0]
+			# print data[1]
 			for reading in data:
-				assert data.has_key('sensor_id')
-				assert data.has_key('value')
-				assert data.has_key('timestamp')
-				sensor = Sensor.query.filter_by(id = sensor_id).first()
-				if sensor:
-					reading = Reading.create(sensor = sensor, value = data['value'], timestamp = data['timestamp'])
-					response += reading
+				print reading
+				sensor_id = reading.get('sensor_id', None)
+				value = reading.get('value', None)
+				timestamp_str = reading.get('timestamp', None)
+				timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp_str)
+				if not sensor_id: 
+					response += exc.MissingReadingParameterException('sensor_id')
+				elif not value: 
+					response += exc.MissingReadingParameterException('value')
+				elif not timestamp: 
+					response += exc.MissingReadingParameterException('timestamp')
 				else:
-					response += exc.MissingSensorException(sensor_id)
+					sensor = Sensor.query.filter_by(id = reading['sensor_id']).first()
+					if sensor:
+						# print 'CREATING READING'
+						reading = Reading.create(sensor = sensor, value = value, timestamp = timestamp)
+						# print reading
+						response += reading
+					else:
+						response += exc.MissingSensorException(sensor_id)
 		except Exception, e:
 			response += e
+			print e
+		return response.json()
 
-		
+	
 
 rest_api.add_resource(ReadingList, '/readings', '/readings/all')
 
@@ -308,8 +325,9 @@ class ReadingResource(restful.Resource):
 		response = ApiResponse(request)
 		sensor_id = RequestHelper.get_form_data(response, 'sensor_id', int)
 		value = RequestHelper.get_form_data(response, 'value', float)
-		timestamp = RequestHelper.get_form_data(response, 'timestamp', str)
-		timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp)
+		timestamp_str = RequestHelper.get_form_data(response, 'timestamp', str)
+		timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp_str)
+
 		print request.headers
 		if sensor_id:
 			sensor = Sensor.query.filter_by(id = sensor_id).first()
