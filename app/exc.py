@@ -76,8 +76,8 @@ class InvalidParameterTypeException(ApiException):
 		super(InvalidParameterTypeException, self).__init__('Expected %s to be of type %s.'%(parameter_name, partype))
 
 class MissingReadingParameterException(ApiException):
-	def __init__(self, parameter, name):
-		super(MissingReadingParameterException, self).__init__("Submit readings as a JSON formatted array containing a dict for each reading. Each dict must have keys 'sensor_id', 'value' and 'timestamp'")
+	def __init__(self, parameter):
+		super(MissingReadingParameterException, self).__init__("Submit readings as a JSON formatted array containing a dict for each reading. Each dict must have keys 'sensor_id', 'value' and 'timestamp'. Missing parameter: %s"%parameter)
 # class InvalidParameterValueException(ApiException):
 # 	def __init__(self, parameter_name, choices):
 # 		super(InvalidParameterValueException, self).__init__('Parameter %s must be one of %s.'%(parameter_name, partype))
