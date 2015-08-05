@@ -215,7 +215,27 @@ rest_api.add_resource(SensorList, '/sensors')
 # rest_api.add_resource(SensorResource, '/sensor/<string:sensor_id>', '/sensor')
 
 
+def store_reading(response, sensor_id, value, timestamp_str):
+		timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp_str)
+		if not sensor_id: 
+			response += exc.MissingReadingParameterException('sensor_id')
+		elif not value: 
+			response += exc.MissingReadingParameterException('value')
+		elif not timestamp: 
+			response += exc.MissingReadingParameterException('timestamp')
+		else:
+			sensor = Sensor.query.filter_by(id = sensor_id).first()
+			if sensor:
+				# print 'CREATING READING'
+				reading = Reading.create(sensor = sensor, value = value, timestamp = timestamp)
+				# print reading
+				response += reading
+			else:
+				response += exc.MissingSensorException(sensor_id)
+
+
 class ReadingList(restful.Resource):
+	
 	def get(self):
 		response = ApiResponse(request)
 		
@@ -269,34 +289,35 @@ class ReadingList(restful.Resource):
 		try:
 			data = ujson.loads(request.form['data'])
 			# print data
-			assert isinstance(data, Iterable)
-			print len(data)
-			# print data[0]
-			# print data[1]
-			for reading in data:
-				print reading
-				sensor_id = reading.get('sensor_id', None)
-				value = reading.get('value', None)
-				timestamp_str = reading.get('timestamp', None)
-				timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp_str)
-				if not sensor_id: 
-					response += exc.MissingReadingParameterException('sensor_id')
-				elif not value: 
-					response += exc.MissingReadingParameterException('value')
-				elif not timestamp: 
-					response += exc.MissingReadingParameterException('timestamp')
-				else:
-					sensor = Sensor.query.filter_by(id = reading['sensor_id']).first()
-					if sensor:
-						# print 'CREATING READING'
-						reading = Reading.create(sensor = sensor, value = value, timestamp = timestamp)
-						# print reading
-						response += reading
-					else:
-						response += exc.MissingSensorException(sensor_id)
-		except Exception, e:
-			response += e
+		except Exception:
+			response += Exception('Could not parse json data')
 			print e
+		assert isinstance(data, Iterable)
+		print len(data)
+		# print data[0]
+		# print data[1]
+		for reading in data:
+			print reading
+			sensor_id = reading.get('sensor_id', None)
+			value = reading.get('value', None)
+			timestamp_str = reading.get('timestamp', None)
+			store_reading(response, sensor_id, value, timestamp_str)
+			# if not sensor_id: 
+			# 	response += exc.MissingReadingParameterException('sensor_id')
+			# elif not value: 
+			# 	response += exc.MissingReadingParameterException('value')
+			# elif not timestamp: 
+			# 	response += exc.MissingReadingParameterException('timestamp')
+			# else:
+			# 	sensor = Sensor.query.filter_by(id = reading['sensor_id']).first()
+			# 	if sensor:
+			# 		# print 'CREATING READING'
+			# 		reading = Reading.create(sensor = sensor, value = value, timestamp = timestamp)
+			# 		# print reading
+			# 		response += reading
+			# 	else:
+			# 		response += exc.MissingSensorException(sensor_id)
+	
 		return response.json()
 
 	
@@ -318,24 +339,13 @@ class ReadingResource(restful.Resource):
 		else:
 			response += exc.IncompleteURLException(correct_url_format = 'GET /reading/<int:reading_id>')
 		return response.json()
-			
-
 
 	def post(self):
 		response = ApiResponse(request)
 		sensor_id = RequestHelper.get_form_data(response, 'sensor_id', int)
 		value = RequestHelper.get_form_data(response, 'value', float)
 		timestamp_str = RequestHelper.get_form_data(response, 'timestamp', str)
-		timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp_str)
-
-		print request.headers
-		if sensor_id:
-			sensor = Sensor.query.filter_by(id = sensor_id).first()
-			if sensor:
-				reading = Reading.create(sensor = sensor, value = value, timestamp = timestamp)
-				response += reading
-			else:
-				response += exc.MissingSensorException(sensor_id)
+		store_reading(response, sensor_id, value, timestamp_str)
 		return response.json()
 
 
