@@ -226,9 +226,7 @@ def store_reading(response, sensor_id, value, timestamp_str):
 		else:
 			sensor = Sensor.query.filter_by(id = sensor_id).first()
 			if sensor:
-				# print 'CREATING READING'
 				reading = Reading.create(sensor = sensor, value = value, timestamp = timestamp)
-				# print reading
 				response += reading
 			else:
 				response += exc.MissingSensorException(sensor_id)
@@ -284,19 +282,18 @@ class ReadingList(restful.Resource):
 		response = ApiResponse(request)
 		try:
 			data = ujson.loads(request.form['data'])
-			# print data
+			if isinstance(data, Iterable):
+				for reading in data:
+					sensor_id = reading.get('sensor_id', None)
+					value = reading.get('value', None)
+					timestamp_str = reading.get('timestamp', None)
+					store_reading(response, sensor_id, value, timestamp_str)
+			else:
+				response += Exception('Please submit data as a JSON list')
 		except Exception, e:
 			response += Exception('Could not parse json data')
 			print e
-		if isinstance(data, Iterable):
-			for reading in data:
-				print reading
-				sensor_id = reading.get('sensor_id', None)
-				value = reading.get('value', None)
-				timestamp_str = reading.get('timestamp', None)
-				store_reading(response, sensor_id, value, timestamp_str)
-		else:
-			response += Exception('Please submit data as a JSON list')
+		
 
 		return response.json()
 
