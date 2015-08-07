@@ -58,7 +58,7 @@ chef/
 doc/
 .vagrant/
 
-db_config.yml
+#db_config.yml
 
 
 ### File system stuff
