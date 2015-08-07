@@ -1,11 +1,13 @@
 import argparse
-from app import flapp, conf
+
+from app import conf
+from app import flapp as application
 from satoyama.definitions import ENVIRONMENTS
 
 def run_webserver(name, env):
 	conf.configure_flapp(env)
-	flapp.logger.debug('Running webserver with config: %s'%flapp.config)
-	flapp.run()
+	application.logger.debug('Running webserver with config: %s'%application.config)
+	application.run()
 
 
 if __name__ == "__main__":
