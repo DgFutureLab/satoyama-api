@@ -281,42 +281,39 @@ class ReadingList(restful.Resource):
 
 	def post(self):
 		response = ApiResponse(request)
-		
-		data = request.form['data']
+		format = request.form.get('format', 'json')
+		data = request.form.get('data', '')
 
+		if format == 'compact':
+			readings = data.split(';')
+			stored_readings = 0
+			for reading in readings:
+				try:
+					sensor_id, value, timestamp_str = reading.split(',')
+				except ValueError:
+					response += Exception('Please submit readings as sensor_id,value,timestamp;')				
 
-		readings = data.split(';')
-		stored_readings = 0
-		for reading in readings:
+				try: 
+					store_reading(response, sensor_id, value, timestamp_str)
+					stored_readings += 1
+				except Exception, e:
+					response += Exception('Could not store reading')								
+			return 'Stored: ' + str(stored_readings)
+		elif format == 'json':
 			try:
-				sensor_id, value, timestamp_str = reading.split(',')
-			except ValueError:
-				response += Exception('Please submit readings as sensor_id,value,timestamp;')				
-
-			try: 
-				store_reading(response, sensor_id, value, timestamp_str)
-				stored_readings += 1
+				readings = ujson.loads(data)
+				if isinstance(readings, Iterable):
+					for reading in readings:
+						sensor_id = reading.get('sensor_id', None)
+						value = reading.get('value', None)
+						timestamp_str = reading.get('timestamp', None)
+						store_reading(response, sensor_id, value, timestamp_str)
+				else:
+					response += Exception('Please submit data as a JSON list')
 			except Exception, e:
-				response += Exception('Could not store reading')								
-		return str(stored_readings)
-
-
-		# try:
-		# 	data = ujson.loads(request.form['data'])
-		# 	if isinstance(data, Iterable):
-		# 		for reading in data:
-		# 			sensor_id = reading.get('sensor_id', None)
-		# 			value = reading.get('value', None)
-		# 			timestamp_str = reading.get('timestamp', None)
-		# 			store_reading(response, sensor_id, value, timestamp_str)
-		# 	else:
-		# 		response += Exception('Please submit data as a JSON list')
-		# except Exception, e:
-		# 	response += Exception('Could not parse json data')
-		# 	print e
-		
-
-		return response.json()
+				response += Exception('Could not parse json data')
+				print e
+			return response.json()
 
 rest_api.add_resource(ReadingList, '/readings', '/readings/all')
 
