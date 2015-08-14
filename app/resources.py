@@ -217,6 +217,7 @@ rest_api.add_resource(SensorList, '/sensors')
 
 def store_reading(response, sensor_id, value, timestamp_str):
 		timestamp = DatetimeHelper.convert_timestamp_to_datetime(timestamp_str)
+		print timestamp
 		if not sensor_id: 
 			response += exc.MissingReadingParameterException('sensor_id')
 		elif not value: 
@@ -280,24 +281,42 @@ class ReadingList(restful.Resource):
 
 	def post(self):
 		response = ApiResponse(request)
-		try:
-			data = ujson.loads(request.form['data'])
-			if isinstance(data, Iterable):
-				for reading in data:
-					sensor_id = reading.get('sensor_id', None)
-					value = reading.get('value', None)
-					timestamp_str = reading.get('timestamp', None)
-					store_reading(response, sensor_id, value, timestamp_str)
-			else:
-				response += Exception('Please submit data as a JSON list')
-		except Exception, e:
-			response += Exception('Could not parse json data')
-			print e
+		
+		data = request.form['data']
+
+
+		readings = data.split(';')
+		stored_readings = 0
+		for reading in readings:
+			try:
+				sensor_id, value, timestamp_str = reading.split(',')
+			except ValueError:
+				response += Exception('Please submit readings as sensor_id,value,timestamp;')				
+
+			try: 
+				store_reading(response, sensor_id, value, timestamp_str)
+				stored_readings += 1
+			except Exception, e:
+				response += Exception('Could not store reading')								
+		return str(stored_readings)
+
+
+		# try:
+		# 	data = ujson.loads(request.form['data'])
+		# 	if isinstance(data, Iterable):
+		# 		for reading in data:
+		# 			sensor_id = reading.get('sensor_id', None)
+		# 			value = reading.get('value', None)
+		# 			timestamp_str = reading.get('timestamp', None)
+		# 			store_reading(response, sensor_id, value, timestamp_str)
+		# 	else:
+		# 		response += Exception('Please submit data as a JSON list')
+		# except Exception, e:
+		# 	response += Exception('Could not parse json data')
+		# 	print e
 		
 
 		return response.json()
-
-	
 
 rest_api.add_resource(ReadingList, '/readings', '/readings/all')
 
