@@ -1,6 +1,7 @@
 from app import flapp
 from app import rest_api
 from satoyama.models import *
+from satoyama import nodetypes
 import exc
 from exc import *
 from flask.ext import restful
@@ -182,6 +183,13 @@ class SensorList(restful.Resource):
 
 rest_api.add_resource(SensorList, '/sensors')
 
+class NodeTypeList(restful.Resource):
+	def get(self):
+		api_response = ApiResponse()
+		api_response += nodetypes
+		return api_response.json()
+
+rest_api.add_resource(NodeTypeList, '/nodetypes')
 
 # 	def post(self):
 # 		"""
