@@ -63,8 +63,13 @@ rest_api.add_resource(SiteResource, '/site/<int:site_id>', '/site')
 
 class NodeList(restful.Resource):
 	def get(self):
+		
 		api_response = ApiResponse()
-		nodes = Node.query.all()
+		filters = {}
+
+		site_id = RequestHelper.get_form_data(api_response, 'site_id', str)
+		if site_id: filters.update({'site_id': site_id})
+		nodes = Node.query.filter_by(**filters).all()
 		for node in nodes: api_response += node
 		return api_response.json()
 
