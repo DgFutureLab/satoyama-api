@@ -32,5 +32,19 @@ ricefield:
         name: humidity
         dummyMin: 10
         dummyMax: 80
+logfam:
+  sensors:
+    - alias: Koji
+      sensortype: 
+        unit: bool
+    - alias: Sachiko
+      sensortype: 
+        unit: bool
+    - alias: Risa
+      sensortype: 
+        unit: bool
+    - alias: Satomi
+      sensortype: 
+        unit: bool
 empty:
   sensors: []
