@@ -14,7 +14,10 @@ from resources import put_reading_in_database, SensorData
 def index():
 	return '<h1>Hello!</h1>'
 
-	
+@flapp.route('/testpost', methods = ['POST', 'GET'])
+def testpost():
+       print request.args
+       return str(request.args)
 
 
 def format_data(sensor_data):
