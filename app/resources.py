@@ -300,11 +300,14 @@ class ReadingList(restful.Resource):
 		print data
 
 		if format == 'compact':
-			readings = data.split(';')
+			data = data.split(';')
+			node, readings = data.split('@')
 			stored_readings = 0
+			
 			for reading in readings:
 				try:
 					sensor_id, value, timestamp_str = reading.split(',')
+					if sensor_id.find('@'): sensor_id = sensor_id[2:]
 				except ValueError:
 					response += Exception('Please submit readings as sensor_id,value,timestamp;')				
 
