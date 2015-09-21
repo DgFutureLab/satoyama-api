@@ -294,8 +294,10 @@ class ReadingList(restful.Resource):
 
 	def post(self):
 		response = ApiResponse(request)
-		format = request.form.get('format', 'json')
-		data = request.form.get('data', '')
+		format = request.data.get('format', 'json')
+		data = request.data.get('data', '')
+		print format
+		print data
 
 		if format == 'compact':
 			readings = data.split(';')
