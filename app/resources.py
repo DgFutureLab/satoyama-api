@@ -301,22 +301,21 @@ class ReadingList(restful.Resource):
 
 		if format == 'compact':
 			data = data.split(';')
-			node, readings = data.split('@')
+			data.remove('')
 			stored_readings = 0
-			
-			for reading in readings:
+			for reading in data:
 				try:
-					sensor_id, value, timestamp_str = reading.split(',')
-					if sensor_id.find('@'): sensor_id = sensor_id[2:]
+					node_id, sensor_id, value, timestamp_str = reading.split(',')
+					# print node_id, sensor_id, value, timestamp_str
 				except ValueError:
 					response += Exception('Please submit readings as sensor_id,value,timestamp;')				
-
 				try: 
 					store_reading(response, sensor_id, value, timestamp_str)
 					stored_readings += 1
 				except Exception, e:
 					response += Exception('Could not store reading')								
-			return 'Stored: ' + str(stored_readings)
+			return 'Stored: ' + str(stored_readings) # This short return is to avoid crashing sensor nodes by sending back long response.
+
 		elif format == 'json':
 			try:
 				readings = ujson.loads(data)
@@ -330,7 +329,6 @@ class ReadingList(restful.Resource):
 					response += Exception('Please submit data as a JSON list')
 			except Exception, e:
 				response += Exception('Could not parse json data')
-				print e
 			return response.json()
 
 rest_api.add_resource(ReadingList, '/readings', '/readings/all')
