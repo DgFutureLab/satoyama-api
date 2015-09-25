@@ -46,5 +46,10 @@ logfam:
     - alias: Satomi
       sensortype: 
         unit: bool
+toilet:
+  sensors:
+    - alias: occupied
+      sensortype: 
+        unit: bool
 empty:
   sensors: []
