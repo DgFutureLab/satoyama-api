@@ -170,13 +170,20 @@ rest_api.add_resource(YakResource, '/yaks/<int:yak_id>')
 
 class SensorResource(restful.Resource):
 	def get(self, sensor_id):
-		response = ApiResponse(request)
+		
+		response = ApiResponse(request) 
 		sensor = Sensor.query.filter_by(id = sensor_id).first()
 		if sensor:
 			response += sensor
 		else:
 			response += exc.MissingSensorException(sensor_id)
 		return response.json()
+
+
+# store_reading(response, sensor_id, value, timestamp_str):
+
+
+rest_api.add_resource(SensorResource, '/sensor/<int:sensor_id>')
 
 class SensorList(restful.Resource):
 	def get(self):
@@ -338,15 +345,27 @@ class ReadingResource(restful.Resource):
 
 
 	def get(self, reading_id = None):
-		response = ApiResponse(request)
-		if reading_id:
-			reading = Reading.query.filter_by(id = reading_id).first()
-			if reading: 
-				response += reading
-			else: 
-				response += exc.MissingReadingException(reading_id)			
+		response = ApiResponse(request)	
+		if request.args:
+			# print request.args.keys()
+			### Temporary hack to posting data but sending urlencoded data in a GET request
+			value = request.args['value']
+			sensor_id = request.args['sensor_id']
+			if Sensor.query.filter_by(id = sensor_id).all():
+				store_reading(response, sensor_id, value, datetime.now())
+				return 'OK'
+			else:
+				return 'ERROR'
 		else:
-			response += exc.IncompleteURLException(correct_url_format = 'GET /reading/<int:reading_id>')
+
+			if reading_id:
+				reading = Reading.query.filter_by(id = reading_id).first()
+				if reading: 
+					response += reading
+				else: 
+					response += exc.MissingReadingException(reading_id)			
+			else:
+				response += exc.IncompleteURLException(correct_url_format = 'GET /reading/<int:reading_id>')
 		return response.json()
 
 	def post(self):
